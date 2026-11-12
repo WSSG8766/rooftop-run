@@ -326,6 +326,54 @@ kbd{
 @media (max-width:620px){
   .char-pick{grid-template-columns:repeat(1,minmax(0,1fr))}
 }
+/* 五张卡片的最后一张占满整行，避免尾行只剩单个窄卡 */
+.char-pick > :last-child:nth-child(odd){grid-column:1/-1}
+.pick-label{
+  font-size:clamp(10px,.9vw,12px);
+  letter-spacing:.14em;
+  color:rgba(243,236,221,.6);
+  margin:0 0 8px;
+}
+.treasure-pick{margin-bottom:clamp(12px,1.6vw,18px)}
+
+/* ===== 游戏中：左侧宝物图标 + 冷却倒计时 ===== */
+.relic{
+  position:absolute;
+  left:clamp(10px,1.6vw,20px);
+  top:clamp(82px,12vh,124px);
+  width:clamp(44px,5vw,56px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  pointer-events:none;
+  transition:opacity .25s ease;
+}
+.relic[hidden]{display:none}
+.relic-icon{
+  width:100%;
+  aspect-ratio:1/1;
+  display:grid;
+  place-items:center;
+  padding:5px;
+  background:rgba(7,12,17,.5);
+  border:1px solid rgba(243,236,221,.2);
+  box-shadow:inset 0 0 0 1px rgba(243,236,221,.04);
+}
+.relic-icon svg{width:100%;height:100%;display:block}
+.relic-cd{
+  font-size:clamp(9px,.85vw,11px);
+  letter-spacing:.1em;
+  color:rgba(255,194,102,.9);
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.relic.off{opacity:.42}
+.relic.off .relic-cd{color:rgba(243,236,221,.55)}
+@media (max-width:760px), (hover:none) and (pointer:coarse){
+  .relic{top:56px;left:8px;width:40px}
+  .relic-cd{font-size:9px}
+}
 .char-card{
   appearance:none;
   display:flex;align-items:center;gap:10px;
@@ -411,7 +459,14 @@ kbd{
 
 @media (hover:none) and (pointer:coarse){
   .touch{display:block}
-  .energy{bottom:auto;top:clamp(46px,8vh,72px);left:50%;transform:translateX(-50%);width:min(42vw,220px)}
+}
+@media (hover:none) and (pointer:coarse), (max-width:760px){
+  .hud{padding:10px 12px}
+  .energy{
+    top:auto;bottom:8px;
+    left:50%;right:auto;transform:translateX(-50%);
+    width:min(44vw,190px);
+  }
 }
 @media (max-width:760px){
   .start-grid{grid-template-columns:1fr;gap:clamp(14px,3vw,22px);align-items:start}
@@ -484,6 +539,11 @@ kbd{
     <div class="energy-tip" id="energyTip">满槽后按 E 冲刺</div>
   </div>
 
+  <div class="relic" id="relicHud" hidden>
+    <div class="relic-icon" id="relicIcon"></div>
+    <div class="relic-cd" id="relicCd"></div>
+  </div>
+
   <div class="touch">
     <button class="tbtn t-dash" id="tDash">技能</button>
     <button class="tbtn t-slide" id="tSlide">滑铲</button>
@@ -495,7 +555,7 @@ kbd{
       <div class="start-copy">
         <div class="eyebrow">无尽跑酷 · 城市天台</div>
         <h1>夜行天台</h1>
-        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过低矮的悬梁与门架，跨过楼缝，把散落的能量攒满，再在整座城市的上方放出绝招。三位跑者三种绝招：<em>阿隼</em>御剑斩障，<em>小满</em>飞升提速，<em>齐衡</em>开盾挡下一次撞击。</p>
+        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过低矮的悬梁与门架，跨过楼缝，把散落的能量攒满，再在整座城市的上方放出绝招。五位跑者各有绝招：<em>阿隼</em>御剑斩障，<em>小满</em>飞升提速，<em>齐衡</em>开盾挡下一次撞击，<em>玄枢</em>滑翔并用回生法阵复活，<em>沈砚</em>四段跳、掷葫芦清场，葫芦碎了还能再替你挡一次。</p>
         <div class="char-pick" id="charPick" role="radiogroup" aria-label="选择跑者">
           <button type="button" class="char-card is-on" data-char="male" role="radio" aria-checked="true">
             <span class="char-face">
@@ -608,9 +668,37 @@ kbd{
             </span>
             <span class="char-meta"><b>玄枢</b><em>法师 · 滑翔 + 回生法阵</em></span>
           </button>
+          <button type="button" class="char-card" data-char="wuxia" role="radio" aria-checked="false">
+            <span class="char-face">
+              <svg viewBox="0 0 40 40" aria-hidden="true">
+                <ellipse cx="20" cy="37" rx="9" ry="2" fill="rgba(0,0,0,.28)"/>
+                <path d="M6.5 40c0-8 6-12.5 13.5-12.5s13.5 4.5 13.5 12.5z" fill="#dfe7e0"/>
+                <path d="M15 28.4l5 8.6 5-8.6" stroke="#e0b15a" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+                <circle cx="20" cy="18.4" r="8.6" fill="#f0c8a0"/>
+                <path d="M10.8 17.6c0-6.6 4-9.4 9.2-9.4s9.2 2.8 9.2 9.4c-1.6-3.2-4.4-4.8-9.2-4.8s-7.6 1.6-9.2 4.8z" fill="#22261f"/>
+                <ellipse cx="20" cy="9.6" rx="13.6" ry="3.4" fill="#c9b183"/>
+                <path d="M20 1.2l8.8 8.4H11.2z" fill="#e3cf9f"/>
+                <path d="M20 1.2l8.8 8.4H20z" fill="#cdb27c"/>
+                <path d="M11.6 9.4c5.4 1.8 11.4 1.8 16.8 0" stroke="#8f7748" stroke-width="1.1" fill="none"/>
+                <ellipse cx="16.8" cy="19.2" rx="2" ry="2.4" fill="#fffdf8"/>
+                <ellipse cx="23.2" cy="19.2" rx="2" ry="2.4" fill="#fffdf8"/>
+                <ellipse cx="17" cy="19.4" rx="1.3" ry="1.7" fill="#4a3a22"/>
+                <ellipse cx="23" cy="19.4" rx="1.3" ry="1.7" fill="#4a3a22"/>
+                <circle cx="16.4" cy="18.4" r=".7" fill="#fff"/>
+                <circle cx="22.4" cy="18.4" r=".7" fill="#fff"/>
+                <path d="M18.6 23.6q1.4 1.2 2.8 0" stroke="rgba(150,60,54,.6)" stroke-width="1.1" fill="none"/>
+                <circle cx="31" cy="21.6" r="3.2" fill="#e8b45c"/>
+                <circle cx="31" cy="26.4" r="4.2" fill="#f2c877"/>
+                <path d="M31 26.4c1.6 0 2.4 1.2 2.4 2.6" stroke="#a9762f" stroke-width=".9" fill="none"/>
+                <circle cx="30" cy="20.4" r="1" fill="#fff6dc"/>
+              </svg>
+            </span>
+            <span class="char-meta"><b>沈砚</b><em>侠客 · 四段跳 + 葫芦击</em></span>
+          </button>
         </div>
         <div class="start-actions">
           <button class="btn-ghost" id="charBtn" type="button">选择角色<b id="charBtnName">阿隼</b></button>
+          <button class="btn-ghost" id="treasureBtn" type="button">宝物<b id="treasureBtnName">未携带</b></button>
           <button class="btn-primary" id="startBtn">开始奔跑</button>
           <div class="best-line">最佳 <b id="startBest">—</b></div>
         </div>
@@ -618,6 +706,7 @@ kbd{
           <span><b>跳跃</b>右下按钮</span>
           <span><b>滑铲</b>左下按钮</span>
           <span><b>技能</b>左边缘按钮</span>
+          <span><b>能量槽</b>底部（满槽跳跃不耗能量）</span>
         </div>
         <div class="ios-note" id="iosNote" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -642,6 +731,7 @@ kbd{
           <p id="skillDesc">能量满 100 时触发 <b>超频</b>：消耗 90 点能量（留 10 点），3.4 秒无敌撞碎障碍，收招时清空场上障碍。</p>
         </div>
         <div class="side-note">碰撞或坠楼即结束本局。速度会随距离逐渐加快，<em>连击拾取</em>能把单颗能量推到 8 倍分。</div>
+        <div class="side-note">宝物：<em>羽扇</em>每 15 秒起风清空障碍；<em>项链</em>死亡复活一次并充满能量（每局一次）；<em>戒指</em>能量槽上限降低 5%；<em>钻石</em>放技能有 15% 概率不耗能量；<em>水晶</em>三段跳后落雷劈掉前方一个障碍。</div>
       </div>
     </div>
     <div class="start-foot">ENTER / 空格 开始</div>
@@ -656,7 +746,99 @@ kbd{
         </div>
         <button class="btn-ghost" id="charBack" type="button">返回</button>
       </div>
-      <div class="char-panel-body" id="charPanelBody"></div>
+      <div class="char-panel-body" id="charPanelBody">
+        <div id="treasureBlock">
+          <div class="pick-label">宝物 · 每位跑者可搭配一件</div>
+          <div class="char-pick treasure-pick" id="treasurePick" role="radiogroup" aria-label="选择宝物">
+            <button type="button" class="char-card is-on" data-treasure="" role="radio" aria-checked="true">
+              <span class="char-face">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <circle cx="20" cy="20" r="12.5" fill="none" stroke="#6f7d86" stroke-width="1.6" stroke-dasharray="3 3"/>
+                  <path d="M14 26l6-12 6 12" stroke="#8fa89c" stroke-width="2" fill="none" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="char-meta"><b>空手</b><em>不携带宝物</em></span>
+            </button>
+            <button type="button" class="char-card" data-treasure="fan" role="radio" aria-checked="false">
+              <span class="char-face">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <path d="M20 30l-1-6z" fill="none"/>
+                  <path d="M20 28l-4 10" stroke="#8a6a34" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M20 29c-9 0-15-6-15-13 8 2 12 6 15 13z" fill="#f4e2b8"/>
+                  <path d="M20 29c9 0 15-6 15-13-8 2-12 6-15 13z" fill="#e8cf9a"/>
+                  <path d="M20 29c-5-3-7-8-6-14 5 3 7 8 6 14z" fill="#dfc07f"/>
+                  <path d="M20 29c5-3 7-8 6-14-5 3-7 8-6 14z" fill="#efd9a8"/>
+                  <path d="M20 29c-2-4-2-9 0-13 2 4 2 9 0 13z" fill="#fff3d4"/>
+                  <circle cx="20" cy="29.4" r="2.4" fill="#b8863c"/>
+                </svg>
+              </span>
+              <span class="char-meta"><b>羽扇</b><em>每 15 秒起风清场</em></span>
+            </button>
+            <button type="button" class="char-card" data-treasure="necklace" role="radio" aria-checked="false">
+              <span class="char-face">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <path d="M12 11q4 12 8 12 4 0 8-12" stroke="#d8b36a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                  <circle cx="20" cy="24" r="3" fill="#f0d79a"/>
+                  <circle cx="20" cy="28" r="5.4" fill="#7fd8c4"/>
+                  <circle cx="20" cy="28" r="5.4" fill="none" stroke="#e8d6a4" stroke-width="1.4"/>
+                  <path d="M17.6 28l1.6-1.8 1.4 2 1.6-2" stroke="#ffffff" stroke-width="1.1" fill="none" opacity=".8"/>
+                </svg>
+              </span>
+              <span class="char-meta"><b>项链</b><em>死亡复活一次并充满能量</em></span>
+            </button>
+            <button type="button" class="char-card" data-treasure="ring" role="radio" aria-checked="false">
+              <span class="char-face">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <circle cx="20" cy="24" r="10" fill="none" stroke="#e8d6a4" stroke-width="3"/>
+                  <path d="M20 6l6 6-6 6-6-6z" fill="#c9a6ff"/>
+                  <path d="M20 6l6 6-6 6z" fill="#9b7be0"/>
+                  <path d="M20 13.6l3 4-3 3-3-3z" fill="#efe2ff" opacity=".85"/>
+                </svg>
+              </span>
+              <span class="char-meta"><b>戒指</b><em>能量槽上限 −5%</em></span>
+            </button>
+            <button type="button" class="char-card" data-treasure="diamond" role="radio" aria-checked="false">
+              <span class="char-face">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <path d="M20 6l10 8-10 20-10-20z" fill="#bfe9ff"/>
+                  <path d="M20 6l10 8-10 20z" fill="#7fd0f0"/>
+                  <path d="M10 14h20" stroke="#efe2ff" stroke-width="1.2" opacity=".6"/>
+                  <path d="M20 6l-6 8 6 20 6-20z" fill="#eef9ff" opacity=".55"/>
+                  <circle cx="16.6" cy="11.6" r="1.6" fill="#ffffff"/>
+                </svg>
+              </span>
+              <span class="char-meta"><b>钻石</b><em>放技能 15% 概率不耗能量</em></span>
+            </button>
+            <button type="button" class="char-card" data-treasure="crystal" role="radio" aria-checked="false">
+              <span class="char-face">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <path d="M16 34l-5-13 3-7 4 5z" fill="#8ff0e2"/>
+                  <path d="M16 34l-5-13 3-7z" fill="#54c8bd"/>
+                  <path d="M24 34l-2-17 4-8 5 9z" fill="#c6fff6"/>
+                  <path d="M24 34l-2-17 4-8z" fill="#66d9cd"/>
+                  <path d="M8 16l-2 6 1 4 3-4z" fill="#a9f3e9"/>
+                  <path d="M19 9l-3-5 5 1z" stroke="#e9fffb" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="char-meta"><b>水晶</b><em>三段跳后闪电消灭前方障碍</em></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="start-foot">选中后自动返回</div>
+    </div>
+  </div>
+
+  <div class="overlay overlay--char" id="treasureScreen">
+    <div class="char-panel">
+      <div class="char-panel-head">
+        <div>
+          <h2>选择宝物</h2>
+          <p>每局可搭配一件宝物，也可以空手</p>
+        </div>
+        <button class="btn-ghost" id="treasureBack" type="button">返回</button>
+      </div>
+      <div class="char-panel-body" id="treasurePanelBody"></div>
       <div class="start-foot">选中后自动返回</div>
     </div>
   </div>
@@ -792,6 +974,7 @@ const CHARS = {
     id: 'mage',
     name: '玄枢',
     fly: false,
+    mage: true,
     glide: true,
     passive: true,
     meterMax: 150,
@@ -811,13 +994,51 @@ const CHARS = {
     scarfSoft: 'rgba(143,107,255,.5)',
     rgb: '198,160,255',
     burst: 'rgba(198,160,255,.9)'
+  },
+  wuxia: {
+    id: 'wuxia',
+    name: '沈砚',
+    fly: false,
+    wuxia: true,
+    jumps: 4,
+    freeThird: true,
+    meterMax: 150,
+    dashDur: 0,
+    dashName: '葫芦击',
+    energyName: '元气',
+    ult: '葫芦击',
+    tipIdle: '元气攒满 150 按 E 掷葫芦',
+    tipFull: 'E 葫芦击已就绪',
+    skillHTML: '<b>四段跳</b>：第三段不耗元气，第四段消耗 10 点元气。<br><b>葫芦击</b>：元气槽上限 150，攒满后按 E，消耗 140 点元气（留 10 点），葫芦脱手飞出、清空场上障碍，随后飞回身前。<br><b>葫芦护主</b>：死亡时葫芦碎裂替你挡下，原地复活并获得 0.5 秒无敌；此后葫芦已碎，元气无法再蓄、技能失效。',
+    jacket: '#dfe7e0',
+    jacketLight: '#f4f8f3',
+    jacketDeep: '#8fa89c',
+    pantsA: '#3d4a44',
+    pantsB: '#2b352f',
+    scarf: '#e0b15a',
+    scarfSoft: 'rgba(224,177,90,.5)',
+    rgb: '224,177,90',
+    burst: 'rgba(224,177,90,.9)'
   }
 };
-const CHAR_IDS = ['male', 'female', 'sci', 'mage'];
+const CHAR_IDS = ['male', 'female', 'sci', 'mage', 'wuxia'];
+/* ===== 宝物：每位跑者可搭配一件 ===== */
+const TREASURES = {
+  '': { id: '', name: '未携带', desc: '不带宝物' },
+  fan: { id: 'fan', name: '羽扇', desc: '每 15 秒挥出一阵风，摧毁当前场上的障碍' },
+  necklace: { id: 'necklace', name: '项链', desc: '死亡后复活一次，并立刻充满能量槽（每局限一次）' },
+  ring: { id: 'ring', name: '戒指', desc: '能量槽上限降低 5%' },
+  diamond: { id: 'diamond', name: '钻石', desc: '释放技能后有 15% 概率不消耗能量' },
+  crystal: { id: 'crystal', name: '水晶', desc: '三段跳后召唤闪电，消灭前方一个障碍物' }
+};
+const TREASURE_IDS = ['', 'fan', 'necklace', 'ring', 'diamond', 'crystal'];
 let savedChar = 'male';
+let savedTreasure = '';
 try {
   const c = localStorage.getItem('rooftop-run-char-v1');
   if (c && CHARS[c]) savedChar = c;
+  const t = localStorage.getItem('rooftop-run-treasure-v1');
+  if (t !== null && TREASURES[t]) savedTreasure = t;
 } catch (err) {}
 const W = RULESET.W, H = RULESET.H, GROUND = RULESET.groundY;
 const PLAYER_X = 330;
@@ -990,6 +1211,9 @@ const state = {
   dashT: 0,
   swordT: 0,
   staffT: 0,
+  gourdT: 0,
+  gourdAlive: true,
+  meterLocked: false,
   shield: false,
   shieldT: 0,
   invulnT: 0,
@@ -1002,6 +1226,13 @@ const state = {
   crashT: 0,
   crashReason: 'hit',
   char: savedChar,
+  treasure: savedTreasure,
+  fanT: 15,
+  necklaceUsed: false,
+  windT: 0,
+  boltT: 0,
+  boltX: 0,
+  boltY: 0,
   shake: 0,
   elapsed: 0,
   best: loadBest(),
@@ -1178,14 +1409,68 @@ function requestJump() {
 }
 function meterCap(id) {
   const spec = CHARS[id || state.char];
-  return spec.meterMax || RULESET.meterMax;
+  const base = spec.meterMax || RULESET.meterMax;
+  /* 戒指：能量槽上限降低 5% */
+  return state.treasure === 'ring' ? Math.round(base * 0.95) : base;
+}
+/* 钻石：15% 概率技能免消耗 */
+function paySkillCost(amount) {
+  if (state.treasure === 'diamond' && Math.random() < 0.15) {
+    floatText(PLAYER_X, player.feetY - 152, '钻石 · 零消耗', 'rgba(190,236,255,1)');
+    burst(PLAYER_X, player.feetY - 64, 18, 'rgba(190,236,255,.9)', 280, 46);
+    sfx('djump');
+    return true;
+  }
+  state.meter = Math.max(0, state.meter - amount);
+  return false;
+}
+/* 水晶：闪电劈掉前方最近的一个障碍 */
+function crystalStrike() {
+  let best = null;
+  let bestSx = 0;
+  for (let i = 0; i < world.obstacles.length; i++) {
+    const o = world.obstacles[i];
+    if (o.dead) continue;
+    const sx = o.x - state.worldX;
+    if (sx < PLAYER_X + 40 || sx > PLAYER_X + 760) continue;
+    if (!best || sx < bestSx) { best = o; bestSx = sx; }
+  }
+  state.boltT = 0.42;
+  state.boltX = best ? bestSx + (best.w || 60) * 0.5 : PLAYER_X + 260;
+  state.boltY = best ? (best.type === 'beam' || best.type === 'gate' ? GROUND - 40 : GROUND - best.h) : GROUND;
+  state.shake = Math.max(state.shake, 8);
+  sfx('break');
+  if (best) {
+    best.dead = true;
+    state.shardPts += 15;
+    floatText(state.boltX, state.boltY - 30, '+15', 'rgba(166,255,246,1)');
+  }
+  floatText(state.boltX, state.boltY - 90, '水晶 · 落雷', 'rgba(198,255,248,1)');
+  burst(state.boltX, state.boltY - 14, 18, 'rgba(198,255,248,.95)', 300, 40);
 }
 function requestDash() {
   if (state.mode !== 'run') return;
   if (state.dashT > 0) return;
-  const spec = CHARS[state.char];
-  if (spec.passive) {
+  const spec = CHARS[state.char];  if (spec.passive) {
     floatText(PLAYER_X, player.feetY - 126, '法阵自动待命', 'rgba(198,160,255,.9)');
+    return;
+  }
+  if (spec.wuxia) {
+    if (!state.gourdAlive) {
+      floatText(PLAYER_X, player.feetY - 126, '葫芦已碎 · 技能失效', 'rgba(224,177,90,.85)');
+      return;
+    }
+    if (state.meter < meterCap()) {
+      if (state.meter > 0) floatText(PLAYER_X, player.feetY - 120, '元气未满 ' + Math.round(state.meter) + '/150', 'rgba(243,236,221,.75)');
+      return;
+    }
+    paySkillCost(140);
+    state.gourdT = 1.5;
+    state.shake = Math.max(state.shake, 9);
+    sfx('dash');
+    clearObstacles();
+    burst(PLAYER_X + 66, player.feetY - 70, 20, spec.burst, 320, 40);
+    floatText(PLAYER_X, player.feetY - 132, spec.ult, 'rgba(' + spec.rgb + ',1)');
     return;
   }
   if (spec.shield && state.shield) {
@@ -1196,7 +1481,7 @@ function requestDash() {
     if (state.meter > 0) floatText(PLAYER_X, player.feetY - 120, '能量未满 ' + Math.round(state.meter) + '%', 'rgba(243,236,221,.75)');
     return;
   }
-  state.meter = Math.max(0, state.meter - RULESET.skillCost);
+  paySkillCost(RULESET.skillCost);
   if (spec.shield) {
     state.shield = true;
     state.shieldT = 5;
@@ -1307,7 +1592,18 @@ const charBtnName = document.getElementById('charBtnName');
 const charScreen = document.getElementById('charScreen');
 const charBack = document.getElementById('charBack');
 const charPanelBody = document.getElementById('charPanelBody');
+const treasureBlock = document.getElementById('treasureBlock');
+const treasurePick = document.getElementById('treasurePick');
+const treasureBtn = document.getElementById('treasureBtn');
+const treasureBtnName = document.getElementById('treasureBtnName');
+const treasureScreen = document.getElementById('treasureScreen');
+const treasurePanelBody = document.getElementById('treasurePanelBody');
+const treasureBack = document.getElementById('treasureBack');
+const relicHud = document.getElementById('relicHud');
+const relicIcon = document.getElementById('relicIcon');
+const relicCd = document.getElementById('relicCd');
 if (charPick && charPanelBody) charPanelBody.appendChild(charPick);
+if (treasureBlock && treasurePanelBody) treasurePanelBody.appendChild(treasureBlock);
 const skillDesc = document.getElementById('skillDesc');
 const overKicker = document.getElementById('overKicker');
 const overTitle = document.getElementById('overTitle');
@@ -1334,10 +1630,61 @@ function applyChar() {
   if (charBtnName) charBtnName.textContent = spec.name;
   const cards = charPick.querySelectorAll('.char-card');
   for (let i = 0; i < cards.length; i++) {
+    if (!cards[i].dataset.char) continue;
     const on = cards[i].dataset.char === state.char;
     cards[i].classList.toggle('is-on', on);
     cards[i].setAttribute('aria-checked', on ? 'true' : 'false');
   }
+}
+function applyTreasure() {
+  const t = TREASURES[state.treasure] || TREASURES[''];
+  if (treasureBtnName) treasureBtnName.textContent = t.name;
+  state.meter = Math.min(state.meter, meterCap());
+  energyVal.textContent = Math.round(state.meter) + '/' + meterCap();
+  energyFill.style.width = Math.min(100, Math.round(state.meter / meterCap() * 100)) + '%';
+  if (!treasurePick) return;
+  const cards = treasurePick.querySelectorAll('.char-card');
+  for (let i = 0; i < cards.length; i++) {
+    const on = cards[i].dataset.treasure === state.treasure;
+    cards[i].classList.toggle('is-on', on);
+    cards[i].setAttribute('aria-checked', on ? 'true' : 'false');
+  }
+}
+/* ===== 游戏中左侧宝物图标与冷却 ===== */
+const RELIC_SVG = {
+  fan: '<svg viewBox="0 0 40 40"><path d="M20 28l-4 10" stroke="#8a6a34" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M20 29c-9 0-15-6-15-13 8 2 12 6 15 13z" fill="#f4e2b8"/><path d="M20 29c9 0 15-6 15-13-8 2-12 6-15 13z" fill="#e8cf9a"/><path d="M20 29c-5-3-7-8-6-14 5 3 7 8 6 14z" fill="#dfc07f"/><path d="M20 29c5-3 7-8 6-14-5 3-7 8-6 14z" fill="#efd9a8"/><path d="M20 29c-2-4-2-9 0-13 2 4 2 9 0 13z" fill="#fff3d4"/><circle cx="20" cy="29.4" r="2.4" fill="#b8863c"/></svg>',
+  necklace: '<svg viewBox="0 0 40 40"><path d="M12 11q4 12 8 12 4 0 8-12" stroke="#d8b36a" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="20" cy="24" r="3" fill="#f0d79a"/><circle cx="20" cy="28" r="5.4" fill="#7fd8c4"/><circle cx="20" cy="28" r="5.4" fill="none" stroke="#e8d6a4" stroke-width="1.4"/><path d="M17.6 28l1.6-1.8 1.4 2 1.6-2" stroke="#ffffff" stroke-width="1.1" fill="none" opacity=".8"/></svg>',
+  ring: '<svg viewBox="0 0 40 40"><circle cx="20" cy="24" r="10" fill="none" stroke="#e8d6a4" stroke-width="3"/><path d="M20 6l6 6-6 6-6-6z" fill="#c9a6ff"/><path d="M20 6l6 6-6 6z" fill="#9b7be0"/><path d="M20 13.6l3 4-3 3-3-3z" fill="#efe2ff" opacity=".85"/></svg>',
+  diamond: '<svg viewBox="0 0 40 40"><path d="M20 6l10 8-10 20-10-20z" fill="#bfe9ff"/><path d="M20 6l10 8-10 20z" fill="#7fd0f0"/><path d="M10 14h20" stroke="#efe2ff" stroke-width="1.2" opacity=".6"/><path d="M20 6l-6 8 6 20 6-20z" fill="#eef9ff" opacity=".55"/><circle cx="16.6" cy="11.6" r="1.6" fill="#ffffff"/></svg>',
+  crystal: '<svg viewBox="0 0 40 40"><path d="M16 34l-5-13 3-7 4 5z" fill="#8ff0e2"/><path d="M16 34l-5-13 3-7z" fill="#54c8bd"/><path d="M24 34l-2-17 4-8 5 9z" fill="#c6fff6"/><path d="M24 34l-2-17 4-8z" fill="#66d9cd"/><path d="M8 16l-2 6 1 4 3-4z" fill="#a9f3e9"/></svg>'
+};
+let relicSvgCache = '';
+function syncRelic() {
+  if (!relicHud) return;
+  const t = state.treasure;
+  const show = !!t && state.mode !== 'start' && state.mode !== 'over';
+  if (!show) { relicHud.hidden = true; return; }
+  relicHud.hidden = false;
+  if (relicSvgCache !== t) {
+    relicSvgCache = t;
+    relicIcon.innerHTML = RELIC_SVG[t] || '';
+  }
+  let txt = '';
+  let off = false;
+  if (t === 'fan') {
+    txt = Math.max(0, Math.ceil(state.fanT)) + 's';
+  } else if (t === 'necklace') {
+    txt = state.necklaceUsed ? '已用' : '待命';
+    off = state.necklaceUsed;
+  } else if (t === 'diamond') {
+    txt = '15%';
+  } else if (t === 'crystal') {
+    txt = '三段跳';
+  } else {
+    txt = '−5%';
+  }
+  if (relicCd.textContent !== txt) relicCd.textContent = txt;
+  relicHud.classList.toggle('off', off);
 }
 if (charPick) {
   charPick.addEventListener('click', (e) => {
@@ -1364,6 +1711,29 @@ if (charBtn) {
     if (charScreen) charScreen.classList.add('show');
   });
 }
+if (treasurePick) {
+  treasurePick.addEventListener('click', (e) => {
+    const card = e.target.closest('.char-card');
+    if (!card || state.mode !== 'start') return;
+    if (card.dataset.treasure === undefined) return;
+    state.treasure = card.dataset.treasure;
+    try { localStorage.setItem('rooftop-run-treasure-v1', state.treasure); } catch (err) {}
+    applyTreasure();
+    burst(PLAYER_X, GROUND - 50, 10, 'rgba(232,214,164,.9)', 160, 40);
+    if (treasureScreen) treasureScreen.classList.remove('show');
+  });
+}
+if (treasureBtn) {
+  treasureBtn.addEventListener('click', () => {
+    if (state.mode !== 'start') return;
+    if (treasureScreen) treasureScreen.classList.add('show');
+  });
+}
+if (treasureBack) {
+  treasureBack.addEventListener('click', () => {
+    if (treasureScreen) treasureScreen.classList.remove('show');
+  });
+}
 if (charBack) {
   charBack.addEventListener('click', () => {
     if (charScreen) charScreen.classList.remove('show');
@@ -1380,9 +1750,14 @@ function resetRun() {
   state.dashT = 0;
   state.swordT = 0;
   state.staffT = 0;
+  state.gourdT = 0;
+  state.gourdAlive = true;
+  state.meterLocked = false;
   state.shield = false;
   state.shieldT = 0;
   state.invulnT = 0;
+  state.fanT = 15;
+  state.necklaceUsed = false;
   state.shards = 0;
   state.shardPts = 0;
   state.combo = 1;
@@ -1420,6 +1795,7 @@ function startGame() {
   state.mode = 'run';
   startScreen.classList.remove('show');
   if (charScreen) charScreen.classList.remove('show');
+  if (treasureScreen) treasureScreen.classList.remove('show');
   overScreen.classList.remove('show');
   pauseScreen.classList.remove('show');
   startBestEl.textContent = state.best.dist ? state.best.dist + ' 米' : '—';
@@ -1434,6 +1810,7 @@ function goHome() {
   overScreen.classList.remove('show');
   pauseScreen.classList.remove('show');
   if (charScreen) charScreen.classList.remove('show');
+  if (treasureScreen) treasureScreen.classList.remove('show');
   startScreen.classList.add('show');
   startBestEl.textContent = state.best.dist ? state.best.dist + ' 米' : '—';
 }
@@ -1510,24 +1887,33 @@ function syncHud() {
     energyVal.textContent = meter + '/' + cap;
   }
   const full = state.meter >= cap;
-  if (full !== hudCache.full) {
+  const tipNow = state.meterLocked ? '葫芦已碎 · 元气枯竭，技能失效'
+    : (full ? spec.tipFull : spec.tipIdle);
+  if (full !== hudCache.full || tipNow !== hudCache.tip) {
     hudCache.full = full;
+    hudCache.tip = tipNow;
     energyEl.classList.toggle('full', full);
-    energyTip.textContent = full ? spec.tipFull : spec.tipIdle;
+    energyTip.textContent = tipNow;
   }
   const dashing = state.dashT > 0;
   const shieldOn = !!state.shield;
   const armed = !!spec.mage && state.meter >= meterCap();
-  const chipOn = dashing || shieldOn || armed;
+  const gourdFly = state.char === 'wuxia' && state.gourdT > 0;
+  const fanOn = state.treasure === 'fan';
+  const chipOn = dashing || shieldOn || armed || gourdFly || fanOn || (!!spec.wuxia && !state.gourdAlive);
   const chipText = dashing ? spec.dashName + ' ' + state.dashT.toFixed(1) + 's'
     : (shieldOn ? '护盾 ' + state.shieldT.toFixed(1) + 's'
-      : (armed ? '回生法阵待命' : spec.dashName));
+      : (armed ? '回生法阵待命'
+        : (gourdFly ? '葫芦击 · 掷出'
+          : (!!spec.wuxia && !state.gourdAlive ? '葫芦已碎'
+            : (fanOn ? '羽扇 ' + Math.ceil(state.fanT) + 's' : spec.dashName)))));
   if (chipOn !== hudCache.dash) {
     hudCache.dash = chipOn;
     dashChip.classList.toggle('on', chipOn);
     metricEl.classList.toggle('boost', chipOn);
   }
   if (dashChip.textContent !== chipText) dashChip.textContent = chipText;
+  syncRelic();
 }
 /* ===== 玩家动作 ===== */
 function doJump(stage, cost) {
@@ -1554,6 +1940,8 @@ function doJump(stage, cost) {
     burst(PLAYER_X, player.feetY - 26, 14, 'rgba(255,194,102,.9)', 220, 0);
     floatText(PLAYER_X, player.feetY - 118, '三段跳', 'rgba(255,194,102,.95)');
   }
+  /* 水晶：三段跳落地前召唤闪电，劈掉前方一个障碍 */
+  if (stage === 3 && state.treasure === 'crystal' && state.mode === 'run') crystalStrike();
 }
 function updatePlayer(dt) {
   const wx = state.worldX + PLAYER_X;
@@ -1605,13 +1993,17 @@ function updatePlayer(dt) {
     player.vy = Math.max(player.vy, 640);
     player.sliding = false;
   }
-  /* 跳跃（含缓冲与土狼时间）：二段跳免费，三段跳消耗 10 点能量 */
+  /* 跳跃（含缓冲与土狼时间）：二段免费，三段扣能量（侠客第三段免费），侠客可四段跳；能量满槽时全免费 */
   if (input.jumpBuffer > 0) {
+    const spec = CHARS[state.char];
+    const maxJumps = spec.jumps || 3;
     if (player.onGround || player.coyote > 0) {
       if (!player.sliding) doJump(1, 0);
-    } else if (player.jumps < 3) {
+    } else if (player.jumps < maxJumps) {
       const stage = Math.max(2, player.jumps + 1);
-      const cost = stage === 2 ? 0 : RULESET.tripleJumpCost;
+      const freeJump = state.meter >= meterCap();
+      const freeStage = stage === 2 || (stage === 3 && spec.freeThird);
+      const cost = freeJump || freeStage ? 0 : RULESET.tripleJumpCost;
       if (state.meter >= cost) doJump(stage, cost);
     }
   }
@@ -1647,7 +2039,113 @@ function updatePlayer(dt) {
   }
   /* 掉出楼缝：跌过地面线往下就再也上不来，落到画面底端即判定坠楼 */
   if (player.feetY > GROUND + 26) player.onGround = false;
-  if (player.feetY > H + 30) crash('fall');
+  if (player.feetY > H + 30) {
+    const byMage = mageArmed();
+    const byGourd = wuxiaArmed();
+    const byNecklace = necklaceArmed();
+    if ((byMage || byGourd || byNecklace) && climbBackToRoof()) {
+      if (byMage) doMageRevive();
+      else if (byGourd) doWuxiaRevive();
+      else doNecklaceRevive();
+    } else {
+      crash('fall');
+    }
+  }
+}
+/* 复活时把角色挪回最近的一块屋顶落地，成功返回 true */
+function climbBackToRoof() {
+  const wx = state.worldX + PLAYER_X;
+  let land = null;
+  for (let i = 0; i < world.platforms.length; i++) {
+    const p = world.platforms[i];
+    if (wx >= p.start - 60 && wx <= p.end - 80) { land = p; break; }
+  }
+  if (!land) {
+    for (let i = 0; i < world.platforms.length; i++) {
+      const p = world.platforms[i];
+      if (p.start > wx && p.end - p.start > 240) { land = p; break; }
+    }
+  }
+  if (!land) return false;
+  const px = Math.min(land.end - 90, Math.max(land.start + 90, wx));
+  state.worldX = px - PLAYER_X;
+  player.feetY = GROUND;
+  player.vy = 0;
+  player.onGround = true;
+  player.jumps = 0;
+  player.sliding = false;
+  player.gliding = false;
+  return true;
+}
+function mageArmed() {
+  return !!CHARS[state.char].mage && state.meter >= meterCap('mage');
+}
+function wuxiaArmed() {
+  return !!CHARS[state.char].wuxia && state.gourdAlive && state.mode === 'run';
+}
+/* 项链：每局一次的通用复活 */
+function necklaceArmed() {
+  return state.treasure === 'necklace' && !state.necklaceUsed && state.mode === 'run';
+}
+function doNecklaceRevive() {
+  state.necklaceUsed = true;
+  state.meter = meterCap();
+  state.invulnT = 1;
+  state.shake = 13;
+  clearObstacles();
+  sfx('dash');
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * 6.283 + state.time;
+    burst(PLAYER_X + Math.cos(a) * 26, player.feetY - 58 + Math.sin(a) * 26, 12, 'rgba(127,216,196,.9)', 260, 20);
+  }
+  burst(PLAYER_X, player.feetY - 60, 24, 'rgba(240,215,154,.9)', 320, 36);
+  floatText(PLAYER_X, player.feetY - 140, '项链护佑', 'rgba(127,216,196,1)');
+  floatText(PLAYER_X, player.feetY - 108, '复活 · 能量充满', 'rgba(240,215,154,.95)');
+}
+/* 羽扇：一阵狂风扫过，摧毁当前场上的障碍 */
+function fanGust() {
+  clearObstacles();
+  state.windT = 0.9;
+  state.shake = Math.max(state.shake, 9);
+  sfx('dash');
+  for (let i = 0; i < 6; i++) {
+    burst(W * (0.1 + i * 0.15), GROUND - 30 - i * 20, 10, 'rgba(236,246,240,.5)', 240, 40);
+  }
+  floatText(PLAYER_X + 180, player.feetY - 190, '羽扇 · 狂风过境', 'rgba(224,240,230,.95)');
+}
+function doMageRevive() {
+  state.meter = 0;
+  state.invulnT = 0.5;
+  state.staffT = 0.5;
+  state.shake = 14;
+  /* 法阵爆发：清空当前视野内的全部障碍 */
+  clearObstacles();
+  for (let i = 0; i < 3; i++) {
+    burst(W * (0.3 + i * 0.2), GROUND - 60, 10, 'rgba(198,160,255,.8)', 220, 34);
+  }
+  sfx('dash');
+  burst(PLAYER_X, player.feetY - 52, 26, 'rgba(198,160,255,.95)', 320, 30);
+  burst(PLAYER_X, player.feetY - 96, 16, 'rgba(232,214,255,.9)', 240, 40);
+  floatText(PLAYER_X, player.feetY - 140, '回生法阵', 'rgba(198,160,255,1)');
+  floatText(PLAYER_X, player.feetY - 108, '复活 · 清场 · 0.5s 无敌', 'rgba(232,214,255,.9)');
+}
+function doWuxiaRevive() {
+  /* 葫芦碎一次：挡下这次死亡，之后元气无法再蓄、技能失效 */
+  state.gourdAlive = false;
+  state.gourdT = 0;
+  state.meter = 0;
+  state.meterLocked = true;
+  state.invulnT = 0.5;
+  state.shake = 14;
+  clearObstacles();
+  sfx('break');
+  for (let i = 0; i < 9; i++) {
+    const a = rand(0, 6.283);
+    burst(PLAYER_X + 42 + Math.cos(a) * 14, player.feetY - 62 + Math.sin(a) * 14, 4, 'rgba(242,200,119,.95)', 260, 26);
+  }
+  burst(PLAYER_X, player.feetY - 64, 22, 'rgba(224,177,90,.9)', 320, 34);
+  floatText(PLAYER_X, player.feetY - 140, '葫芦碎裂', 'rgba(242,200,119,1)');
+  floatText(PLAYER_X, player.feetY - 108, '复活 · 元气枯竭', 'rgba(240,208,140,.9)');
 }
 function playerBox() {
   const h = player.sliding ? 48 : 92;
@@ -1705,18 +2203,21 @@ function collide() {
         burst(sx + o.w / 2, oy + oh * 0.5, 26, 'rgba(255,217,79,.95)', 340, 20);
         burst(PLAYER_X, player.feetY - 50, 18, 'rgba(255,240,168,.9)', 260, 30);
         floatText(PLAYER_X, player.feetY - 132, '护盾抵挡', 'rgba(255,217,79,1)');
-      } else if (spec.mage && state.meter >= meterCap('mage')) {
+      } else if (mageArmed()) {
         /* 回生法阵：受击瞬间用尽全部法能复活，0.5 秒无敌 */
-        state.meter = 0;
-        state.invulnT = 0.5;
-        state.staffT = 0.5;
         o.dead = true;
-        state.shake = 14;
-        sfx('dash');
+        doMageRevive();
         burst(sx + o.w / 2, oy + oh * 0.5, 28, 'rgba(198,160,255,.95)', 360, 24);
-        burst(PLAYER_X, player.feetY - 52, 20, 'rgba(232,214,255,.9)', 280, 40);
-        floatText(PLAYER_X, player.feetY - 140, '回生法阵', 'rgba(198,160,255,1)');
-        floatText(PLAYER_X, player.feetY - 108, '复活 · 0.5s 无敌', 'rgba(232,214,255,.9)');
+        return;
+      } else if (wuxiaArmed()) {
+        /* 葫芦护主：葫芦碎裂挡下这次死亡，此后技能失效 */
+        o.dead = true;
+        doWuxiaRevive();
+        return;
+      } else if (necklaceArmed()) {
+        /* 项链护佑：每局一次的通用复活，并把能量充满 */
+        o.dead = true;
+        doNecklaceRevive();
         return;
       } else {
         crash('hit');
@@ -1746,7 +2247,7 @@ function collect() {
       state.maxCombo = Math.max(state.maxCombo, state.combo);
       state.comboT = RULESET.comboWindow;
       /* 技能生效期间不吸收能量 */
-      if (state.dashT <= 0) state.meter = Math.min(meterCap(), state.meter + RULESET.shardGain);
+      if (state.dashT <= 0 && !state.meterLocked) state.meter = Math.min(meterCap(), state.meter + RULESET.shardGain);
       sfx('coin');
       burst(sx, s.y, 7, 'rgba(255,214,140,.9)', 150, 0);
       floatText(sx, s.y - 18, '+' + pts, 'rgba(255,214,140,1)');
@@ -1785,6 +2286,17 @@ function updateRun(dt) {
   state.dashT = Math.max(0, state.dashT - dt);
   state.swordT = Math.max(0, state.swordT - dt);
   state.staffT = Math.max(0, state.staffT - dt);
+  state.gourdT = Math.max(0, state.gourdT - dt);
+  state.windT = Math.max(0, (state.windT || 0) - dt);
+  state.boltT = Math.max(0, (state.boltT || 0) - dt);
+  /* 羽扇：每 15 秒自动挥出一阵风 */
+  if (state.treasure === 'fan' && state.mode === 'run') {
+    state.fanT -= dt;
+    if (state.fanT <= 0) {
+      state.fanT = 15;
+      fanGust();
+    }
+  }
   if (dashing && state.dashT <= 0) clearObstacles();
   state.shake = Math.max(0, state.shake - dt * 36);
   if (state.comboT > 0) {
@@ -2390,16 +2902,26 @@ const QS_LOOK = {
     hair: '#211a33', hairHi: '#5a4680', skin: '#ffe4cf', skinDeep: '#dda184',
     ribbon: 'rgba(198,160,255,.88)', ribbon2: 'rgba(232,214,255,.5)',
     cape: 'rgba(143,107,255,.5)', metal: '#e9d8a8'
+  },
+  wuxia: {
+    robe: '#dfe7e0', robeLight: '#f6faf4', robeDeep: '#8fa89c',
+    trim: '#e0b15a', sash: '#3d4a44', boot: '#efe9da', bootDeep: '#b3aa93',
+    hair: '#22261f', hairHi: '#4d5445', skin: '#f0c8a0', skinDeep: '#c48f68',
+    ribbon: 'rgba(224,177,90,.8)', ribbon2: 'rgba(240,208,140,.45)',
+    cape: 'rgba(224,177,90,.34)', metal: '#e8b45c',
+    gourd: '#f2c877', gourdDeep: '#e8b45c', gourdShade: '#a9762f'
   }
 };
 const QS_BODY = {
   male: { headR: 23, hipY: -19.5, thigh: 10, shin: 9, shoulder: 11.5, stride: 0.82, bounce: 2.0, lean: -0.14, sleeveR: 6.2 },
   female: { headR: 25, hipY: -18, thigh: 9, shin: 8, shoulder: 9, stride: 0.6, bounce: 3.6, lean: -0.05, sleeveR: 8.4 },
   sci: { headR: 24, hipY: -18.8, thigh: 9.4, shin: 8.6, shoulder: 11.8, stride: 0.72, bounce: 2.6, lean: -0.1, sleeveR: 6.8 },
-  mage: { headR: 25, hipY: -18.2, thigh: 8.9, shin: 8, shoulder: 8.8, stride: 0.6, bounce: 3.4, lean: -0.04, sleeveR: 9.4 }
+  mage: { headR: 25, hipY: -18.2, thigh: 8.9, shin: 8, shoulder: 8.8, stride: 0.6, bounce: 3.4, lean: -0.04, sleeveR: 9.4 },
+  wuxia: { headR: 24, hipY: -19, thigh: 9.6, shin: 8.8, shoulder: 11, stride: 0.74, bounce: 2.4, lean: -0.12, sleeveR: 7.4 }
 };
 let QS_SCI = false;
 let QS_MAGE = false;
+let QS_WUXIA = false;
 let QS_FLY = false;
 function qsCapsule(x1, y1, x2, y2, r, c1, c2) {
   ctx.lineCap = 'round';
@@ -2943,6 +3465,147 @@ function qsHat(look, p, fem) {
   ctx.fill();
 }
 
+/* 斗笠：竹编锥帽 + 宽帽檐 + 系带 */
+function qsDouLi(look, p, fem) {
+  const cx = 3;
+  const hy = fem ? -64 : -68;
+  const r = p.headR;
+  const brimY = hy - r * 0.58;
+  /* 帽檐投在额头的阴影 */
+  ctx.fillStyle = 'rgba(44,38,24,.22)';
+  ctx.beginPath();
+  ctx.ellipse(cx + 1, brimY + 5, r * 1.1, r * 0.3, -0.06, 0, 6.283);
+  ctx.fill();
+  /* 锥面 */
+  const g = ctx.createLinearGradient(cx - r * 1.5, brimY - r * 1.9, cx + r * 1.2, brimY + r * 0.1);
+  g.addColorStop(0, '#f6e9c3');
+  g.addColorStop(0.38, '#e3cf9f');
+  g.addColorStop(1, '#b59a63');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 1.72, brimY + 2);
+  ctx.quadraticCurveTo(cx - r * 0.95, brimY - r * 1.55, cx - r * 0.04, brimY - r * 1.86);
+  ctx.quadraticCurveTo(cx + r * 0.95, brimY - r * 1.5, cx + r * 1.72, brimY + 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(96,76,42,.4)';
+  ctx.lineWidth = 1.1;
+  ctx.stroke();
+  /* 前檐 */
+  ctx.fillStyle = '#cbb079';
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 1.72, brimY + 1);
+  ctx.quadraticCurveTo(cx, brimY + r * 0.75, cx + r * 1.72, brimY + 1);
+  ctx.quadraticCurveTo(cx, brimY + r * 0.3, cx - r * 1.72, brimY + 1);
+  ctx.closePath();
+  ctx.fill();
+  /* 竹编横纹 */
+  ctx.strokeStyle = 'rgba(120,96,54,.38)';
+  ctx.lineWidth = 1;
+  for (let i = 1; i <= 3; i++) {
+    const k = i / 4.2;
+    ctx.beginPath();
+    ctx.moveTo(cx - r * (1.42 - k * 0.9), brimY - r * 0.18 - k * r * 0.52);
+    ctx.quadraticCurveTo(cx, brimY - r * 0.3 - k * r * 0.85, cx + r * (1.42 - k * 0.9), brimY - r * 0.18 - k * r * 0.52);
+    ctx.stroke();
+  }
+  /* 顶珠 */
+  ctx.fillStyle = look.metal;
+  ctx.beginPath();
+  ctx.arc(cx - r * 0.04, brimY - r * 1.9, r * 0.13, 0, 6.283);
+  ctx.fill();
+  /* 系带 */
+  ctx.strokeStyle = look.sash;
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 1.1, brimY + 3);
+  ctx.quadraticCurveTo(cx - r * 0.2, brimY + r * 1.05, cx + r * 1.05, brimY + 3);
+  ctx.stroke();
+}
+/* 葫芦本体 */
+function qsGourd(x, y, s, rot, look) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = 'rgba(20,26,20,.3)';
+  ctx.beginPath();
+  ctx.arc(0, s * 0.16, s * 0.76, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = look.gourd;
+  ctx.beginPath();
+  ctx.arc(0, -s * 0.72, s * 0.5, 0, 6.283);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(0, s * 0.18, s * 0.74, 0, 6.283);
+  ctx.fill();
+  /* 高光与暗部 */
+  ctx.fillStyle = 'rgba(255,248,222,.9)';
+  ctx.beginPath();
+  ctx.arc(-s * 0.22, -s * 0.84, s * 0.15, 0, 6.283);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(-s * 0.3, s * 0.05, s * 0.18, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(169,118,47,.28)';
+  ctx.beginPath();
+  ctx.arc(s * 0.26, s * 0.34, s * 0.34, 0, 6.283);
+  ctx.fill();
+  /* 束腰 */
+  ctx.strokeStyle = look.gourdDeep;
+  ctx.lineWidth = s * 0.18;
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.36, -s * 0.26);
+  ctx.lineTo(s * 0.36, -s * 0.26);
+  ctx.stroke();
+  /* 柄 */
+  ctx.strokeStyle = '#6d5a34';
+  ctx.lineWidth = s * 0.15;
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 1.16);
+  ctx.lineTo(0, -s * 1.56);
+  ctx.stroke();
+  ctx.restore();
+}
+/* 身前小葫芦：平时浮动，掷出时飞向前方再飞回 */
+function drawGourdFloat(sx, sy) {
+  if (!state.gourdAlive) return;
+  const look = QS_LOOK.wuxia;
+  const dur = 1.5;
+  if (state.gourdT > 0) {
+    const p = 1 - state.gourdT / dur;
+    const fly = Math.sin(Math.PI * p);
+    const gx = sx + 40 + fly * 760;
+    const gy = sy - 66 - fly * 40;
+    const rot = p * 14;
+    /* 飞行拖尾 */
+    ctx.strokeStyle = 'rgba(224,177,90,.55)';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    for (let i = 1; i <= 4; i++) {
+      const t = Math.max(0, p - i * 0.06);
+      const px = sx + 40 + Math.sin(Math.PI * t) * 760;
+      ctx.globalAlpha = 0.42 - i * 0.08;
+      ctx.beginPath();
+      ctx.moveTo(px, gy + 4);
+      ctx.lineTo(px - 26, gy + 2 + i * 2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    qsGourd(gx, gy, 21, rot, look);
+    return;
+  }
+  const bob = Math.sin(state.time * 2.6) * 3.5;
+  const rot = Math.sin(state.time * 1.7) * 0.12;
+  /* 葫芦下方的一点灵光 */
+  const halo = ctx.createRadialGradient(sx + 48, sy - 60 + bob, 2, sx + 48, sy - 60 + bob, 34);
+  halo.addColorStop(0, 'rgba(242,200,119,.28)');
+  halo.addColorStop(1, 'rgba(242,200,119,0)');
+  ctx.fillStyle = halo;
+  ctx.beginPath();
+  ctx.arc(sx + 48, sy - 60 + bob, 34, 0, 6.283);
+  ctx.fill();
+  qsGourd(sx + 48, sy - 60 + bob, 19, rot, look);
+}
 function qsHead(ph, look, fem, p) {
   const cx = 3;
   const hy = fem ? -64 : -68;
@@ -3164,6 +3827,7 @@ function drawRunPose() {
   const fem = id === 'female' || id === 'mage';
   QS_SCI = id === 'sci';
   QS_MAGE = id === 'mage';
+  QS_WUXIA = id === 'wuxia';
   const look = QS_LOOK[id];
   const p = QS_BODY[id];
   const air = !player.onGround;
@@ -3184,7 +3848,7 @@ function drawRunPose() {
     ctx.translate(0, -4 + Math.sin(state.time * 4) * 2);
     ctx.rotate(-0.24);
   }
-  if (!fem && !QS_SCI && !QS_MAGE) qsSword(look);
+  if (!fem && !QS_SCI && !QS_MAGE && !QS_WUXIA) qsSword(look);
   qsRibbons(look, ph, fem);
   qsHairBack(look, fem, ph);
   const st = p.stride;
@@ -3201,6 +3865,7 @@ function drawRunPose() {
   else qsArm(-4, air ? (fem ? 2.2 : 1.9) : 0.5 + sw * 0.8, look, true, p, fem);
   qsHead(ph, look, fem, p);
   if (QS_MAGE) qsHat(look, p, fem);
+  if (QS_WUXIA) qsDouLi(look, p, fem);
   if (gliding) qsArm(16, 0.6, look, false, p, fem);
   else qsArm(6, air ? (fem ? 2.1 : 1.3) : 0.5 - sw * 0.85, look, false, p, fem);
   if (QS_MAGE) qsStaff(look, ph, gliding);
@@ -3211,6 +3876,7 @@ function drawSlidePose() {
   const fem = id === 'female' || id === 'mage';
   QS_SCI = id === 'sci';
   QS_MAGE = id === 'mage';
+  QS_WUXIA = id === 'wuxia';
   const look = QS_LOOK[id];
   const p = QS_BODY[id];
   ctx.save();
@@ -3224,6 +3890,7 @@ function drawSlidePose() {
   qsArm(-4, 2.0, look, true, p, fem);
   qsHead(0, look, fem, p);
   if (QS_MAGE) qsHat(look, p, fem);
+  if (QS_WUXIA) qsDouLi(look, p, fem);
   qsArm(6, 1.2, look, false, p, fem);
   if (QS_MAGE) qsStaff(look, 0, false);
   ctx.restore();
@@ -3300,6 +3967,10 @@ function drawPlayer() {
   if (state.staffT > 0) drawStaffSwing(sx, sy);
   if (state.swordT > 0) drawSword(sx, sy);
   if (state.char === 'female' && state.dashT > 0) drawBambooLeaves(sx, sy);
+  if (state.char === 'wuxia') drawGourdFloat(sx, sy);
+  if (mageArmed() && state.mode === 'run') drawMageAura(sx, sy);
+  if (state.windT > 0) drawWindGust();
+  if (state.boltT > 0) drawCrystalBolt();
   /* 护盾罩 */
   if (state.shield) {
     const cy = sy - 50;
@@ -3550,6 +4221,121 @@ function drawStaffSwing(sx, sy) {
   ctx.restore();
 }
 
+/* 法阵待命：脚下一圈紫色符文光环，提示可自动复活 */
+function drawMageAura(sx, sy) {
+  const t = state.time;
+  const pulse = 0.55 + Math.abs(Math.sin(t * 2.4)) * 0.45;
+  ctx.save();
+  ctx.globalAlpha = pulse;
+  ctx.strokeStyle = 'rgba(198,160,255,.85)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(sx, sy - 4, 34, 11, 0, 0, 6.283);
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(sx, sy - 4);
+  ctx.rotate(t * 1.2);
+  ctx.strokeStyle = 'rgba(232,214,255,.6)';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 28, 9, 0, 0, 6.283);
+  ctx.stroke();
+  for (let i = 0; i < 4; i++) {
+    const a = i * Math.PI / 2;
+    ctx.beginPath();
+    ctx.arc(Math.cos(a) * 28, Math.sin(a) * 9, 2.6, 0, 6.283);
+    ctx.stroke();
+  }
+  ctx.restore();
+  /* 环绕上浮的符文碎片 */
+  for (let i = 0; i < 3; i++) {
+    const p = ((t * 0.7 + i * 0.33) % 1);
+    const a = t * 1.6 + i * 2.1;
+    ctx.globalAlpha = Math.sin(Math.PI * p) * 0.75;
+    ctx.fillStyle = 'rgba(232,214,255,.9)';
+    ctx.fillRect(sx + Math.cos(a) * 24 - 1.6, sy - 18 - p * 46 + Math.sin(a) * 6, 3.2, 3.2);
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+/* 水晶落雷：自天而降的折线电光 */
+function drawCrystalBolt() {
+  const k = state.boltT / 0.42;
+  const bx = state.boltX;
+  const by = state.boltY;
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, k * 1.6);
+  ctx.lineCap = 'round';
+  /* 光晕 */
+  const glow = ctx.createRadialGradient(bx, by, 2, bx, by, 74);
+  glow.addColorStop(0, 'rgba(198,255,248,.55)');
+  glow.addColorStop(1, 'rgba(198,255,248,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(bx, by, 74, 0, 6.283);
+  ctx.fill();
+  /* 主电光：固定折线（用时间做抖动） */
+  const seg = 7;
+  const top = -20;
+  const pts = [];
+  for (let i = 0; i <= seg; i++) {
+    const t = i / seg;
+    const jitter = i === 0 || i === seg ? 0 : Math.sin(state.time * 42 + i * 7.3) * 30;
+    pts.push([bx + jitter, top + (by - top) * t]);
+  }
+  ctx.strokeStyle = 'rgba(255,255,255,.95)';
+  ctx.lineWidth = 3.4;
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i <= seg; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(150,246,255,.85)';
+  ctx.lineWidth = 9;
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i <= seg; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.stroke();
+  /* 分叉 */
+  ctx.strokeStyle = 'rgba(190,255,250,.8)';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(pts[3][0], pts[3][1]);
+  ctx.lineTo(pts[3][0] - 34, pts[3][1] + 40);
+  ctx.moveTo(pts[4][0], pts[4][1]);
+  ctx.lineTo(pts[4][0] + 28, pts[4][1] + 36);
+  ctx.stroke();
+  /* 落点光环 */
+  ctx.strokeStyle = 'rgba(198,255,248,.55)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(bx, by, 40 * (1.4 - k * 0.4), 12, 0, 0, 6.283);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+/* 羽扇狂风：横贯屏幕的风痕 */
+function drawWindGust() {
+  const k = state.windT / 0.9;
+  ctx.save();
+  ctx.globalAlpha = 0.5 * k;
+  ctx.lineCap = 'round';
+  for (let i = 0; i < 9; i++) {
+    const y = GROUND - 20 - i * 34;
+    const len = 260 + (i % 3) * 90;
+    const off = (1 - k) * 520 - i * 46;
+    ctx.strokeStyle = i % 2 ? 'rgba(236,246,240,.75)' : 'rgba(200,232,220,.6)';
+    ctx.lineWidth = 3 - (i % 3) * 0.6;
+    ctx.beginPath();
+    ctx.moveTo(-40 + off, y + 14);
+    ctx.quadraticCurveTo(-40 + off + len * 0.5, y - 10, -40 + off + len, y + 2);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
 /* ===== 绘制：特效层 ===== */
 function drawParticles() {
   for (let i = 0; i < world.particles.length; i++) {
@@ -3664,6 +4450,7 @@ energyFill.style.width = '0%';
 energyVal.textContent = '0/' + meterCap();
 syncMute();
 applyChar();
+applyTreasure();
 requestAnimationFrame(function boot(now) {
   lastFrame = now;
   loop(now);
