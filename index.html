@@ -399,12 +399,19 @@ kbd{
 }
 .touch .tbtn:active{background:rgba(95,227,200,.2);border-color:rgba(95,227,200,.6)}
 .touch .t-jump{right:clamp(12px,2vw,22px)}
-.touch .t-slide{right:calc(clamp(12px,2vw,22px) + clamp(74px,10.4vw,104px))}
-.touch .t-dash{left:clamp(12px,2vw,22px);border-color:rgba(95,227,200,.45);color:var(--teal)}
+.touch .t-slide{left:clamp(12px,2vw,22px)}
+.touch .t-dash{
+  left:clamp(6px,1.1vw,12px);
+  bottom:auto;top:46%;transform:translateY(-50%);
+  width:clamp(52px,7.4vw,70px);height:clamp(52px,7.4vw,70px);
+  border-color:rgba(95,227,200,.45);
+  color:var(--teal);
+  font-size:clamp(9px,.9vw,11px);
+}
 
 @media (hover:none) and (pointer:coarse){
   .touch{display:block}
-  .energy{bottom:clamp(92px,13vw,120px)}
+  .energy{bottom:auto;top:clamp(46px,8vh,72px);left:50%;transform:translateX(-50%);width:min(42vw,220px)}
 }
 @media (max-width:760px){
   .start-grid{grid-template-columns:1fr;gap:clamp(14px,3vw,22px);align-items:start}
@@ -416,6 +423,14 @@ kbd{
 @media (max-height:520px){
   .start-side{display:none}
   .start-grid{grid-template-columns:1fr}
+}
+@media (max-width:900px), (hover:none) and (pointer:coarse){
+  .overlay{overflow-y:auto;overflow-x:hidden;align-items:flex-start;-webkit-overflow-scrolling:touch}
+  .overlay--char{padding:12px 12px 28px}
+  .char-panel{width:100%;max-height:none;margin:auto 0}
+  .char-panel-head{flex-wrap:wrap;align-items:flex-start;gap:8px}
+  .char-panel-head p{letter-spacing:.1em}
+  .char-panel-body .char-pick{grid-template-columns:1fr;gap:8px}
 }
 @media (orientation:portrait) and (max-width:900px){
   .start-grid{grid-template-columns:1fr;gap:10px}
@@ -601,8 +616,8 @@ kbd{
         </div>
         <div class="touch-hint">
           <span><b>跳跃</b>右下按钮</span>
-          <span><b>滑铲</b>右下内侧按钮</span>
-          <span><b>技能</b>左下技能键</span>
+          <span><b>滑铲</b>左下按钮</span>
+          <span><b>技能</b>左边缘按钮</span>
         </div>
         <div class="ios-note" id="iosNote" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
