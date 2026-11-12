@@ -289,10 +289,13 @@ kbd{
 /* ===== character pick ===== */
 .char-pick{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:10px;
   margin:0 0 clamp(14px,2vw,22px);
-  max-width:34em;
+  max-width:42em;
+}
+@media (max-width:620px){
+  .char-pick{grid-template-columns:repeat(1,minmax(0,1fr))}
 }
 .char-card{
   appearance:none;
@@ -315,6 +318,7 @@ kbd{
   background:rgba(7,12,17,.55);
   border:1px solid rgba(243,236,221,.12);
 }
+.char-face img{width:100%;height:100%;display:block;object-fit:cover;object-position:50% 10%}
 .char-face svg{width:100%;height:100%;display:block}
 .char-meta{display:flex;flex-direction:column;gap:2px;min-width:0}
 .char-meta b{font-size:clamp(12px,1.1vw,14px);letter-spacing:.08em;font-weight:700}
@@ -447,37 +451,87 @@ kbd{
       <div class="start-copy">
         <div class="eyebrow">无尽跑酷 · 城市天台</div>
         <h1>夜行天台</h1>
-        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过悬梁，跨过楼缝，把散落的能量攒满，然后在整座城市的上方<em>超频冲刺</em>。两位跑者两种绝招：<em>阿隼</em>撞碎障碍，<em>小满</em>越缝起飞。</p>
+        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过悬梁，跨过楼缝，把散落的能量攒满，然后在整座城市的上方<em>超频冲刺</em>。三位跑者三种绝招：<em>阿隼</em>撞碎障碍，<em>小满</em>越缝起飞，<em>齐衡</em>开盾挡下一次撞击。</p>
         <div class="char-pick" id="charPick" role="radiogroup" aria-label="选择跑者">
           <button type="button" class="char-card is-on" data-char="male" role="radio" aria-checked="true">
             <span class="char-face">
               <svg viewBox="0 0 40 40" aria-hidden="true">
-                <circle cx="20" cy="11.5" r="5.4" fill="#e8bd97"/>
-                <path d="M14.6 11.5a5.4 5.4 0 0 1 10.8 0z" fill="#121b21"/>
-                <path d="M25 10c3.6 1.4 4.4 5 3 9.4-2.4-1.8-3.4-4.6-3-9.4z" fill="#121b21"/>
-                <rect x="14.2" y="18" width="11.6" height="12.6" rx="3.6" fill="#ffc266"/>
-                <path d="M14.4 21.4h11.2" stroke="#e39b41" stroke-width="3"/>
-                <path d="M16 30.4l-1.6 7.6M24 30.4l1.6 7.6" stroke="#3d4f5c" stroke-width="2.8" stroke-linecap="round"/>
-                <path d="M14.6 19.4l-6 3.2M25.6 19.4l6 3.2" stroke="#e39b41" stroke-width="2.4" stroke-linecap="round"/>
-                <path d="M15 19.6c-4.4 1.4-8.6 0-11 3.4" stroke="#5fe3c8" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                <ellipse cx="20" cy="37" rx="9" ry="2" fill="rgba(0,0,0,.28)"/>
+                <path d="M6.5 40c0-8 6-12.5 13.5-12.5s13.5 4.5 13.5 12.5z" fill="#eaf3f6"/>
+                <path d="M15 28.4l5 8.6 5-8.6" stroke="#5fe3c8" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+                <circle cx="20" cy="16.5" r="9.4" fill="#ffd9b6"/>
+                <path d="M10.6 15.4c0-8.2 4.4-11.4 9.4-11.4s9.4 3.2 9.4 11.4c-2-4.2-5-6.2-9.4-6.2s-7.4 2-9.4 6.2z" fill="#151b24"/>
+                <circle cx="20" cy="5.2" r="3.6" fill="#151b24"/>
+                <path d="M14.8 4.2l10.4 2.4" stroke="#5fe3c8" stroke-width="1.7" stroke-linecap="round"/>
+                <circle cx="25.4" cy="6.7" r="1.3" fill="#5fe3c8"/>
+                <ellipse cx="16.6" cy="17.4" rx="2.4" ry="2.9" fill="#fffdf8"/>
+                <ellipse cx="23.4" cy="17.4" rx="2.4" ry="2.9" fill="#fffdf8"/>
+                <ellipse cx="16.8" cy="17.6" rx="1.5" ry="2" fill="#0d5c50"/>
+                <ellipse cx="23.2" cy="17.6" rx="1.5" ry="2" fill="#0d5c50"/>
+                <circle cx="16.2" cy="16.6" r=".8" fill="#fff"/>
+                <circle cx="22.6" cy="16.6" r=".8" fill="#fff"/>
+                <ellipse cx="14.6" cy="21.4" rx="1.8" ry="1" fill="rgba(255,124,110,.32)"/>
+                <ellipse cx="25.4" cy="21.4" rx="1.8" ry="1" fill="rgba(255,124,110,.32)"/>
+                <path d="M18.6 22.6q1.4 1.4 2.8 0" stroke="rgba(150,60,54,.6)" stroke-width="1.1" fill="none"/>
               </svg>
             </span>
-            <span class="char-meta"><b>阿隼</b><em>超频 · 3.4s 无敌撞碎</em></span>
+            <span class="char-meta"><b>阿隼</b><em>剑客 · 超频 3.4s 清场</em></span>
           </button>
           <button type="button" class="char-card" data-char="female" role="radio" aria-checked="false">
             <span class="char-face">
               <svg viewBox="0 0 40 40" aria-hidden="true">
-                <circle cx="20" cy="11.5" r="5.4" fill="#e8bd97"/>
-                <path d="M14.6 11.5a5.4 5.4 0 0 1 10.8 0z" fill="#121b21"/>
-                <path d="M25.2 8.6c4.8 1.8 5.6 6.6 3.6 12-2.6-2.6-4-7.2-3.6-12z" fill="#121b21"/>
-                <rect x="14.2" y="18" width="11.6" height="12.6" rx="3.6" fill="#ff8574"/>
-                <path d="M14.4 21.4h11.2" stroke="#d9604f" stroke-width="3"/>
-                <path d="M16 30.4l-1.6 7.6M24 30.4l1.6 7.6" stroke="#44535f" stroke-width="2.8" stroke-linecap="round"/>
-                <path d="M14.6 19.4l-6 3.2M25.6 19.4l6 3.2" stroke="#d9604f" stroke-width="2.4" stroke-linecap="round"/>
-                <path d="M15 19.6c-4.4 1.4-8.6 0-11 3.4" stroke="#ffc266" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                <ellipse cx="20" cy="37" rx="9" ry="2" fill="rgba(0,0,0,.28)"/>
+                <path d="M6.5 40c0-8 6-12.5 13.5-12.5s13.5 4.5 13.5 12.5z" fill="#ffe2e8"/>
+                <path d="M15 28.4l5 8.6 5-8.6" stroke="#ffc266" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+                <path d="M11.4 14.6c-4 .4-5.4 6-3.6 12 2.4-1.8 3.6-6.4 3.6-12z" fill="#171c24"/>
+                <path d="M28.6 14.6c4 .4 5.4 6 3.6 12-2.4-1.8-3.6-6.4-3.6-12z" fill="#171c24"/>
+                <circle cx="20" cy="16.5" r="9.4" fill="#ffe1c9"/>
+                <path d="M10.6 15.4c0-8.2 4.4-11.4 9.4-11.4s9.4 3.2 9.4 11.4c-2-4.2-5-6.2-9.4-6.2s-7.4 2-9.4 6.2z" fill="#171c24"/>
+                <circle cx="20" cy="5.2" r="3.6" fill="#171c24"/>
+                <path d="M14.8 4.2l10.4 2.4" stroke="#ffc266" stroke-width="1.7" stroke-linecap="round"/>
+                <circle cx="25.4" cy="6.7" r="1.3" fill="#ffc266"/>
+                <ellipse cx="16.6" cy="17.4" rx="2.4" ry="2.9" fill="#fffdf8"/>
+                <ellipse cx="23.4" cy="17.4" rx="2.4" ry="2.9" fill="#fffdf8"/>
+                <ellipse cx="16.8" cy="17.6" rx="1.5" ry="2" fill="#8a4812"/>
+                <ellipse cx="23.2" cy="17.6" rx="1.5" ry="2" fill="#8a4812"/>
+                <circle cx="16.2" cy="16.6" r=".8" fill="#fff"/>
+                <circle cx="22.6" cy="16.6" r=".8" fill="#fff"/>
+                <path d="M14.2 13.4l-1.4-.8M25.8 13.4l1.4-.8" stroke="#171c24" stroke-width="1"/>
+                <ellipse cx="14.6" cy="21.4" rx="1.8" ry="1" fill="rgba(255,124,110,.32)"/>
+                <ellipse cx="25.4" cy="21.4" rx="1.8" ry="1" fill="rgba(255,124,110,.32)"/>
+                <path d="M18.6 22.6q1.4 1.4 2.8 0" stroke="rgba(150,60,54,.6)" stroke-width="1.1" fill="none"/>
               </svg>
             </span>
-            <span class="char-meta"><b>小满</b><em>飞行 · 2.5s 越缝不坠</em></span>
+            <span class="char-meta"><b>小满</b><em>仙门 · 飞行 2.5s 越缝</em></span>
+          </button>
+          <button type="button" class="char-card" data-char="sci" role="radio" aria-checked="false">
+            <span class="char-face">
+              <svg viewBox="0 0 40 40" aria-hidden="true">
+                <ellipse cx="20" cy="37" rx="9" ry="2" fill="rgba(0,0,0,.28)"/>
+                <path d="M6.5 40c0-8 6-12.5 13.5-12.5s13.5 4.5 13.5 12.5z" fill="#ffd94f"/>
+                <path d="M14.6 28.4l5.4 9.4 5.4-9.4" stroke="#3ec9b0" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+                <path d="M20 32h4.6v4.8h-4.6z" fill="#2f3540"/>
+                <circle cx="20" cy="16.5" r="9.4" fill="#f6c9a4"/>
+                <path d="M10.8 15.6c0-7.6 4.2-10.6 9.2-10.6s9.2 3 9.2 10.6c-1.6-3.8-4.4-5.8-9.2-5.8s-7.6 2-9.2 5.8z" fill="#12161d"/>
+                <path d="M11.6 12.6l3.4 2.6M28.4 12.6l-3.4 2.6" stroke="#12161d" stroke-width="2.6" stroke-linecap="round"/>
+                <rect x="11" y="9.4" width="8" height="4.8" rx="2.4" fill="#ffcf3f" stroke="#2f3540" stroke-width="1.2"/>
+                <rect x="21" y="9.4" width="8" height="4.8" rx="2.4" fill="#ffcf3f" stroke="#2f3540" stroke-width="1.2"/>
+                <path d="M19 11h2" stroke="#2f3540" stroke-width="1.4"/>
+                <circle cx="13.4" cy="10.6" r=".9" fill="#fffdf8"/>
+                <circle cx="23.4" cy="10.6" r=".9" fill="#fffdf8"/>
+                <ellipse cx="16.6" cy="17.8" rx="2.2" ry="2.6" fill="#fffdf8"/>
+                <ellipse cx="23.4" cy="17.8" rx="2.2" ry="2.6" fill="#fffdf8"/>
+                <ellipse cx="16.8" cy="18" rx="1.4" ry="1.8" fill="#6a4210"/>
+                <ellipse cx="23.2" cy="18" rx="1.4" ry="1.8" fill="#6a4210"/>
+                <circle cx="16.2" cy="17" r=".8" fill="#fff"/>
+                <circle cx="22.6" cy="17" r=".8" fill="#fff"/>
+                <path d="M14.4 13.6h4M21.6 13.6h4" stroke="#12161d" stroke-width="1.2"/>
+                <ellipse cx="14.6" cy="21.6" rx="1.8" ry="1" fill="rgba(255,124,110,.28)"/>
+                <ellipse cx="25.4" cy="21.6" rx="1.8" ry="1" fill="rgba(255,124,110,.28)"/>
+                <path d="M18.4 23q1.6 1.2 3.2 0" stroke="rgba(150,60,54,.6)" stroke-width="1.1" fill="none"/>
+              </svg>
+            </span>
+            <span class="char-meta"><b>齐衡</b><em>科学家 · 护盾挡一次</em></span>
           </button>
         </div>
         <div class="start-actions">
@@ -509,7 +563,7 @@ kbd{
         </div>
         <div class="key-row">
           <span class="keys"><kbd>E</kbd></span>
-          <p id="skillDesc">能量满 100 时触发 <b>超频</b>：3.4 秒无敌，撞碎障碍并吸附能量。</p>
+          <p id="skillDesc">能量满 100 时触发 <b>超频</b>：消耗 90 点能量（留 10 点），3.4 秒无敌撞碎障碍，收招时清空场上障碍。</p>
         </div>
         <div class="side-note">碰撞或坠楼即结束本局。速度会随距离逐渐加快，<em>连击拾取</em>能把单颗能量推到 8 倍分。</div>
       </div>
@@ -569,6 +623,7 @@ const RULESET = {
   meterMax: 100,
   shardGain: 9,
   dashCost: 100,
+  skillCost: 90,
   dashDur: 3.4,
   dashSpeedMul: 1.32,
   dashMagnet: 240,
@@ -589,8 +644,9 @@ const CHARS = {
     ult: '超频',
     tipIdle: '满槽后按 E 超频',
     tipFull: 'E 超频已就绪',
-    skillHTML: '能量满 100 时触发 <b>超频</b>：3.4 秒无敌，撞碎障碍并吸附能量。',
+    skillHTML: '能量满 100 时触发 <b>超频</b>：消耗 90 点能量（留 10 点），3.4 秒无敌撞碎障碍，收招时清空场上障碍。',
     jacket: '#ffc266',
+    jacketLight: '#ffd98f',
     jacketDeep: '#e39b41',
     pantsA: '#3d4f5c',
     pantsB: '#2b3944',
@@ -609,8 +665,9 @@ const CHARS = {
     ult: '起飞',
     tipIdle: '满槽后按 E 起飞',
     tipFull: 'E 起飞已就绪',
-    skillHTML: '能量满 100 时触发 <b>起飞</b>：2.5 秒无敌飞行，越过楼缝不会坠落。',
+    skillHTML: '能量满 100 时触发 <b>起飞</b>：消耗 90 点能量（留 10 点），2.5 秒无敌飞行，越缝不坠落，收招清空场上障碍。',
     jacket: '#ff8574',
+    jacketLight: '#ffa695',
     jacketDeep: '#d9604f',
     pantsA: '#44535f',
     pantsB: '#2f3c47',
@@ -618,9 +675,31 @@ const CHARS = {
     scarfSoft: 'rgba(255,194,102,.5)',
     rgb: '255,133,116',
     burst: 'rgba(255,133,116,.85)'
+  },
+  sci: {
+    id: 'sci',
+    name: '齐衡',
+    fly: false,
+    shield: true,
+    dashDur: 0,
+    dashName: '护盾',
+    energyName: '护盾能量',
+    ult: '护盾',
+    tipIdle: '满槽后按 E 开盾',
+    tipFull: 'E 护盾已就绪',
+    skillHTML: '能量满 100 时开启 <b>护盾</b>：消耗 90 点能量（留 10 点），获得一层 7 秒琥珀护盾，可抵挡一次碰撞伤害；护盾不可叠加，用掉或到期后才能再开。',
+    jacket: '#ffd94f',
+    jacketLight: '#fff0a8',
+    jacketDeep: '#d9a21a',
+    pantsA: '#3a3f4b',
+    pantsB: '#2a2f39',
+    scarf: '#3ec9b0',
+    scarfSoft: 'rgba(62,201,176,.5)',
+    rgb: '255,217,79',
+    burst: 'rgba(255,217,79,.9)'
   }
 };
-const CHAR_IDS = ['male', 'female'];
+const CHAR_IDS = ['male', 'female', 'sci'];
 let savedChar = 'male';
 try {
   const c = localStorage.getItem('rooftop-run-char-v1');
@@ -795,6 +874,9 @@ const state = {
   dist: 0,
   meter: 0,
   dashT: 0,
+  shield: false,
+  shieldT: 0,
+  invulnT: 0,
   shards: 0,
   shardPts: 0,
   combo: 1,
@@ -856,10 +938,10 @@ function addObstacle(type, x, diff) {
   }
 }
 function addFeatures(start, end, diff) {
-  let x = start + 150;
+  let x = start + 190;
   let last = '';
   const limit = end - 330;
-  for (let guard = 0; guard < 5 && x < limit; guard++) {
+  for (let guard = 0; guard < 4 && x < limit; guard++) {
     let type;
     const r = Math.random();
     if (diff < 0.12) type = 'crate';
@@ -868,12 +950,12 @@ function addFeatures(start, end, diff) {
     else if (r < 0.90) type = 'beam';
     else type = 'crate';
     if (type === last) type = type === 'beam' ? 'crate' : 'beam';
-    if (type === 'beam' && (x < start + 360 || x + 270 > end - 360)) type = 'crate';
+    if (type === 'beam' && (x < start + 380 || x + 270 > end - 380)) type = 'crate';
     addObstacle(type, x, diff);
     last = type;
-    const baseSpacing = type === 'beam' ? 380 : type === 'duct' ? 340 : 360;
-    const speedNeed = speedAt(x) * (type === 'beam' ? 1.12 : 1.02);
-    x += Math.max(baseSpacing, speedNeed) + Math.random() * 30;
+    const baseSpacing = type === 'beam' ? 490 : type === 'duct' ? 440 : 470;
+    const speedNeed = speedAt(x) * (type === 'beam' ? 1.2 : 1.1);
+    x += Math.max(baseSpacing, speedNeed) + Math.random() * 50;
   }
 }
 function generateAhead() {
@@ -967,11 +1049,24 @@ function requestDash() {
   if (state.mode !== 'run') return;
   if (state.dashT > 0) return;
   const spec = CHARS[state.char];
+  if (spec.shield && state.shield) {
+    floatText(PLAYER_X, player.feetY - 126, '护盾已在身', 'rgba(255,217,79,.9)');
+    return;
+  }
   if (state.meter < RULESET.meterMax) {
     if (state.meter > 0) floatText(PLAYER_X, player.feetY - 120, '能量未满 ' + Math.round(state.meter) + '%', 'rgba(243,236,221,.75)');
     return;
   }
-  state.meter = 0;
+  state.meter = Math.max(0, state.meter - RULESET.skillCost);
+  if (spec.shield) {
+    state.shield = true;
+    state.shieldT = 7;
+    state.shake = 6;
+    sfx('dash');
+    burst(PLAYER_X, player.feetY - 46, 22, spec.burst, 300, 40);
+    floatText(PLAYER_X, player.feetY - 132, spec.ult, 'rgba(' + spec.rgb + ',1)');
+    return;
+  }
   state.dashT = spec.dashDur;
   state.shake = 7;
   sfx('dash');
@@ -1117,6 +1212,9 @@ function resetRun() {
   state.dist = 0;
   state.meter = 0;
   state.dashT = 0;
+  state.shield = false;
+  state.shieldT = 0;
+  state.invulnT = 0;
   state.shards = 0;
   state.shardPts = 0;
   state.combo = 1;
@@ -1245,14 +1343,15 @@ function syncHud() {
     energyTip.textContent = full ? spec.tipFull : spec.tipIdle;
   }
   const dashing = state.dashT > 0;
-  if (dashing !== hudCache.dash) {
-    hudCache.dash = dashing;
-    dashChip.classList.toggle('on', dashing);
-    metricEl.classList.toggle('boost', dashing);
-    dashChip.textContent = dashing ? spec.dashName + ' ' + state.dashT.toFixed(1) + 's' : spec.dashName;
-  } else if (dashing) {
-    dashChip.textContent = spec.dashName + ' ' + state.dashT.toFixed(1) + 's';
+  const shieldOn = !!state.shield;
+  const chipOn = dashing || shieldOn;
+  const chipText = dashing ? spec.dashName + ' ' + state.dashT.toFixed(1) + 's' : (shieldOn ? '护盾 ' + state.shieldT.toFixed(1) + 's' : spec.dashName);
+  if (chipOn !== hudCache.dash) {
+    hudCache.dash = chipOn;
+    dashChip.classList.toggle('on', chipOn);
+    metricEl.classList.toggle('boost', chipOn);
   }
+  if (dashChip.textContent !== chipText) dashChip.textContent = chipText;
 }
 /* ===== 玩家动作 ===== */
 function doJump(stage, cost) {
@@ -1282,6 +1381,15 @@ function doJump(stage, cost) {
 }
 function updatePlayer(dt) {
   const wx = state.worldX + PLAYER_X;
+  state.invulnT = Math.max(0, state.invulnT - dt);
+  if (state.shield) {
+    state.shieldT = Math.max(0, state.shieldT - dt);
+    if (state.shieldT <= 0) {
+      state.shield = false;
+      floatText(PLAYER_X, player.feetY - 128, '护盾消散', 'rgba(255,217,79,.8)');
+      burst(PLAYER_X, player.feetY - 50, 12, 'rgba(255,217,79,.7)', 180, 20);
+    }
+  }
   player.coyote = Math.max(0, player.coyote - dt);
   player.slideLock = Math.max(0, player.slideLock - dt);
   if (input.jumpBuffer > 0) input.jumpBuffer = Math.max(0, input.jumpBuffer - dt);
@@ -1336,7 +1444,7 @@ function updatePlayer(dt) {
   player.vy += RULESET.gravity * dt;
   player.feetY += player.vy * dt;
   const hasGround = groundAt(wx);
-  if (player.vy >= 0 && player.feetY >= GROUND && hasGround) {
+  if (player.vy >= 0 && player.feetY >= GROUND && hasGround && player.feetY < GROUND + 26) {
     if (!player.onGround && player.vy > 200) {
       sfx('land');
       state.shake = Math.max(state.shake, 3);
@@ -1354,7 +1462,9 @@ function updatePlayer(dt) {
       player.sliding = false;
     }
   }
-  if (player.feetY > H + 140) crash('fall');
+  /* 掉出楼缝：跌过地面线往下就再也上不来，落到画面底端即判定坠楼 */
+  if (player.feetY > GROUND + 26) player.onGround = false;
+  if (player.feetY > H + 30) crash('fall');
 }
 function playerBox() {
   const h = player.sliding ? 48 : 92;
@@ -1363,6 +1473,7 @@ function playerBox() {
 function collide() {
   const spec = CHARS[state.char];
   if (spec.fly && state.dashT > 0) return;
+  if (state.invulnT > 0) return;
   const box = playerBox();
   for (let i = 0; i < world.obstacles.length; i++) {
     const o = world.obstacles[i];
@@ -1379,6 +1490,17 @@ function collide() {
         burst(sx + o.w / 2, oy + oh * 0.5, 16, 'rgba(255,194,102,.9)', 280, 20);
         floatText(sx + o.w / 2, oy + 20, '+40', 'rgba(255,194,102,1)');
         state.shardPts += 40;
+      } else if (state.shield) {
+        /* 护盾抵挡一次碰撞 */
+        state.shield = false;
+        state.shieldT = 0;
+        state.invulnT = 0.8;
+        o.dead = true;
+        state.shake = 12;
+        sfx('break');
+        burst(sx + o.w / 2, oy + oh * 0.5, 26, 'rgba(255,217,79,.95)', 340, 20);
+        burst(PLAYER_X, player.feetY - 50, 18, 'rgba(255,240,168,.9)', 260, 30);
+        floatText(PLAYER_X, player.feetY - 132, '护盾抵挡', 'rgba(255,217,79,1)');
       } else {
         crash('hit');
         return;
@@ -1431,9 +1553,20 @@ function updateFx(dt) {
     f.y -= 44 * dt;
   }
 }
+/* 技能收招：清空当前场上的障碍 */
+function clearObstacles() {
+  const keepFrom = state.worldX + W + 240;
+  world.obstacles = world.obstacles.filter(o => o.x + o.w > keepFrom);
+  state.shake = Math.max(state.shake, 4);
+  for (let i = 0; i < 5; i++) {
+    burst(W * (0.18 + i * 0.16), GROUND - 26, 8, 'rgba(243,236,221,.32)', 150, 34);
+  }
+}
 function updateRun(dt) {
   state.elapsed += dt;
+  const dashing = state.dashT > 0;
   state.dashT = Math.max(0, state.dashT - dt);
+  if (dashing && state.dashT <= 0) clearObstacles();
   state.shake = Math.max(0, state.shake - dt * 36);
   if (state.comboT > 0) {
     state.comboT -= dt;
@@ -1938,131 +2071,711 @@ function drawArm(x, y, angle, bend, color) {
   ctx.arc(handX, handY, 3.4, 0, 6.283);
   ctx.fill();
 }
-function drawRunPose() {
-  const spec = CHARS[state.char];
-  const air = !player.onGround;
-  const ph = state.mode === 'start' ? 0.4 : state.time * 13 + state.worldX * 0.02;
-  const sw = Math.sin(ph);
-  const cw = Math.cos(ph);
-  const lean = air ? -0.05 : -0.17;
-  const hipY = -44;
-
-  drawScarf(-2, -78, false);
-
-  let t1, k1, t2, k2;
-  if (air) {
-    t1 = 0.8; k1 = -1.4; t2 = -0.55; k2 = -1.05;
-  } else {
-    t1 = sw * 0.62; k1 = -0.4 - Math.max(0, cw) * 0.75;
-    t2 = -sw * 0.62; k2 = -0.4 - Math.max(0, -cw) * 0.75;
+/* ===== Q版仙侠双角色：阿隼（剑客）与小满（仙门） ===== */
+const QS_LOOK = {
+  male: {
+    robe: '#eef3f4', robeLight: '#ffffff', robeDeep: '#9fb8c4',
+    trim: '#5fe3c8', sash: '#22565c', boot: '#f4efe2', bootDeep: '#b9ae94',
+    hair: '#151b24', hairHi: '#4a5d70', skin: '#f5c9a2', skinDeep: '#c98a63',
+    ribbon: 'rgba(95,227,200,.86)', ribbon2: 'rgba(95,227,200,.45)',
+    cape: 'rgba(95,227,200,.5)', metal: '#d8b36a'
+  },
+  female: {
+    robe: '#ffe6ec', robeLight: '#fffafc', robeDeep: '#d9919f',
+    trim: '#ffc266', sash: '#b8493f', boot: '#fff6ea', bootDeep: '#cdbda2',
+    hair: '#1a1a22', hairHi: '#4f5468', skin: '#ffe3cb', skinDeep: '#dda283',
+    ribbon: 'rgba(255,194,102,.9)', ribbon2: 'rgba(255,214,150,.55)',
+    cape: 'rgba(255,240,214,.55)', metal: '#ffd98f'
+  },
+  sci: {
+    robe: '#ffd94f', robeLight: '#fff3b8', robeDeep: '#d2a015',
+    trim: '#3ec9b0', sash: '#2f3540', boot: '#f9f3e4', bootDeep: '#c0b498',
+    hair: '#12161d', hairHi: '#454f5e', skin: '#f6c9a4', skinDeep: '#cd8d66',
+    ribbon: 'rgba(62,201,176,.82)', ribbon2: 'rgba(120,231,210,.4)',
+    cape: 'rgba(255,240,168,.45)', metal: '#fff0a8'
   }
-  drawLeg(-3, hipY, t1, k1, spec.pantsB, 9);
-  drawLeg(3, hipY, t2, k2, spec.pantsA, 10);
-
-  ctx.save();
-  ctx.translate(0, hipY);
-  ctx.rotate(lean);
-  ctx.fillStyle = spec.jacket;
-  roundRect(ctx, -13, -40, 26, 45, 9);
-  ctx.fill();
-  ctx.fillStyle = spec.jacketDeep;
-  roundRect(ctx, -13, -14, 26, 12, 4);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(24,14,4,.35)';
-  ctx.lineWidth = 1.4;
+};
+const QS_BODY = {
+  male: { headR: 23, hipY: -19.5, thigh: 10, shin: 9, shoulder: 11.5, stride: 0.82, bounce: 2.0, lean: -0.14, sleeveR: 6.2 },
+  female: { headR: 25, hipY: -18, thigh: 9, shin: 8, shoulder: 9, stride: 0.6, bounce: 3.6, lean: -0.05, sleeveR: 8.4 },
+  sci: { headR: 24, hipY: -18.8, thigh: 9.4, shin: 8.6, shoulder: 11.8, stride: 0.72, bounce: 2.6, lean: -0.1, sleeveR: 6.8 }
+};
+let QS_SCI = false;
+function qsCapsule(x1, y1, x2, y2, r, c1, c2) {
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = 'rgba(34,26,40,.4)';
+  ctx.lineWidth = r * 2 + 2;
   ctx.beginPath();
-  ctx.moveTo(4, -37);
-  ctx.lineTo(4, -8);
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
   ctx.stroke();
-  ctx.restore();
-
-  if (state.char === 'female') {
-    /* 马尾：随速度飘动 */
-    const sway = Math.sin(state.time * 9) * (air ? 3.2 : 1.8);
-    ctx.fillStyle = '#121b21';
+  const g = ctx.createLinearGradient(x1, y1, x2, y2);
+  g.addColorStop(0, c1);
+  g.addColorStop(1, c2);
+  ctx.strokeStyle = g;
+  ctx.lineWidth = r * 2;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
+function qsBoot(cx, cy, look, fem) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  const g = ctx.createLinearGradient(0, -7, 0, 5);
+  g.addColorStop(0, look.boot);
+  g.addColorStop(1, look.bootDeep);
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  if (fem) {
+    ctx.moveTo(-5.6, -3.2);
+    ctx.quadraticCurveTo(-6.6, 3, -2.6, 4.2);
+    ctx.quadraticCurveTo(0.6, 5, 4.4, 4.2);
+    ctx.quadraticCurveTo(7.4, 2.4, 6.2, -3.4);
+    ctx.quadraticCurveTo(0, -6, -5.6, -3.2);
+  } else {
+    ctx.moveTo(-6, -5.4);
+    ctx.quadraticCurveTo(-7.2, 3.2, -3, 4.6);
+    ctx.quadraticCurveTo(0.4, 5.4, 4.8, 4.6);
+    ctx.quadraticCurveTo(8.6, 2.4, 7.4, -5.3);
+    ctx.quadraticCurveTo(0, -8, -6, -5.4);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(34,26,40,.42)';
+  ctx.lineWidth = 1.1;
+  ctx.stroke();
+  ctx.fillStyle = look.trim;
+  if (fem) {
     ctx.beginPath();
-    ctx.moveTo(2, -95);
-    ctx.quadraticCurveTo(-13, -92, -20, -79 + sway);
-    ctx.quadraticCurveTo(-11, -74 + sway, -3, -80);
-    ctx.quadraticCurveTo(2, -85, 2, -95);
+    ctx.moveTo(-5.4, 1.2);
+    ctx.quadraticCurveTo(0, 3, 6, 1);
+    ctx.quadraticCurveTo(6.6, 2.6, 5.2, 3.5);
+    ctx.quadraticCurveTo(0, 5.2, -4.8, 3.7);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(-6, -0.4);
+    ctx.lineTo(7.4, -1.4);
+    ctx.lineTo(7.6, 1);
+    ctx.lineTo(-6, 2);
     ctx.closePath();
     ctx.fill();
   }
-  ctx.fillStyle = '#101a20';
+  ctx.fillStyle = 'rgba(255,255,255,.6)';
   ctx.beginPath();
-  ctx.arc(7, -86, 11.5, 0, 6.283);
+  ctx.ellipse(2.6, -2.6, 2.6, 1.1, -0.1, 0, 6.283);
   ctx.fill();
-  ctx.fillStyle = '#e8bd97';
-  ctx.beginPath();
-  ctx.arc(7, -85, 9.6, 0.5, 5.9);
-  ctx.fill();
-  ctx.fillStyle = '#121b21';
-  ctx.beginPath();
-  ctx.arc(7, -89, 10.2, Math.PI * 1.02, Math.PI * 2.0);
-  ctx.fill();
-  ctx.fillStyle = '#0d151a';
-  ctx.beginPath();
-  ctx.arc(12, -84, 1.9, 0, 6.283);
-  ctx.fill();
-
-  const armA = air ? -1.0 : sw * 0.85;
-  const armB = air ? -1.7 : -sw * 0.85;
-  drawArm(1, -78, armB, 0.95, spec.jacketDeep);
-  drawArm(4, -78, armA, 1.15, spec.jacket);
+  ctx.restore();
 }
-function drawSlidePose() {
-  const spec = CHARS[state.char];
-  drawScarf(-20, -48, true);
-  /* 撑地手臂 */
-  strokePath([[4, -52], [-8, -28], [-16, -2]], 6.4, spec.jacketDeep);
-  ctx.fillStyle = '#e8bd97';
+function qsLeg(hipX, hip, knee, look, back, p, fem) {
+  const kx = hipX + Math.sin(hip) * p.thigh;
+  const ky = p.hipY + Math.cos(hip) * p.thigh;
+  const a = hip + knee;
+  const fx = kx + Math.sin(a) * p.shin;
+  const fy = ky + Math.cos(a) * p.shin;
+  qsCapsule(hipX, p.hipY, kx, ky, fem ? 4.6 : 5.4, back ? look.robeDeep : look.robeLight, look.robeDeep);
+  qsCapsule(kx, ky, fx, fy, fem ? 4.0 : 4.8, back ? look.robeDeep : look.robe, look.robeDeep);
+  ctx.strokeStyle = look.trim;
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
-  ctx.arc(-16, -2, 3.4, 0, 6.283);
-  ctx.fill();
-  /* 腿 */
-  strokePath([[-4, -30], [18, -20], [36, -12]], 10, spec.pantsA);
-  strokePath([[-4, -26], [14, -8], [32, -6]], 9, spec.pantsB);
-  ctx.fillStyle = '#f3ecdd';
+  ctx.moveTo(fx - 4, fy - 3.2);
+  ctx.lineTo(fx + 4, fy - 4.2);
+  ctx.stroke();
+  qsBoot(fx, fy + 1.4, look, fem);
+}
+function qsHand(hx, hy, look) {
+  ctx.fillStyle = look.skin;
   ctx.beginPath();
-  ctx.ellipse(38, -11, 6.4, 3.4, 0, 0, 6.283);
+  ctx.arc(hx, hy, 3.6, 0, 6.283);
   ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(34, -5, 6.4, 3.4, 0, 0, 6.283);
-  ctx.fill();
-  /* 躯干 */
+  ctx.strokeStyle = 'rgba(34,26,40,.32)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+function qsArm(sx, sw, look, back, p, fem) {
+  const hx = sx + Math.sin(sw) * 12;
+  const hy = -49 + Math.cos(sw) * 12;
+  if (fem) {
+    qsCapsule(sx, -49, hx, hy, p.sleeveR, back ? look.robe : look.robeLight, back ? look.robeDeep : look.robe);
+    ctx.fillStyle = back ? look.robeDeep : look.robe;
+    ctx.beginPath();
+    ctx.moveTo(hx - 7, hy - 2);
+    ctx.quadraticCurveTo(hx - 3, hy + 11, hx + 7, hy + 10);
+    ctx.quadraticCurveTo(hx + 8, hy + 2, hx + 6, hy - 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = look.trim;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(hx - 6.6, hy + 7);
+    ctx.quadraticCurveTo(hx, hy + 11.4, hx + 6.6, hy + 9);
+    ctx.stroke();
+    qsHand(hx + 1, hy + 9.6, look);
+  } else if (QS_SCI) {
+    qsCapsule(sx, -49, hx, hy, p.sleeveR, back ? look.robe : look.robeLight, back ? look.robeDeep : look.robe);
+    ctx.fillStyle = look.robeDeep;
+    roundRect(ctx, hx - 4.6, hy + 0.6, 9.2, 6.4, 2.6);
+    ctx.fill();
+    ctx.strokeStyle = look.trim;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(hx - 4.4, hy + 3.4);
+    ctx.lineTo(hx + 4.4, hy + 3.4);
+    ctx.stroke();
+    qsHand(hx + 0.4, hy + 10, look);
+  } else {
+    qsCapsule(sx, -49, hx, hy, p.sleeveR, back ? look.robe : look.robeLight, back ? look.robeDeep : look.robe);
+    const g = ctx.createLinearGradient(hx - 4, hy, hx + 4, hy + 6);
+    g.addColorStop(0, look.metal);
+    g.addColorStop(1, look.sash);
+    ctx.fillStyle = g;
+    roundRect(ctx, hx - 4.4, hy + 1, 8.8, 5.6, 2.4);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(34,26,40,.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    qsHand(hx + 0.4, hy + 10, look);
+  }
+}
+function qsSword(look) {
   ctx.save();
   ctx.translate(-6, -32);
-  ctx.rotate(-1.18);
-  ctx.fillStyle = spec.jacket;
-  roundRect(ctx, -13, -40, 26, 45, 9);
+  ctx.rotate(0.66);
+  const g = ctx.createLinearGradient(-3, 0, 3, 0);
+  g.addColorStop(0, '#4a5560');
+  g.addColorStop(0.5, '#20262d');
+  g.addColorStop(1, '#4a5560');
+  ctx.fillStyle = g;
+  roundRect(ctx, -3.2, -6, 6.4, 40, 3);
   ctx.fill();
-  ctx.fillStyle = spec.jacketDeep;
-  roundRect(ctx, -13, -14, 26, 12, 4);
+  ctx.strokeStyle = look.trim;
+  ctx.lineWidth = 1.4;
+  roundRect(ctx, -3.2, -6, 6.4, 40, 3);
+  ctx.stroke();
+  ctx.strokeStyle = look.metal;
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(-7, -6.4);
+  ctx.lineTo(7, -6.4);
+  ctx.stroke();
+  ctx.fillStyle = '#3a2a1c';
+  roundRect(ctx, -2.6, -17, 5.2, 11, 2.4);
   ctx.fill();
+  ctx.strokeStyle = look.trim;
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.arc(0, -18.6, 2.2, 0, 6.283);
+  ctx.stroke();
   ctx.restore();
-  /* 头 */
-  if (state.char === 'female') {
-    const sway = Math.sin(state.time * 10) * 2;
-    ctx.fillStyle = '#121b21';
+}
+function qsRibbons(look, ph, fem) {
+  const n = fem ? 3 : 1;
+  for (let k = 0; k < n; k++) {
     ctx.beginPath();
-    ctx.moveTo(-28, -46);
-    ctx.quadraticCurveTo(-42, -34 + sway, -32, -18 + sway);
-    ctx.quadraticCurveTo(-26, -28, -23, -38);
+    ctx.moveTo(2 - k * 2, -30 + k * 2);
+    const len = fem ? 6 : 5;
+    for (let i = 1; i <= len; i++) {
+      const px = 2 - k * 2 - i * (fem ? 7.5 : 6);
+      const py = -30 + k * 2 + i * (fem ? 4.4 : 5) + Math.sin(ph * 0.9 + i * 0.8 + k) * (fem ? 5 : 4);
+      ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = k === 0 ? look.ribbon : look.ribbon2;
+    ctx.lineWidth = k === 0 ? (fem ? 3.4 : 4) : 2.4;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+}
+function qsBody(lean, look, p, fem, ph) {
+  ctx.save();
+  ctx.translate(0, -32);
+  ctx.rotate(lean);
+  ctx.translate(0, 32);
+  if (fem) {
+    /* 长裙 */
+    const sk = ctx.createLinearGradient(-14, -30, 12, -6);
+    sk.addColorStop(0, look.robeLight);
+    sk.addColorStop(0.6, look.robe);
+    sk.addColorStop(1, look.robeDeep);
+    ctx.fillStyle = sk;
+    ctx.beginPath();
+    const flap = Math.sin(ph * 0.9) * 1.4;
+    ctx.moveTo(-8, -30);
+    ctx.quadraticCurveTo(-13 - flap, -18, -10 - flap, -7);
+    ctx.quadraticCurveTo(0, -3, 11 + flap * 0.5, -7);
+    ctx.quadraticCurveTo(12, -19, 8, -30);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(52,40,44,.32)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(52,40,44,.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-2, -29);
+    ctx.lineTo(-3 - flap, -8);
+    ctx.moveTo(5, -29);
+    ctx.lineTo(6 + flap * 0.5, -8);
+    ctx.stroke();
+    ctx.strokeStyle = look.trim;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(-10 - flap, -8.4);
+    ctx.quadraticCurveTo(0, -4, 11 + flap * 0.5, -8);
+    ctx.stroke();
+  }
+  /* 上襦 */
+  const g = ctx.createLinearGradient(-12, -52, 12, -24);
+  g.addColorStop(0, look.robeDeep);
+  g.addColorStop(0.45, look.robe);
+  g.addColorStop(1, look.robeLight);
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  const sx = fem ? 9.4 : 11.6;
+  ctx.moveTo(-sx, -50);
+  ctx.quadraticCurveTo(-sx - 2.5, -36, -8.4, -29);
+  ctx.quadraticCurveTo(0, -26.5, 8.4, -29);
+  ctx.quadraticCurveTo(sx + 2.5, -36, sx, -50);
+  ctx.quadraticCurveTo(0, -53, -sx, -50);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(52,40,44,.35)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  /* 交领 */
+  ctx.strokeStyle = look.trim;
+  ctx.lineWidth = fem ? 2.8 : 3.2;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-sx * 0.78, -50);
+  ctx.quadraticCurveTo(2, -41, sx * 0.74, -48);
+  ctx.stroke();
+  if (QS_SCI) {
+    /* 实验大褂：开襟外套、立领、胸袋工牌 */
+    const coat = ctx.createLinearGradient(-16, -50, 16, -8);
+    coat.addColorStop(0, look.robeDeep);
+    coat.addColorStop(0.42, look.robeLight);
+    coat.addColorStop(1, look.robe);
+    ctx.fillStyle = coat;
+    roundRect(ctx, -sx - 3, -50, 8.6, 43, 3);
+    ctx.fill();
+    roundRect(ctx, sx - 5.6, -50, 9, 43, 3);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(70,52,16,.3)';
+    ctx.lineWidth = 1.1;
+    roundRect(ctx, -sx - 3, -50, 8.6, 43, 3);
+    ctx.stroke();
+    roundRect(ctx, sx - 5.6, -50, 9, 43, 3);
+    ctx.stroke();
+    ctx.strokeStyle = look.trim;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(-sx + 4.6, -47);
+    ctx.quadraticCurveTo(-sx + 3.4, -26, -sx + 4.2, -9);
+    ctx.moveTo(sx - 4.6, -47);
+    ctx.quadraticCurveTo(sx - 3.4, -26, sx - 4.2, -9);
+    ctx.stroke();
+    /* 立领 */
+    ctx.fillStyle = look.robeDeep;
+    roundRect(ctx, -3.8, -53, 7.6, 4.6, 2.2);
+    ctx.fill();
+    ctx.strokeStyle = look.trim;
+    ctx.lineWidth = 1.4;
+    roundRect(ctx, -3.8, -53, 7.6, 4.6, 2.2);
+    ctx.stroke();
+    /* 胸袋 + 工牌 */
+    ctx.fillStyle = look.robeDeep;
+    roundRect(ctx, sx - 6.8, -44, 6.4, 6, 1.8);
+    ctx.fill();
+    ctx.fillStyle = '#fffdf4';
+    roundRect(ctx, sx - 6, -43.2, 4.8, 4.4, 1.4);
+    ctx.fill();
+    ctx.fillStyle = look.trim;
+    roundRect(ctx, sx - 5.6, -42.6, 4, 1.2, 0.6);
+    ctx.fill();
+  }
+  /* 束腰 */
+  const sg = ctx.createLinearGradient(0, -32, 0, -25);
+  sg.addColorStop(0, look.sash);
+  sg.addColorStop(1, look.robeDeep);
+  ctx.fillStyle = sg;
+  roundRect(ctx, -10.5, -32, 21, fem ? 6 : 7.4, 2.5);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(30,24,30,.4)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = look.trim;
+  if (fem) {
+    ctx.beginPath();
+    ctx.ellipse(6, -29, 3.4, 2.6, 0, 0, 6.283);
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.arc(5.5, -28.3, 3.2, 0, 6.283);
+    ctx.fill();
+    ctx.fillStyle = look.metal;
+    ctx.beginPath();
+    ctx.arc(5.5, -28.3, 1.5, 0, 6.283);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+function qsHairBack(look, fem, ph) {
+  const g = ctx.createLinearGradient(-26, -74, -4, -18);
+  g.addColorStop(0, look.hairHi);
+  g.addColorStop(0.45, look.hair);
+  g.addColorStop(1, '#05080c');
+  const sway = Math.sin(ph * 0.5) * 1.8;
+  ctx.fillStyle = g;
+  if (QS_SCI) {
+    ctx.beginPath();
+    ctx.moveTo(-13, -76);
+    ctx.quadraticCurveTo(-25 + sway, -64, -20 + sway, -50);
+    ctx.quadraticCurveTo(-9, -58, -4, -70);
+    ctx.closePath();
+    ctx.fill();
+  } else if (fem) {
+    ctx.quadraticCurveTo(-26 + sway, -52, -19 + sway, -22);
+    ctx.quadraticCurveTo(-9, -42, -4, -64);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(8, -70);
+    ctx.quadraticCurveTo(22 - sway, -54, 16 - sway, -30);
+    ctx.quadraticCurveTo(8, -46, 4, -64);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(-12, -74);
+    ctx.quadraticCurveTo(-28 + sway, -56, -20 + sway, -36);
+    ctx.quadraticCurveTo(-9, -50, -5, -68);
     ctx.closePath();
     ctx.fill();
   }
-  ctx.fillStyle = '#e8bd97';
+}
+function qsPonytail(look, ph, fem) {
+  const sway = Math.sin(ph * 0.8) * 2.6;
+  const g = ctx.createLinearGradient(-8, -96, -34, -50);
+  g.addColorStop(0, look.hairHi);
+  g.addColorStop(0.5, look.hair);
+  g.addColorStop(1, '#05080c');
+  ctx.fillStyle = g;
+  if (fem) {
+    ctx.beginPath();
+    ctx.moveTo(-6, -86);
+    ctx.bezierCurveTo(-24 + sway, -94, -34 + sway, -74, -26 + sway, -46);
+    ctx.bezierCurveTo(-30 + sway, -58, -16, -76, -2, -82);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(-8, -90);
+    ctx.bezierCurveTo(-30 + sway, -92, -40 + sway, -70, -30 + sway, -44);
+    ctx.bezierCurveTo(-33 + sway, -60, -18, -80, -4, -86);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+function qsGoggles(look, cx, hy, r) {
+  ctx.strokeStyle = look.sash;
+  ctx.lineWidth = 4.2;
+  ctx.lineCap = 'butt';
   ctx.beginPath();
-  ctx.arc(-22, -40, 9.6, 0, 6.283);
-  ctx.fill();
-  ctx.fillStyle = '#121b21';
+  ctx.moveTo(cx - r * 0.96, hy - r * 0.46);
+  ctx.quadraticCurveTo(cx, hy - r * 1.0, cx + r * 0.92, hy - r * 0.56);
+  ctx.stroke();
+  for (let i = 0; i < 2; i++) {
+    const lx = cx + (i === 0 ? -r * 0.22 : r * 0.54);
+    const ly = hy - r * 0.62 + i * r * 0.05;
+    const glass = ctx.createLinearGradient(lx - 7, ly - 5, lx + 7, ly + 5);
+    glass.addColorStop(0, 'rgba(255,246,196,.96)');
+    glass.addColorStop(0.52, 'rgba(255,207,63,.82)');
+    glass.addColorStop(1, 'rgba(62,201,176,.6)');
+    ctx.fillStyle = glass;
+    roundRect(ctx, lx - 7, ly - 4.8, 14, 9.6, 4.4);
+    ctx.fill();
+    ctx.strokeStyle = look.sash;
+    ctx.lineWidth = 1.8;
+    roundRect(ctx, lx - 7, ly - 4.8, 14, 9.6, 4.4);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.8)';
+    ctx.beginPath();
+    ctx.ellipse(lx - 2.4, ly - 2, 3.4, 1.5, -0.3, 0, 6.283);
+    ctx.fill();
+  }
+  ctx.strokeStyle = look.metal;
+  ctx.lineWidth = 1.6;
   ctx.beginPath();
-  ctx.arc(-22, -43, 10.2, Math.PI * 1.02, Math.PI * 2.0);
+  ctx.moveTo(cx + r * 0.1, hy - r * 0.62);
+  ctx.lineTo(cx + r * 0.26, hy - r * 0.6);
+  ctx.stroke();
+}
+function qsHead(ph, look, fem, p) {
+  const cx = 3;
+  const hy = fem ? -64 : -68;
+  const r = p.headR;
+  /* 脖子 */
+  ctx.fillStyle = look.skinDeep;
+  roundRect(ctx, cx - 5.6, hy + r * 0.6, 11.2, 10, 4);
   ctx.fill();
-  ctx.fillStyle = '#0d151a';
+  /* 耳朵 */
+  ctx.fillStyle = look.skin;
   ctx.beginPath();
-  ctx.arc(-18, -39, 1.9, 0, 6.283);
+  ctx.ellipse(cx - r * 0.84, hy + r * 0.2, 3.4, 4.6, 0, 0, 6.283);
   ctx.fill();
+  /* 侧脸 */
+  const skin = ctx.createRadialGradient(cx - r * 0.35, hy - r * 0.42, 3, cx + 4, hy + 6, r * 1.18);
+  skin.addColorStop(0, '#fff7ec');
+  skin.addColorStop(0.42, look.skin);
+  skin.addColorStop(1, look.skinDeep);
+  ctx.fillStyle = skin;
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 0.94, hy + r * 0.1);
+  ctx.quadraticCurveTo(cx - r * 1.0, hy - r * 1.05, cx, hy - r * 1.06);
+  ctx.quadraticCurveTo(cx + r * 0.98, hy - r * 1.05, cx + r * 0.94, hy + r * 0.02);
+  ctx.quadraticCurveTo(cx + r * 1.0, hy + r * 0.34, cx + r * 0.86, hy + r * 0.48);
+  ctx.lineTo(cx + r * 1.08, hy + r * 0.58);
+  ctx.lineTo(cx + r * 0.84, hy + r * 0.66);
+  if (fem) {
+    ctx.quadraticCurveTo(cx + r * 0.8, hy + r * 0.98, cx + r * 0.4, hy + r * 1.02);
+    ctx.quadraticCurveTo(cx - r * 0.02, hy + r * 1.1, cx - r * 0.44, hy + r * 0.82);
+  } else {
+    ctx.quadraticCurveTo(cx + r * 0.68, hy + r * 1.1, cx + r * 0.26, hy + r * 1.08);
+    ctx.quadraticCurveTo(cx - r * 0.14, hy + r * 1.0, cx - r * 0.52, hy + r * 0.76);
+  }
+  ctx.quadraticCurveTo(cx - r * 0.86, hy + r * 0.48, cx - r * 0.94, hy + r * 0.1);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(92,52,40,.32)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  /* 头发 */
+  const hair = ctx.createLinearGradient(cx - r, hy - r * 1.1, cx + r, hy);
+  hair.addColorStop(0, look.hair);
+  hair.addColorStop(0.45, look.hairHi);
+  hair.addColorStop(1, look.hair);
+  ctx.fillStyle = hair;
+  ctx.beginPath();
+  if (fem) {
+    ctx.moveTo(cx + r * 0.94, hy - r * 0.06);
+    ctx.quadraticCurveTo(cx + r * 1.02, hy - r * 1.0, cx, hy - r * 1.14);
+    ctx.quadraticCurveTo(cx - r * 1.02, hy - r * 1.0, cx - r * 0.98, hy - r * 0.04);
+    ctx.quadraticCurveTo(cx - r * 1.02, hy + r * 0.5, cx - r * 0.86, hy + r * 0.92);
+    ctx.lineTo(cx - r * 0.6, hy + r * 0.2);
+    ctx.quadraticCurveTo(cx - r * 0.2, hy - r * 0.34, cx + r * 0.2, hy - r * 0.34);
+    ctx.quadraticCurveTo(cx + r * 0.66, hy - r * 0.4, cx + r * 0.86, hy - r * 0.14);
+    ctx.quadraticCurveTo(cx + r * 0.92, hy - r * 0.1, cx + r * 0.94, hy - r * 0.06);
+  } else {
+    ctx.moveTo(cx + r * 0.94, hy - r * 0.1);
+    ctx.quadraticCurveTo(cx + r * 1.04, hy - r * 1.02, cx + r * 0.1, hy - r * 1.16);
+    ctx.quadraticCurveTo(cx - r * 0.98, hy - r * 1.04, cx - r * 0.96, hy - r * 0.08);
+    ctx.quadraticCurveTo(cx - r * 1.04, hy + r * 0.42, cx - r * 0.9, hy + r * 0.86);
+    ctx.lineTo(cx - r * 0.62, hy + r * 0.16);
+    ctx.lineTo(cx - r * 0.42, hy - r * 0.3);
+    ctx.lineTo(cx - r * 0.14, hy + r * 0.02);
+    ctx.lineTo(cx + r * 0.14, hy - r * 0.34);
+    ctx.lineTo(cx + r * 0.5, hy + r * 0.02);
+    ctx.lineTo(cx + r * 0.74, hy - r * 0.4);
+    ctx.quadraticCurveTo(cx + r * 0.9, hy - r * 0.18, cx + r * 0.94, hy - r * 0.1);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(8,12,16,.42)';
+  ctx.lineWidth = 1.1;
+  ctx.stroke();
+  /* 发髻 */
+  if (!QS_SCI) {
+  const bun = ctx.createRadialGradient(cx - r * 0.5, hy - r * 1.3, 2, cx - r * 0.4, hy - r * 1.1, r * 0.6);
+  bun.addColorStop(0, look.hairHi);
+  bun.addColorStop(0.55, look.hair);
+  bun.addColorStop(1, '#05080c');
+  ctx.fillStyle = bun;
+  ctx.beginPath();
+  ctx.ellipse(cx - r * 0.4, hy - r * 1.06, r * 0.46, r * 0.42, -0.2, 0, 6.283);
+  ctx.fill();
+  if (fem) {
+    /* 玉兰发饰 */
+    ctx.fillStyle = '#fff4e8';
+    for (let i = 0; i < 3; i++) {
+      const a = -0.9 + i * 0.7;
+      ctx.beginPath();
+      ctx.ellipse(cx + r * 0.5 + Math.cos(a) * 3, hy - r * 1.18 + Math.sin(a) * 3, 2.6, 1.7, a, 0, 6.283);
+      ctx.fill();
+    }
+    ctx.fillStyle = look.metal;
+    ctx.beginPath();
+    ctx.arc(cx + r * 0.5, hy - r * 1.18, 1.6, 0, 6.283);
+    ctx.fill();
+    /* 花钿 */
+    ctx.fillStyle = 'rgba(210,72,72,.75)';
+    ctx.beginPath();
+    ctx.moveTo(cx + r * 0.3, hy - r * 0.62);
+    ctx.lineTo(cx + r * 0.38, hy - r * 0.52);
+    ctx.lineTo(cx + r * 0.3, hy - r * 0.42);
+    ctx.lineTo(cx + r * 0.22, hy - r * 0.52);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    /* 玉冠 */
+    ctx.fillStyle = look.metal;
+    roundRect(ctx, cx - r * 0.72, hy - r * 1.22, r * 0.62, r * 0.24, 3);
+    ctx.fill();
+    ctx.fillStyle = look.trim;
+    ctx.beginPath();
+    ctx.arc(cx - r * 0.4, hy - r * 1.1, r * 0.11, 0, 6.283);
+    ctx.fill();
+  }
+  } else {
+    qsGoggles(look, cx, hy, r);
+  }
+  /* 马尾 */
+  if (!QS_SCI) qsPonytail(look, ph, fem);
+  /* 头发高光 */
+  ctx.strokeStyle = 'rgba(200,228,255,.3)';
+  ctx.lineWidth = 3.2;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(cx, hy, r * 0.76, Math.PI * 1.2, Math.PI * 1.46);
+  ctx.stroke();
+  /* 眉毛 */
+  ctx.strokeStyle = 'rgba(28,20,26,.64)';
+  ctx.lineWidth = fem ? 1.7 : 2.2;
+  ctx.beginPath();
+  if (fem) {
+    ctx.moveTo(cx + r * 0.06, hy - r * 0.36);
+    ctx.quadraticCurveTo(cx + r * 0.34, hy - r * 0.46, cx + r * 0.62, hy - r * 0.36);
+  } else {
+    ctx.moveTo(cx + r * 0.04, hy - r * 0.32);
+    ctx.quadraticCurveTo(cx + r * 0.32, hy - r * 0.48, cx + r * 0.66, hy - r * 0.3);
+  }
+  ctx.stroke();
+  /* 主眼 */
+  const ey = hy + r * 0.06;
+  const ex = cx + r * 0.36;
+  const erx = fem ? r * 0.3 : r * 0.28;
+  const ery = fem ? r * 0.34 : r * 0.28;
+  ctx.fillStyle = '#fffdf8';
+  ctx.beginPath();
+  ctx.ellipse(ex, ey, erx, ery, 0, 0, 6.283);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(92,52,40,.3)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  const ig = ctx.createRadialGradient(ex, ey - ery * 0.3, 1, ex, ey, erx);
+  if (fem) {
+    ig.addColorStop(0, '#ffeab4');
+    ig.addColorStop(0.5, '#f0a94c');
+    ig.addColorStop(1, '#8a4812');
+  } else {
+    ig.addColorStop(0, '#d6fff6');
+    ig.addColorStop(0.5, '#2bb597');
+    ig.addColorStop(1, '#0a5245');
+  }
+  ctx.fillStyle = ig;
+  ctx.beginPath();
+  ctx.ellipse(ex + 1, ey + 1, erx * 0.72, ery * 0.82, 0, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = '#17110f';
+  ctx.beginPath();
+  ctx.ellipse(ex + 1, ey + 1, erx * 0.32, ery * 0.4, 0, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.95)';
+  ctx.beginPath();
+  ctx.arc(ex - erx * 0.22, ey - ery * 0.34, erx * 0.28, 0, 6.283);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(ex + erx * 0.4, ey + ery * 0.34, erx * 0.14, 0, 6.283);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(26,18,16,.82)';
+  ctx.lineWidth = fem ? 2.2 : 1.6;
+  ctx.beginPath();
+  ctx.ellipse(ex, ey, erx, ery, 0, Math.PI * 1.02, Math.PI * 1.98);
+  ctx.stroke();
+  if (fem) {
+    ctx.strokeStyle = 'rgba(26,18,16,.7)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(ex + erx * 0.6, ey + 1);
+    ctx.lineTo(ex + erx * 1.3, ey - 2);
+    ctx.stroke();
+  }
+  /* 次眼 */
+  ctx.fillStyle = '#fffdf8';
+  ctx.beginPath();
+  ctx.ellipse(cx - r * 0.16, ey + 1, r * 0.15, fem ? r * 0.24 : r * 0.22, 0, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(26,18,16,.6)';
+  ctx.beginPath();
+  ctx.ellipse(cx - r * 0.14, ey + 1.4, r * 0.09, r * 0.14, 0, 0, 6.283);
+  ctx.fill();
+  /* 腮红 */
+  ctx.fillStyle = fem ? 'rgba(255,124,110,.32)' : 'rgba(255,124,110,.2)';
+  ctx.beginPath();
+  ctx.ellipse(cx + r * 0.62, hy + r * 0.46, r * 0.16, r * 0.1, 0.2, 0, 6.283);
+  ctx.fill();
+  /* 嘴 */
+  ctx.strokeStyle = 'rgba(150,60,54,.6)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx + r * 0.58, hy + r * 0.68, fem ? 2.2 : 2.6, 0.4, Math.PI - 0.4);
+  ctx.stroke();
+  /* 轮廓光 */
+  ctx.strokeStyle = 'rgba(255,255,255,.42)';
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.arc(cx, hy, r * 0.94, Math.PI * 1.12, Math.PI * 1.5);
+  ctx.stroke();
+}
+function drawRunPose() {
+  const id = state.char;
+  const fem = id === 'female';
+  QS_SCI = id === 'sci';
+  const look = QS_LOOK[id];
+  const p = QS_BODY[id];
+  const air = !player.onGround;
+  const flying = CHARS[id].fly && state.dashT > 0;
+  const ph = state.mode === 'start' ? 0.55 : state.time * (fem ? 11.4 : 12.6) + state.worldX * 0.02;
+  const sw = Math.sin(ph);
+  const bob = air ? 0 : Math.abs(sw) * p.bounce;
+
+  ctx.save();
+  ctx.translate(0, -bob);
+  if (flying) {
+    ctx.translate(0, -6 + Math.sin(state.time * 6) * 1.8);
+    ctx.rotate(-0.2);
+  }
+  if (!fem && !QS_SCI) qsSword(look);
+  qsRibbons(look, ph, fem);
+  qsHairBack(look, fem, ph);
+  const st = p.stride;
+  qsLeg(-6, air ? -0.42 : -sw * st, air ? (fem ? -0.7 : -1.05) : -0.75 - Math.max(0, -sw) * 0.3, look, true, p, fem);
+  qsLeg(4, air ? 0.6 : sw * st, air ? (fem ? -0.5 : -0.8) : -0.75 + Math.max(0, sw) * 0.32, look, false, p, fem);
+  qsBody(air ? (fem ? -0.02 : -0.05) : p.lean, look, p, fem, ph);
+  qsArm(-4, air ? (fem ? 2.2 : 1.9) : 0.5 + sw * 0.8, look, true, p, fem);
+  qsHead(ph, look, fem, p);
+  qsArm(6, air ? (fem ? 2.1 : 1.3) : 0.5 - sw * 0.85, look, false, p, fem);
+  ctx.restore();
+}
+function drawSlidePose() {
+  const id = state.char;
+  const fem = id === 'female';
+  QS_SCI = id === 'sci';
+  const look = QS_LOOK[id];
+  const p = QS_BODY[id];
+  ctx.save();
+  ctx.translate(0, -12);
+  ctx.rotate(1.0);
+  qsRibbons(look, state.time * 6, fem);
+  qsHairBack(look, fem, 0);
+  qsLeg(-5, -0.5, -0.9, look, true, p, fem);
+  qsLeg(5, 0.4, -0.35, look, false, p, fem);
+  qsBody(-0.06, look, p, fem, 0);
+  qsArm(-4, 2.0, look, true, p, fem);
+  qsHead(0, look, fem, p);
+  qsArm(6, 1.2, look, false, p, fem);
+  ctx.restore();
 }
 function drawPlayer() {
   const spec = CHARS[state.char];
@@ -2073,7 +2786,7 @@ function drawPlayer() {
   if (groundAt(wx) && sy < GROUND + 8) {
     const airH = Math.max(0, GROUND - sy);
     const a = clamp(1 - airH / 300, 0.12, 1) * 0.5;
-    const rw = 24 - Math.min(10, airH * 0.04);
+    const rw = 27 - Math.min(10, airH * 0.04);
     ctx.globalAlpha = a;
     ctx.fillStyle = '#04080b';
     ctx.beginPath();
@@ -2087,16 +2800,16 @@ function drawPlayer() {
       const gx = sx - i * 24;
       const alpha = 0.13 * (1 - i / 6);
       ctx.fillStyle = 'rgba(' + spec.rgb + ',' + alpha.toFixed(3) + ')';
-      roundRect(ctx, gx - 11, sy - 84, 22, 84, 10);
+      roundRect(ctx, gx - 12, sy - 96, 24, 96, 11);
       ctx.fill();
     }
-    const aura = ctx.createRadialGradient(sx, sy - 46, 8, sx, sy - 46, 96);
+    const aura = ctx.createRadialGradient(sx, sy - 52, 8, sx, sy - 52, 104);
     aura.addColorStop(0, 'rgba(' + spec.rgb + ',.34)');
     aura.addColorStop(0.55, 'rgba(' + spec.rgb + ',.10)');
     aura.addColorStop(1, 'rgba(' + spec.rgb + ',0)');
     ctx.fillStyle = aura;
     ctx.beginPath();
-    ctx.arc(sx, sy - 46, 96, 0, 6.283);
+    ctx.arc(sx, sy - 52, 104, 0, 6.283);
     ctx.fill();
     if (spec.fly) {
       /* 飞行：身后拉出水平气浪 */
@@ -2111,6 +2824,19 @@ function drawPlayer() {
         ctx.lineTo(sx - 44 - i * 10 - len, yy);
         ctx.stroke();
       }
+    } else {
+      /* 超频：身后拖出剑光 */
+      ctx.lineCap = 'round';
+      for (let i = 0; i < 3; i++) {
+        const yy = sy - 78 + i * 26;
+        const off = 14 + i * 6;
+        ctx.strokeStyle = 'rgba(255,194,102,' + (0.5 - i * 0.11).toFixed(2) + ')';
+        ctx.lineWidth = 4 - i;
+        ctx.beginPath();
+        ctx.moveTo(sx - 46 - off, yy + 16);
+        ctx.lineTo(sx - 14 - off * 0.4, yy - 12);
+        ctx.stroke();
+      }
     }
   }
   ctx.save();
@@ -2119,6 +2845,48 @@ function drawPlayer() {
   if (player.sliding) drawSlidePose();
   else drawRunPose();
   ctx.restore();
+  /* 护盾罩 */
+  if (state.shield) {
+    const cy = sy - 50;
+    const pulse = 1 + Math.sin(state.time * 3.4) * 0.035;
+    const rad = 56 * pulse;
+    /* 最后 1.5 秒闪烁提示即将消散 */
+    const fading = state.shieldT < 1.5;
+    ctx.globalAlpha = fading ? 0.45 + Math.abs(Math.sin(state.time * 9)) * 0.55 : 1;
+    const g = ctx.createRadialGradient(sx, cy, rad * 0.34, sx, cy, rad);
+    g.addColorStop(0, 'rgba(255,217,79,.05)');
+    g.addColorStop(0.7, 'rgba(255,217,79,.16)');
+    g.addColorStop(1, 'rgba(255,240,168,.5)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(sx, cy, rad, 0, 6.283);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,240,168,.8)';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(sx, cy, rad, 0, 6.283);
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(sx, cy);
+    ctx.rotate(state.time * 0.55);
+    ctx.strokeStyle = 'rgba(255,217,79,.45)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    for (let i = 0; i <= 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      const rx = Math.cos(a) * rad * 0.86;
+      const ry = Math.sin(a) * rad * 0.86;
+      if (i === 0) ctx.moveTo(rx, ry);
+      else ctx.lineTo(rx, ry);
+    }
+    ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ctx.beginPath();
+    ctx.arc(sx - rad * 0.42, cy - rad * 0.5, 5, 0, 6.283);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
 }
 
 /* ===== 绘制：特效层 ===== */
