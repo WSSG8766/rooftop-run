@@ -731,7 +731,7 @@ kbd{
           <p id="skillDesc">能量满 100 时触发 <b>超频</b>：消耗 90 点能量（留 10 点），3.4 秒无敌撞碎障碍，收招时清空场上障碍。</p>
         </div>
         <div class="side-note">碰撞或坠楼即结束本局。速度会随距离逐渐加快，<em>连击拾取</em>能把单颗能量推到 8 倍分。</div>
-        <div class="side-note">宝物：<em>羽扇</em>每 15 秒起风清空障碍；<em>项链</em>死亡复活一次并充满能量（每局一次）；<em>戒指</em>能量槽上限降低 5%；<em>钻石</em>放技能有 15% 概率不耗能量；<em>水晶</em>三段跳后落雷劈掉前方一个障碍。</div>
+        <div class="side-note">宝物：<em>羽扇</em>每 15 秒起风清空障碍；<em>项链</em>死亡复活一次并充满能量（每局一次）；<em>戒指</em>能量槽上限降低 5%；<em>钻石</em>放技能有 15% 概率不耗能量；<em>水晶</em>三段跳后落雷劈掉前方一个障碍（10 秒冷却）。</div>
       </div>
     </div>
     <div class="start-foot">ENTER / 空格 开始</div>
@@ -820,7 +820,7 @@ kbd{
                   <path d="M19 9l-3-5 5 1z" stroke="#e9fffb" stroke-width="1.6" fill="none" stroke-linecap="round"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>水晶</b><em>三段跳后闪电消灭前方障碍</em></span>
+              <span class="char-meta"><b>水晶</b><em>三段跳后落雷劈障碍 · 冷却 10 秒</em></span>
             </button>
           </div>
         </div>
@@ -1233,6 +1233,7 @@ const state = {
   boltT: 0,
   boltX: 0,
   boltY: 0,
+  crystalCd: 0,
   shake: 0,
   elapsed: 0,
   best: loadBest(),
@@ -1439,6 +1440,7 @@ function crystalStrike() {
   state.boltX = best ? bestSx + (best.w || 60) * 0.5 : PLAYER_X + 260;
   state.boltY = best ? (best.type === 'beam' || best.type === 'gate' ? GROUND - 40 : GROUND - best.h) : GROUND;
   state.shake = Math.max(state.shake, 8);
+  state.crystalCd = 10;
   sfx('break');
   if (best) {
     best.dead = true;
@@ -1679,7 +1681,12 @@ function syncRelic() {
   } else if (t === 'diamond') {
     txt = '15%';
   } else if (t === 'crystal') {
-    txt = '三段跳';
+    if (state.crystalCd > 0) {
+      txt = Math.max(0, Math.ceil(state.crystalCd)) + 's';
+      off = true;
+    } else {
+      txt = '待命';
+    }
   } else {
     txt = '−5%';
   }
@@ -1940,8 +1947,8 @@ function doJump(stage, cost) {
     burst(PLAYER_X, player.feetY - 26, 14, 'rgba(255,194,102,.9)', 220, 0);
     floatText(PLAYER_X, player.feetY - 118, '三段跳', 'rgba(255,194,102,.95)');
   }
-  /* 水晶：三段跳落地前召唤闪电，劈掉前方一个障碍 */
-  if (stage === 3 && state.treasure === 'crystal' && state.mode === 'run') crystalStrike();
+  /* 水晶：三段跳落地前召唤闪电，劈掉前方一个障碍（10 秒冷却） */
+  if (stage === 3 && state.treasure === 'crystal' && state.mode === 'run' && state.crystalCd <= 0) crystalStrike();
 }
 function updatePlayer(dt) {
   const wx = state.worldX + PLAYER_X;
@@ -2289,6 +2296,7 @@ function updateRun(dt) {
   state.gourdT = Math.max(0, state.gourdT - dt);
   state.windT = Math.max(0, (state.windT || 0) - dt);
   state.boltT = Math.max(0, (state.boltT || 0) - dt);
+  state.crystalCd = Math.max(0, (state.crystalCd || 0) - dt);
   /* 羽扇：每 15 秒自动挥出一阵风 */
   if (state.treasure === 'fan' && state.mode === 'run') {
     state.fanT -= dt;
