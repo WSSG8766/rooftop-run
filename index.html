@@ -222,7 +222,36 @@ h1{
   text-wrap:pretty;
 }
 .lede em{color:var(--amber);font-style:normal}
-.start-actions{display:flex;align-items:center;gap:clamp(14px,2vw,24px);flex-wrap:wrap}
+.start-actions{display:flex;align-items:center;gap:clamp(12px,2vw,24px);flex-wrap:wrap}
+.btn-ghost{
+  appearance:none;
+  border:1px solid rgba(243,236,221,.28);
+  background:rgba(243,236,221,.05);
+  color:var(--paper);
+  font-family:var(--font-sans);
+  font-size:clamp(12px,1.15vw,14px);
+  font-weight:600;
+  letter-spacing:.1em;
+  padding:clamp(10px,1.2vw,13px) clamp(16px,2vw,24px);
+  cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:border-color .16s ease, background .16s ease, transform .16s ease;
+}
+.btn-ghost:hover{border-color:rgba(255,194,102,.6);background:rgba(255,194,102,.08)}
+.btn-ghost:active{transform:scale(.985)}
+.btn-ghost b{color:var(--amber);font-weight:700}
+.overlay--char{background:rgba(5,9,13,.82)}
+.char-panel{
+  width:min(720px,100%);
+  background:rgba(9,15,20,.96);
+  border:1px solid rgba(243,236,221,.16);
+  padding:clamp(16px,2.6vw,30px);
+}
+.char-panel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:clamp(12px,2vw,20px)}
+.char-panel-head h2{font-family:var(--font-display);font-weight:600;font-size:clamp(22px,2.8vw,32px);margin:0;letter-spacing:.04em}
+.char-panel-head p{margin:6px 0 0;font-size:clamp(10px,.9vw,12px);letter-spacing:.16em;color:rgba(243,236,221,.5)}
+.char-panel .char-pick{max-width:100%;margin:0}
+.char-panel-body{display:block}
 .btn-primary{
   appearance:none;
   border:0;
@@ -289,7 +318,7 @@ kbd{
 /* ===== character pick ===== */
 .char-pick{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:10px;
   margin:0 0 clamp(14px,2vw,22px);
   max-width:42em;
@@ -441,7 +470,7 @@ kbd{
   </div>
 
   <div class="touch">
-    <button class="tbtn t-dash" id="tDash">冲刺</button>
+    <button class="tbtn t-dash" id="tDash">技能</button>
     <button class="tbtn t-slide" id="tSlide">滑铲</button>
     <button class="tbtn t-jump" id="tJump">跳跃</button>
   </div>
@@ -451,7 +480,7 @@ kbd{
       <div class="start-copy">
         <div class="eyebrow">无尽跑酷 · 城市天台</div>
         <h1>夜行天台</h1>
-        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过悬梁，跨过楼缝，把散落的能量攒满，然后在整座城市的上方<em>超频冲刺</em>。三位跑者三种绝招：<em>阿隼</em>撞碎障碍，<em>小满</em>越缝起飞，<em>齐衡</em>开盾挡下一次撞击。</p>
+        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过低矮的悬梁与门架，跨过楼缝，把散落的能量攒满，再在整座城市的上方放出绝招。三位跑者三种绝招：<em>阿隼</em>御剑斩障，<em>小满</em>飞升提速，<em>齐衡</em>开盾挡下一次撞击。</p>
         <div class="char-pick" id="charPick" role="radiogroup" aria-label="选择跑者">
           <button type="button" class="char-card is-on" data-char="male" role="radio" aria-checked="true">
             <span class="char-face">
@@ -475,7 +504,7 @@ kbd{
                 <path d="M18.6 22.6q1.4 1.4 2.8 0" stroke="rgba(150,60,54,.6)" stroke-width="1.1" fill="none"/>
               </svg>
             </span>
-            <span class="char-meta"><b>阿隼</b><em>剑客 · 超频 3.4s 清场</em></span>
+            <span class="char-meta"><b>阿隼</b><em>剑客 · 御剑 3.5s 斩障</em></span>
           </button>
           <button type="button" class="char-card" data-char="female" role="radio" aria-checked="false">
             <span class="char-face">
@@ -502,7 +531,7 @@ kbd{
                 <path d="M18.6 22.6q1.4 1.4 2.8 0" stroke="rgba(150,60,54,.6)" stroke-width="1.1" fill="none"/>
               </svg>
             </span>
-            <span class="char-meta"><b>小满</b><em>仙门 · 飞行 2.5s 越缝</em></span>
+            <span class="char-meta"><b>小满</b><em>仙门 · 飞升 2.5s 双倍速</em></span>
           </button>
           <button type="button" class="char-card" data-char="sci" role="radio" aria-checked="false">
             <span class="char-face">
@@ -531,17 +560,49 @@ kbd{
                 <path d="M18.4 23q1.6 1.2 3.2 0" stroke="rgba(150,60,54,.6)" stroke-width="1.1" fill="none"/>
               </svg>
             </span>
-            <span class="char-meta"><b>齐衡</b><em>科学家 · 护盾挡一次</em></span>
+            <span class="char-meta"><b>齐衡</b><em>科学家 · 护盾 5s</em></span>
+          </button>
+          <button type="button" class="char-card" data-char="mage" role="radio" aria-checked="false">
+            <span class="char-face">
+              <svg viewBox="0 0 40 40" aria-hidden="true">
+                <ellipse cx="20" cy="37" rx="9" ry="2" fill="rgba(0,0,0,.28)"/>
+                <path d="M6.5 40c0-8 6-12.5 13.5-12.5s13.5 4.5 13.5 12.5z" fill="#c9a6ff"/>
+                <path d="M14.6 28.4l5.4 9.4 5.4-9.4" stroke="#3b2a5e" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+                <path d="M20 32h4.6v4.8h-4.6z" fill="#efe2ff"/>
+                <path d="M11.4 22.6c-1.4 6-1.8 10-1 14.4M28.6 22.6c1.4 6 1.8 10 1 14.4" stroke="#211a33" stroke-width="4.6" stroke-linecap="round"/>
+                <circle cx="20" cy="16.5" r="9.4" fill="#ffe4cf"/>
+                <path d="M10.8 15.6c0-7.6 4.2-10.6 9.2-10.6s9.2 3 9.2 10.6c-1.6-3.8-4.4-5.8-9.2-5.8s-7.6 2-9.2 5.8z" fill="#211a33"/>
+                <path d="M9.6 12.4c-2.6-.4-3.8 2.2-2.4 4.2M30.4 12.4c2.6-.4 3.8 2.2 2.4 4.2" stroke="#211a33" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <ellipse cx="20" cy="8.6" rx="14.2" ry="3.6" fill="#a586e0"/>
+                <path d="M13.2 8.2l6.8-10.2 4 10.6z" fill="#c9a6ff"/>
+                <path d="M20 8.2q2.4-8 1.6-9.6" stroke="#efe2ff" stroke-width="1.4" fill="none"/>
+                <path d="M29.4 8.4l2.2 7.6-1.8 5.2" stroke="#e8d6ff" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <circle cx="31.4" cy="7.4" r="3" fill="#8f6bff"/>
+                <circle cx="31.4" cy="7.4" r="1.4" fill="#ffffff"/>
+                <ellipse cx="16.6" cy="17.8" rx="2.2" ry="2.6" fill="#fffdf8"/>
+                <ellipse cx="23.4" cy="17.8" rx="2.2" ry="2.6" fill="#fffdf8"/>
+                <ellipse cx="16.8" cy="18" rx="1.4" ry="1.8" fill="#6a3a2a"/>
+                <ellipse cx="23.2" cy="18" rx="1.4" ry="1.8" fill="#6a3a2a"/>
+                <circle cx="16.2" cy="17" r=".8" fill="#fff"/>
+                <circle cx="22.6" cy="17" r=".8" fill="#fff"/>
+                <ellipse cx="14.6" cy="21.6" rx="1.8" ry="1" fill="rgba(255,124,110,.3)"/>
+                <ellipse cx="25.4" cy="21.6" rx="1.8" ry="1" fill="rgba(255,124,110,.3)"/>
+                <path d="M18.4 22.8q1.6 1.2 3.2 0" stroke="rgba(150,60,54,.6)" stroke-width="1.1" fill="none"/>
+                <path d="M27 13.6l1.6 1.6-1.6 1.6-1.6-1.6z" fill="#e6d6ff"/>
+              </svg>
+            </span>
+            <span class="char-meta"><b>玄枢</b><em>法师 · 滑翔 + 回生法阵</em></span>
           </button>
         </div>
         <div class="start-actions">
+          <button class="btn-ghost" id="charBtn" type="button">选择角色<b id="charBtnName">阿隼</b></button>
           <button class="btn-primary" id="startBtn">开始奔跑</button>
           <div class="best-line">最佳 <b id="startBest">—</b></div>
         </div>
         <div class="touch-hint">
           <span><b>跳跃</b>右下按钮</span>
           <span><b>滑铲</b>右下内侧按钮</span>
-          <span><b>超频</b>左下冲刺</span>
+          <span><b>技能</b>左下技能键</span>
         </div>
         <div class="ios-note" id="iosNote" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -569,6 +630,20 @@ kbd{
       </div>
     </div>
     <div class="start-foot">ENTER / 空格 开始</div>
+  </div>
+
+  <div class="overlay overlay--char" id="charScreen">
+    <div class="char-panel">
+      <div class="char-panel-head">
+        <div>
+          <h2>选择跑者</h2>
+          <p>每位跑者一套专属技能</p>
+        </div>
+        <button class="btn-ghost" id="charBack" type="button">返回</button>
+      </div>
+      <div class="char-panel-body" id="charPanelBody"></div>
+      <div class="start-foot">选中后自动返回</div>
+    </div>
   </div>
 
   <div class="overlay overlay--over" id="overScreen">
@@ -638,13 +713,13 @@ const CHARS = {
     id: 'male',
     name: '阿隼',
     fly: false,
-    dashDur: 3.4,
-    dashName: '超频中',
-    energyName: '超频能量',
-    ult: '超频',
-    tipIdle: '满槽后按 E 超频',
-    tipFull: 'E 超频已就绪',
-    skillHTML: '能量满 100 时触发 <b>超频</b>：消耗 90 点能量（留 10 点），3.4 秒无敌撞碎障碍，收招时清空场上障碍。',
+    dashDur: 3.5,
+    dashName: '御剑中',
+    energyName: '御剑能量',
+    ult: '御剑',
+    tipIdle: '满槽后按 E 御剑',
+    tipFull: 'E 御剑已就绪',
+    skillHTML: '能量满 100 时触发 <b>御剑</b>：消耗 90 点能量（留 10 点），角色前方出现一把飞剑，3.5 秒内自动斩除前方障碍。',
     jacket: '#ffc266',
     jacketLight: '#ffd98f',
     jacketDeep: '#e39b41',
@@ -660,12 +735,12 @@ const CHARS = {
     name: '小满',
     fly: true,
     dashDur: 2.5,
-    dashName: '飞行中',
+    dashName: '飞升中',
     energyName: '飞行能量',
-    ult: '起飞',
-    tipIdle: '满槽后按 E 起飞',
-    tipFull: 'E 起飞已就绪',
-    skillHTML: '能量满 100 时触发 <b>起飞</b>：消耗 90 点能量（留 10 点），2.5 秒无敌飞行，越缝不坠落，收招清空场上障碍。',
+    ult: '飞升',
+    tipIdle: '满槽后按 E 飞升',
+    tipFull: 'E 飞升已就绪',
+    skillHTML: '能量满 100 时触发 <b>飞升</b>：消耗 90 点能量（留 10 点），裙带飘起、身旁竹叶纷飞，2.5 秒内以双倍速度冲刺，越缝不坠落。',
     jacket: '#ff8574',
     jacketLight: '#ffa695',
     jacketDeep: '#d9604f',
@@ -687,7 +762,7 @@ const CHARS = {
     ult: '护盾',
     tipIdle: '满槽后按 E 开盾',
     tipFull: 'E 护盾已就绪',
-    skillHTML: '能量满 100 时开启 <b>护盾</b>：消耗 90 点能量（留 10 点），获得一层 7 秒琥珀护盾，可抵挡一次碰撞伤害；护盾不可叠加，用掉或到期后才能再开。',
+    skillHTML: '能量满 100 时开启 <b>护盾</b>：消耗 90 点能量（留 10 点），获得一层 5 秒琥珀护盾，可抵挡一次碰撞伤害；护盾不可叠加，用掉或到期后才能再开。',
     jacket: '#ffd94f',
     jacketLight: '#fff0a8',
     jacketDeep: '#d9a21a',
@@ -697,9 +772,33 @@ const CHARS = {
     scarfSoft: 'rgba(62,201,176,.5)',
     rgb: '255,217,79',
     burst: 'rgba(255,217,79,.9)'
+  },
+  mage: {
+    id: 'mage',
+    name: '玄枢',
+    fly: false,
+    glide: true,
+    passive: true,
+    meterMax: 150,
+    dashDur: 0,
+    dashName: '法阵就绪',
+    energyName: '法能',
+    ult: '回生法阵',
+    tipIdle: '法能攒满 150 自动待命',
+    tipFull: '回生法阵已待命（受击自动触发）',
+    skillHTML: '<b>滑翔</b>：二段跳后长按跳跃键即展开法袍滑翔，缓慢下降、飞得更远。<br><b>回生法阵</b>（被动）：法能槽上限 150，攒满后自动待命，按 E 无效。受击瞬间挥动法杖、清空全部法能，把这次死亡化为复活，并获得 0.5 秒无敌。',
+    jacket: '#c9a6ff',
+    jacketLight: '#e5d6ff',
+    jacketDeep: '#7b5cc4',
+    pantsA: '#35284f',
+    pantsB: '#251c39',
+    scarf: '#8f6bff',
+    scarfSoft: 'rgba(143,107,255,.5)',
+    rgb: '198,160,255',
+    burst: 'rgba(198,160,255,.9)'
   }
 };
-const CHAR_IDS = ['male', 'female', 'sci'];
+const CHAR_IDS = ['male', 'female', 'sci', 'mage'];
 let savedChar = 'male';
 try {
   const c = localStorage.getItem('rooftop-run-char-v1');
@@ -863,9 +962,9 @@ const world = {
 };
 const player = {
   feetY: GROUND, vy: 0, onGround: true, jumps: 0, sliding: false,
-  slideT: 0, slideLock: 0, coyote: 0, crashRot: 0, crashSpin: 0
+  slideT: 0, slideLock: 0, coyote: 0, crashRot: 0, crashSpin: 0, gliding: false
 };
-const input = { jumpBuffer: 0, slideHeld: false };
+const input = { jumpBuffer: 0, slideHeld: false, jumpHeld: false };
 const state = {
   mode: 'start',
   time: 0,
@@ -874,6 +973,8 @@ const state = {
   dist: 0,
   meter: 0,
   dashT: 0,
+  swordT: 0,
+  staffT: 0,
   shield: false,
   shieldT: 0,
   invulnT: 0,
@@ -930,6 +1031,11 @@ function addObstacle(type, x, diff) {
     world.obstacles.push({ type: 'duct', x, w, h: 36, dead: false, seed: Math.random() });
     addShardArc(x + w / 2, 4, 132, 94, GROUND);
     lastObstacleEnd = x + w;
+  } else if (type === 'gate') {
+    const w = 150 + Math.random() * 46;
+    world.obstacles.push({ type: 'gate', x, w, h: GROUND - 78, dead: false, seed: Math.random() });
+    addShardLine(x + w / 2, 4, 46, GROUND - 42);
+    lastObstacleEnd = x + w;
   } else {
     const w = 136 + Math.random() * 70 + diff * 28;
     world.obstacles.push({ type: 'beam', x, w, h: GROUND - 80, dead: false, seed: Math.random() });
@@ -938,23 +1044,33 @@ function addObstacle(type, x, diff) {
   }
 }
 function addFeatures(start, end, diff) {
-  let x = start + 190;
+  const len = end - start;
+  let x = start + 185;
   let last = '';
-  const limit = end - 330;
-  for (let guard = 0; guard < 4 && x < limit; guard++) {
+  const limit = end - 60;
+  /* 长平台保底一道门架：一定要有需要滑铲的地方 */
+  if (len > 520 && Math.random() < 0.28) {
+    const gx = start + 250 + Math.random() * 40;
+    addObstacle('gate', gx, diff);
+    last = 'gate';
+    x = gx + 500;
+  }
+  for (let guard = 0; guard < 5 && x < limit; guard++) {
     let type;
     const r = Math.random();
     if (diff < 0.12) type = 'crate';
-    else if (r < 0.40) type = 'crate';
-    else if (r < 0.70) type = 'duct';
-    else if (r < 0.90) type = 'beam';
-    else type = 'crate';
-    if (type === last) type = type === 'beam' ? 'crate' : 'beam';
-    if (type === 'beam' && (x < start + 380 || x + 270 > end - 380)) type = 'crate';
+    else if (r < 0.36) type = 'crate';
+    else if (r < 0.62) type = 'duct';
+    else if (r < 0.84) type = 'beam';
+    else type = 'gate';
+    if (type === last) type = type === 'beam' ? 'gate' : 'beam';
+    /* 位置实在放不下就跳过，不要退化成货箱 */
+    if (type === 'beam' && (x < start + 320 || x + 190 > end - 70)) { x += 280; continue; }
+    if (type === 'gate' && (x + 240 > end - 40)) { x += 300; continue; }
     addObstacle(type, x, diff);
     last = type;
-    const baseSpacing = type === 'beam' ? 490 : type === 'duct' ? 440 : 470;
-    const speedNeed = speedAt(x) * (type === 'beam' ? 1.2 : 1.1);
+    const baseSpacing = type === 'beam' ? 490 : type === 'gate' ? 500 : type === 'duct' ? 440 : 470;
+    const speedNeed = speedAt(x) * (type === 'beam' || type === 'gate' ? 1.2 : 1.1);
     x += Math.max(baseSpacing, speedNeed) + Math.random() * 50;
   }
 }
@@ -1045,22 +1161,30 @@ function requestJump() {
   if (state.mode !== 'run') return;
   input.jumpBuffer = RULESET.jumpBuffer;
 }
+function meterCap(id) {
+  const spec = CHARS[id || state.char];
+  return spec.meterMax || RULESET.meterMax;
+}
 function requestDash() {
   if (state.mode !== 'run') return;
   if (state.dashT > 0) return;
   const spec = CHARS[state.char];
+  if (spec.passive) {
+    floatText(PLAYER_X, player.feetY - 126, '法阵自动待命', 'rgba(198,160,255,.9)');
+    return;
+  }
   if (spec.shield && state.shield) {
     floatText(PLAYER_X, player.feetY - 126, '护盾已在身', 'rgba(255,217,79,.9)');
     return;
   }
-  if (state.meter < RULESET.meterMax) {
+  if (state.meter < meterCap()) {
     if (state.meter > 0) floatText(PLAYER_X, player.feetY - 120, '能量未满 ' + Math.round(state.meter) + '%', 'rgba(243,236,221,.75)');
     return;
   }
   state.meter = Math.max(0, state.meter - RULESET.skillCost);
   if (spec.shield) {
     state.shield = true;
-    state.shieldT = 7;
+    state.shieldT = 5;
     state.shake = 6;
     sfx('dash');
     burst(PLAYER_X, player.feetY - 46, 22, spec.burst, 300, 40);
@@ -1068,6 +1192,7 @@ function requestDash() {
     return;
   }
   state.dashT = spec.dashDur;
+  if (state.char === 'male') state.swordT = spec.dashDur;
   state.shake = 7;
   sfx('dash');
   burst(PLAYER_X, player.feetY - 44, 24, spec.burst, 320, 60);
@@ -1092,7 +1217,7 @@ window.addEventListener('keydown', (e) => {
   if (k === ' ' || k === 'ArrowUp' || k === 'ArrowDown') e.preventDefault();
   if (e.repeat) return;
   if (k === 'Enter' && (state.mode === 'start' || state.mode === 'over')) { startGame(); return; }
-  if (isJumpKey(k)) { requestJump(); return; }
+  if (isJumpKey(k)) { input.jumpHeld = true; requestJump(); return; }
   if (isSlideKey(k)) { input.slideHeld = true; return; }
   if (k === 'e' || k === 'E' || k === 'Shift') { requestDash(); return; }
   if (k === 'p' || k === 'P' || k === 'Escape') { togglePause(); return; }
@@ -1100,9 +1225,11 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => {
   if (isSlideKey(e.key)) input.slideHeld = false;
+  if (isJumpKey(e.key)) input.jumpHeld = false;
 });
 window.addEventListener('blur', () => {
   input.slideHeld = false;
+  input.jumpHeld = false;
   input.jumpBuffer = 0;
   if (state.mode === 'run') togglePause(true);
 });
@@ -1115,13 +1242,15 @@ canvas.addEventListener('pointerdown', (e) => {
   if (state.mode !== 'run') return;
   const rect = canvas.getBoundingClientRect();
   const nx = (e.clientX - rect.left) / Math.max(1, rect.width);
-  if (nx > 0.58) requestJump();
+  if (nx > 0.58) { input.jumpHeld = true; requestJump(); }
   else { input.slideHeld = true; state.pointerSlide = true; }
 });
 window.addEventListener('pointerup', () => {
+  input.jumpHeld = false;
   if (state.pointerSlide) { input.slideHeld = false; state.pointerSlide = false; }
 });
 window.addEventListener('pointercancel', () => {
+  input.jumpHeld = false;
   if (state.pointerSlide) { input.slideHeld = false; state.pointerSlide = false; }
 });
 
@@ -1137,7 +1266,7 @@ function bindHold(el, down, up) {
   el.addEventListener('pointercancel', release);
   el.addEventListener('pointerleave', release);
 }
-bindHold(document.getElementById('tJump'), requestJump, () => {});
+bindHold(document.getElementById('tJump'), () => { input.jumpHeld = true; requestJump(); }, () => { input.jumpHeld = false; });
 bindHold(document.getElementById('tSlide'), () => { input.slideHeld = true; }, () => { input.slideHeld = false; });
 bindHold(document.getElementById('tDash'), requestDash, () => {});
 
@@ -1158,6 +1287,12 @@ const energyVal = document.getElementById('energyVal');
 const energyTip = document.getElementById('energyTip');
 const energyLabel = document.getElementById('energyLabel');
 const charPick = document.getElementById('charPick');
+const charBtn = document.getElementById('charBtn');
+const charBtnName = document.getElementById('charBtnName');
+const charScreen = document.getElementById('charScreen');
+const charBack = document.getElementById('charBack');
+const charPanelBody = document.getElementById('charPanelBody');
+if (charPick && charPanelBody) charPanelBody.appendChild(charPick);
 const skillDesc = document.getElementById('skillDesc');
 const overKicker = document.getElementById('overKicker');
 const overTitle = document.getElementById('overTitle');
@@ -1176,10 +1311,12 @@ if (isAppleTouch && iosNote) {
 /* ===== 角色切换 ===== */
 function applyChar() {
   const spec = CHARS[state.char];
+  state.meter = Math.min(state.meter, meterCap());
   energyLabel.textContent = spec.energyName;
-  energyTip.textContent = state.meter >= RULESET.meterMax ? spec.tipFull : spec.tipIdle;
+  energyTip.textContent = state.meter >= meterCap() ? spec.tipFull : spec.tipIdle;
   dashChip.textContent = spec.dashName;
   skillDesc.innerHTML = spec.skillHTML;
+  if (charBtnName) charBtnName.textContent = spec.name;
   const cards = charPick.querySelectorAll('.char-card');
   for (let i = 0; i < cards.length; i++) {
     const on = cards[i].dataset.char === state.char;
@@ -1192,15 +1329,29 @@ if (charPick) {
     const card = e.target.closest('.char-card');
     if (!card || state.mode !== 'start') return;
     const id = card.dataset.char;
-    if (!CHARS[id] || id === state.char) return;
-    state.char = id;
-    player.feetY = GROUND;
-    player.vy = 0;
-    player.onGround = true;
-    player.sliding = false;
-    try { localStorage.setItem('rooftop-run-char-v1', id); } catch (err) {}
-    applyChar();
-    burst(PLAYER_X, GROUND - 50, 10, CHARS[id].burst, 160, 40);
+    if (!CHARS[id]) return;
+    if (id !== state.char) {
+      state.char = id;
+      player.feetY = GROUND;
+      player.vy = 0;
+      player.onGround = true;
+      player.sliding = false;
+      try { localStorage.setItem('rooftop-run-char-v1', id); } catch (err) {}
+      applyChar();
+      burst(PLAYER_X, GROUND - 50, 10, CHARS[id].burst, 160, 40);
+    }
+    if (charScreen) charScreen.classList.remove('show');
+  });
+}
+if (charBtn) {
+  charBtn.addEventListener('click', () => {
+    if (state.mode !== 'start') return;
+    if (charScreen) charScreen.classList.add('show');
+  });
+}
+if (charBack) {
+  charBack.addEventListener('click', () => {
+    if (charScreen) charScreen.classList.remove('show');
   });
 }
 
@@ -1212,6 +1363,8 @@ function resetRun() {
   state.dist = 0;
   state.meter = 0;
   state.dashT = 0;
+  state.swordT = 0;
+  state.staffT = 0;
   state.shield = false;
   state.shieldT = 0;
   state.invulnT = 0;
@@ -1251,6 +1404,7 @@ function startGame() {
   resetRun();
   state.mode = 'run';
   startScreen.classList.remove('show');
+  if (charScreen) charScreen.classList.remove('show');
   overScreen.classList.remove('show');
   pauseScreen.classList.remove('show');
   startBestEl.textContent = state.best.dist ? state.best.dist + ' 米' : '—';
@@ -1264,6 +1418,7 @@ function goHome() {
   state.mode = 'start';
   overScreen.classList.remove('show');
   pauseScreen.classList.remove('show');
+  if (charScreen) charScreen.classList.remove('show');
   startScreen.classList.add('show');
   startBestEl.textContent = state.best.dist ? state.best.dist + ' 米' : '—';
 }
@@ -1309,7 +1464,7 @@ document.getElementById('pauseBtn').addEventListener('click', () => togglePause(
 document.getElementById('resumeBtn').addEventListener('click', () => togglePause());
 
 /* ===== HUD 同步 ===== */
-const hudCache = { dist: -1, best: -1, combo: -1, meter: -1, dash: -1, full: -1 };
+const hudCache = { dist: -1, best: -1, combo: -1, meter: -1, pct: -1, dash: -1, full: -1 };
 function syncHud() {
   const spec = CHARS[state.char];
   if (energyLabel.textContent !== spec.energyName) energyLabel.textContent = spec.energyName;
@@ -1331,12 +1486,15 @@ function syncHud() {
     comboValEl.textContent = state.combo;
   }
   const meter = Math.round(state.meter);
-  if (meter !== hudCache.meter) {
+  const cap = meterCap();
+  const pct = Math.round(meter / cap * 100);
+  if (meter !== hudCache.meter || pct !== hudCache.pct) {
     hudCache.meter = meter;
-    energyFill.style.width = meter + '%';
-    energyVal.textContent = meter;
+    hudCache.pct = pct;
+    energyFill.style.width = Math.min(100, pct) + '%';
+    energyVal.textContent = meter + '/' + cap;
   }
-  const full = state.meter >= RULESET.meterMax;
+  const full = state.meter >= cap;
   if (full !== hudCache.full) {
     hudCache.full = full;
     energyEl.classList.toggle('full', full);
@@ -1344,8 +1502,11 @@ function syncHud() {
   }
   const dashing = state.dashT > 0;
   const shieldOn = !!state.shield;
-  const chipOn = dashing || shieldOn;
-  const chipText = dashing ? spec.dashName + ' ' + state.dashT.toFixed(1) + 's' : (shieldOn ? '护盾 ' + state.shieldT.toFixed(1) + 's' : spec.dashName);
+  const armed = !!spec.mage && state.meter >= meterCap();
+  const chipOn = dashing || shieldOn || armed;
+  const chipText = dashing ? spec.dashName + ' ' + state.dashT.toFixed(1) + 's'
+    : (shieldOn ? '护盾 ' + state.shieldT.toFixed(1) + 's'
+      : (armed ? '回生法阵待命' : spec.dashName));
   if (chipOn !== hudCache.dash) {
     hudCache.dash = chipOn;
     dashChip.classList.toggle('on', chipOn);
@@ -1441,7 +1602,14 @@ function updatePlayer(dt) {
   }
 
   /* 物理 */
-  player.vy += RULESET.gravity * dt;
+  /* 法师滑翔：二段跳后按住跳跃键，重力大幅衰减、缓慢下降 */
+  const gliding = !!spec.glide && !player.onGround && player.jumps >= 2 && input.jumpHeld && player.vy > -30 && state.dashT <= 0;
+  player.gliding = gliding;
+  player.vy += RULESET.gravity * (gliding ? 0.2 : 1) * dt;
+  if (gliding && player.vy > 148) player.vy = 148;
+  if (gliding && Math.random() < dt * 26) {
+    burst(PLAYER_X - 14, player.feetY - 34, 2, 'rgba(198,160,255,.55)', 90, 22);
+  }
   player.feetY += player.vy * dt;
   const hasGround = groundAt(wx);
   if (player.vy >= 0 && player.feetY >= GROUND && hasGround && player.feetY < GROUND + 26) {
@@ -1470,6 +1638,26 @@ function playerBox() {
   const h = player.sliding ? 48 : 92;
   return { x: PLAYER_X - 19, y: player.feetY - h, w: 38, h: h };
 }
+/* 御剑：飞剑主动斩除正前方障碍 */
+function swordSweep() {
+  if (state.swordT <= 0) return;
+  const from = PLAYER_X + 10;
+  const to = PLAYER_X + 270;
+  for (let i = 0; i < world.obstacles.length; i++) {
+    const o = world.obstacles[i];
+    if (o.dead) continue;
+    const sx = o.x - state.worldX;
+    if (sx + o.w < from || sx > to) continue;
+    o.dead = true;
+    const overhead = o.type === 'beam' || o.type === 'gate';
+    const oy = overhead ? 70 : GROUND - o.h;
+    state.shardPts += 20;
+    state.shake = Math.max(state.shake, 5);
+    sfx('break');
+    burst(sx + o.w / 2, oy + 60, 12, 'rgba(255,194,102,.9)', 250, 10);
+    floatText(sx + o.w / 2, oy + 40, '+20', 'rgba(255,194,102,1)');
+  }
+}
 function collide() {
   const spec = CHARS[state.char];
   if (spec.fly && state.dashT > 0) return;
@@ -1480,8 +1668,9 @@ function collide() {
     if (o.dead) continue;
     const sx = o.x - state.worldX;
     if (sx > W + 120 || sx + o.w < -120) continue;
-    const oy = o.type === 'beam' ? 0 : GROUND - o.h;
-    const oh = o.type === 'beam' ? GROUND - 80 : o.h;
+    const overhead = o.type === 'beam' || o.type === 'gate';
+    const oy = overhead ? 0 : GROUND - o.h;
+    const oh = o.h;
     if (box.x + box.w > sx + 4 && box.x < sx + o.w - 4 && box.y + box.h > oy + 2 && box.y < oy + oh - 2) {
       if (state.dashT > 0) {
         o.dead = true;
@@ -1501,6 +1690,19 @@ function collide() {
         burst(sx + o.w / 2, oy + oh * 0.5, 26, 'rgba(255,217,79,.95)', 340, 20);
         burst(PLAYER_X, player.feetY - 50, 18, 'rgba(255,240,168,.9)', 260, 30);
         floatText(PLAYER_X, player.feetY - 132, '护盾抵挡', 'rgba(255,217,79,1)');
+      } else if (spec.mage && state.meter >= meterCap('mage')) {
+        /* 回生法阵：受击瞬间用尽全部法能复活，0.5 秒无敌 */
+        state.meter = 0;
+        state.invulnT = 0.5;
+        state.staffT = 0.5;
+        o.dead = true;
+        state.shake = 14;
+        sfx('dash');
+        burst(sx + o.w / 2, oy + oh * 0.5, 28, 'rgba(198,160,255,.95)', 360, 24);
+        burst(PLAYER_X, player.feetY - 52, 20, 'rgba(232,214,255,.9)', 280, 40);
+        floatText(PLAYER_X, player.feetY - 140, '回生法阵', 'rgba(198,160,255,1)');
+        floatText(PLAYER_X, player.feetY - 108, '复活 · 0.5s 无敌', 'rgba(232,214,255,.9)');
+        return;
       } else {
         crash('hit');
         return;
@@ -1529,7 +1731,7 @@ function collect() {
       state.maxCombo = Math.max(state.maxCombo, state.combo);
       state.comboT = RULESET.comboWindow;
       /* 技能生效期间不吸收能量 */
-      if (state.dashT <= 0) state.meter = Math.min(RULESET.meterMax, state.meter + RULESET.shardGain);
+      if (state.dashT <= 0) state.meter = Math.min(meterCap(), state.meter + RULESET.shardGain);
       sfx('coin');
       burst(sx, s.y, 7, 'rgba(255,214,140,.9)', 150, 0);
       floatText(sx, s.y - 18, '+' + pts, 'rgba(255,214,140,1)');
@@ -1566,6 +1768,8 @@ function updateRun(dt) {
   state.elapsed += dt;
   const dashing = state.dashT > 0;
   state.dashT = Math.max(0, state.dashT - dt);
+  state.swordT = Math.max(0, state.swordT - dt);
+  state.staffT = Math.max(0, state.staffT - dt);
   if (dashing && state.dashT <= 0) clearObstacles();
   state.shake = Math.max(0, state.shake - dt * 36);
   if (state.comboT > 0) {
@@ -1574,10 +1778,21 @@ function updateRun(dt) {
   }
   const target = speedAt(state.worldX);
   state.speed += (target - state.speed) * Math.min(1, dt * 2.4);
-  const mul = state.dashT > 0 ? RULESET.dashSpeedMul : 1;
+  let mul = 1;
+  if (state.dashT > 0) {
+    const spec = CHARS[state.char];
+    if (spec.fly) {
+      /* 飞升：2.5 秒全程双倍速度冲刺 */
+      mul = 2;
+    } else {
+      mul = RULESET.dashSpeedMul;
+    }
+  }
+  if (state.swordT > 0) mul = Math.max(mul, 1.18);
   state.worldX += state.speed * mul * dt;
   updatePlayer(dt);
   if (state.mode !== 'run') return;
+  swordSweep();
   collide();
   if (state.mode !== 'run') return;
   collect();
@@ -1932,8 +2147,68 @@ function drawObstacles() {
     if (x > W + 80 || x + o.w < -80) continue;
     if (o.type === 'crate') drawCrate(x, o);
     else if (o.type === 'duct') drawDuct(x, o);
+    else if (o.type === 'gate') drawGate(x, o);
     else drawBeam(x, o);
   }
+}
+function drawGate(x, o) {
+  const bottom = GROUND - 78;
+  const postW = 18;
+  /* 两侧立柱：从顶到底的整幅门框 */
+  const postA = ctx.createLinearGradient(x - 4, 0, x + postW, 0);
+  postA.addColorStop(0, '#0e181e');
+  postA.addColorStop(0.55, '#22323c');
+  postA.addColorStop(1, '#101a20');
+  ctx.fillStyle = postA;
+  ctx.fillRect(x - 4, 0, postW, bottom + 6);
+  ctx.fillRect(x + o.w - postW + 4, 0, postW, bottom + 6);
+  /* 立柱霓虹边 */
+  ctx.fillStyle = 'rgba(255,194,102,.55)';
+  ctx.fillRect(x + postW - 7, 0, 3, bottom + 6);
+  ctx.fillRect(x + o.w - postW + 8, 0, 3, bottom + 6);
+  /* 横梁（低位，只能滑铲钻过） */
+  const barH = 30;
+  ctx.fillStyle = '#142028';
+  ctx.fillRect(x - 6, bottom - barH, o.w + 12, barH);
+  ctx.fillStyle = '#1d2b34';
+  ctx.fillRect(x - 6, bottom - barH + 5, o.w + 12, 6);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x - 6, bottom - 13, o.w + 12, 13);
+  ctx.clip();
+  ctx.strokeStyle = 'rgba(255,194,102,.85)';
+  ctx.lineWidth = 6;
+  for (let i = -20; i < o.w + 40; i += 18) {
+    ctx.beginPath();
+    ctx.moveTo(x + i, bottom);
+    ctx.lineTo(x + i + 16, bottom - 13);
+    ctx.stroke();
+  }
+  ctx.restore();
+  /* 顶部吊索 */
+  ctx.strokeStyle = 'rgba(140,160,172,.3)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 3; i++) {
+    const hx = x + 34 + i * (o.w - 68) / 2;
+    ctx.beginPath();
+    ctx.moveTo(hx, 0);
+    ctx.lineTo(hx, bottom - barH);
+    ctx.stroke();
+  }
+  /* 警示灯与下滑箭头 */
+  const blink = 0.55 + Math.abs(Math.sin(state.time * 4)) * 0.45;
+  ctx.fillStyle = 'rgba(255,133,116,' + blink.toFixed(2) + ')';
+  ctx.beginPath();
+  ctx.arc(x + o.w / 2, bottom - barH - 10, 5, 0, 6.283);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(95,227,200,.75)';
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.moveTo(x + o.w / 2 + 10, bottom - barH + 12);
+  ctx.lineTo(x + o.w / 2 + 18, bottom - 8);
+  ctx.lineTo(x + o.w / 2 + 2, bottom - 8);
+  ctx.closePath();
+  ctx.stroke();
 }
 function drawCrate(x, o) {
   const y = GROUND - o.h;
@@ -2093,14 +2368,24 @@ const QS_LOOK = {
     hair: '#12161d', hairHi: '#454f5e', skin: '#f6c9a4', skinDeep: '#cd8d66',
     ribbon: 'rgba(62,201,176,.82)', ribbon2: 'rgba(120,231,210,.4)',
     cape: 'rgba(255,240,168,.45)', metal: '#fff0a8'
+  },
+  mage: {
+    robe: '#c9a6ff', robeLight: '#efe2ff', robeDeep: '#7b5cc4',
+    trim: '#e6d6ff', sash: '#3b2a5e', boot: '#efe6ff', bootDeep: '#b8a6d6',
+    hair: '#211a33', hairHi: '#5a4680', skin: '#ffe4cf', skinDeep: '#dda184',
+    ribbon: 'rgba(198,160,255,.88)', ribbon2: 'rgba(232,214,255,.5)',
+    cape: 'rgba(143,107,255,.5)', metal: '#e9d8a8'
   }
 };
 const QS_BODY = {
   male: { headR: 23, hipY: -19.5, thigh: 10, shin: 9, shoulder: 11.5, stride: 0.82, bounce: 2.0, lean: -0.14, sleeveR: 6.2 },
   female: { headR: 25, hipY: -18, thigh: 9, shin: 8, shoulder: 9, stride: 0.6, bounce: 3.6, lean: -0.05, sleeveR: 8.4 },
-  sci: { headR: 24, hipY: -18.8, thigh: 9.4, shin: 8.6, shoulder: 11.8, stride: 0.72, bounce: 2.6, lean: -0.1, sleeveR: 6.8 }
+  sci: { headR: 24, hipY: -18.8, thigh: 9.4, shin: 8.6, shoulder: 11.8, stride: 0.72, bounce: 2.6, lean: -0.1, sleeveR: 6.8 },
+  mage: { headR: 25, hipY: -18.2, thigh: 8.9, shin: 8, shoulder: 8.8, stride: 0.6, bounce: 3.4, lean: -0.04, sleeveR: 9.4 }
 };
 let QS_SCI = false;
+let QS_MAGE = false;
+let QS_FLY = false;
 function qsCapsule(x1, y1, x2, y2, r, c1, c2) {
   ctx.lineCap = 'round';
   ctx.strokeStyle = 'rgba(34,26,40,.4)';
@@ -2239,6 +2524,68 @@ function qsArm(sx, sw, look, back, p, fem) {
     qsHand(hx + 0.4, hy + 10, look);
   }
 }
+function qsStaff(look, ph, gliding) {
+  ctx.save();
+  /* 法杖握在右手，斜向右上，随步频轻摆 */
+  const sway = Math.sin(ph * 0.9) * 0.06;
+  ctx.translate(9, -30);
+  ctx.rotate((gliding ? -0.34 : -0.18) + sway);
+  const len = 86;
+  /* 杖身 */
+  const g = ctx.createLinearGradient(-2.6, 0, 2.6, 0);
+  g.addColorStop(0, '#3a2a4e');
+  g.addColorStop(0.45, '#5d4374');
+  g.addColorStop(1, '#2b1f3c');
+  ctx.fillStyle = g;
+  roundRect(ctx, -2.6, -len + 14, 5.2, len + 12, 2.6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(20,14,30,.6)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, -2.6, -len + 14, 5.2, len + 12, 2.6);
+  ctx.stroke();
+  /* 金箍 */
+  ctx.fillStyle = look.metal;
+  for (let i = 0; i < 3; i++) {
+    const yy = -len + 26 + i * 22;
+    ctx.fillRect(-3.2, yy, 6.4, 3.2);
+  }
+  /* 杖头托座 */
+  ctx.fillStyle = look.metal;
+  ctx.beginPath();
+  ctx.moveTo(-8, -len + 16);
+  ctx.lineTo(0, -len + 6);
+  ctx.lineTo(8, -len + 16);
+  ctx.lineTo(0, -len + 22);
+  ctx.closePath();
+  ctx.fill();
+  /* 法球光晕 */
+  const orbY = -len - 2;
+  const glow = ctx.createRadialGradient(0, orbY, 1, 0, orbY, 26);
+  glow.addColorStop(0, 'rgba(232,214,255,.85)');
+  glow.addColorStop(0.42, 'rgba(198,160,255,.42)');
+  glow.addColorStop(1, 'rgba(198,160,255,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(0, orbY, 26, 0, 6.283);
+  ctx.fill();
+  /* 法球本体 */
+  const orb = ctx.createRadialGradient(-2, orbY - 3, 1, 0, orbY, 9);
+  orb.addColorStop(0, '#ffffff');
+  orb.addColorStop(0.5, '#e8d6ff');
+  orb.addColorStop(1, '#8f6bff');
+  ctx.fillStyle = orb;
+  ctx.beginPath();
+  ctx.arc(0, orbY, 8.4, 0, 6.283);
+  ctx.fill();
+  /* 环绕符文环 */
+  ctx.strokeStyle = 'rgba(232,214,255,.65)';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.ellipse(0, orbY, 12.6, 4.4, Math.sin(state.time * 1.4) * 0.5, 0, 6.283);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function qsSword(look) {
   ctx.save();
   ctx.translate(-6, -32);
@@ -2271,6 +2618,23 @@ function qsSword(look) {
   ctx.restore();
 }
 function qsRibbons(look, ph, fem) {
+  if (QS_FLY && fem) {
+    /* 飞升：裙带向上飘起 */
+    for (let k = 0; k < 3; k++) {
+      ctx.beginPath();
+      ctx.moveTo(3 - k * 3, -34 + k * 5);
+      for (let i = 1; i <= 8; i++) {
+        const px = 3 - k * 3 - i * (6.5 + k);
+        const py = -34 + k * 5 - i * (5.2 + k);
+        ctx.lineTo(px, py + Math.sin(ph * 1.4 + i * 0.9 + k) * (6 + k));
+      }
+      ctx.strokeStyle = k === 0 ? look.ribbon : look.ribbon2;
+      ctx.lineWidth = k === 0 ? 3.4 : 2.4;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+    return;
+  }
   const n = fem ? 3 : 1;
   for (let k = 0; k < n; k++) {
     ctx.beginPath();
@@ -2512,6 +2876,58 @@ function qsGoggles(look, cx, hy, r) {
   ctx.lineTo(cx + r * 0.26, hy - r * 0.6);
   ctx.stroke();
 }
+function qsHat(look, p, fem) {
+  const cx = 3;
+  const hy = fem ? -64 : -68;
+  const r = p.headR;
+  const brimY = hy - r * 0.7;
+  /* 帽檐 */
+  ctx.fillStyle = look.robeDeep;
+  ctx.beginPath();
+  ctx.ellipse(cx, brimY + 3, r * 1.42, r * 0.42, -0.08, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = look.robe;
+  ctx.beginPath();
+  ctx.ellipse(cx, brimY, r * 1.42, r * 0.42, -0.08, 0, 6.283);
+  ctx.fill();
+  ctx.strokeStyle = look.metal;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(cx, brimY + 1, r * 1.42, r * 0.42, -0.08, 0.15, Math.PI - 0.15);
+  ctx.stroke();
+  /* 尖顶 */
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 0.78, brimY - 1);
+  ctx.quadraticCurveTo(cx - r * 0.4, hy - r * 2.0, cx + r * 0.72, hy - r * 2.3);
+  ctx.quadraticCurveTo(cx + r * 0.34, hy - r * 1.5, cx + r * 0.78, brimY + 2);
+  ctx.closePath();
+  const g = ctx.createLinearGradient(cx - r, hy - r * 2.3, cx + r * 0.8, brimY);
+  g.addColorStop(0, look.robeLight);
+  g.addColorStop(0.45, look.robe);
+  g.addColorStop(1, look.robeDeep);
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(40,28,60,.4)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  /* 帽带 */
+  ctx.strokeStyle = look.sash;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 0.72, brimY - 4);
+  ctx.quadraticCurveTo(cx, brimY - r * 0.55, cx + r * 0.74, brimY - 2);
+  ctx.stroke();
+  /* 帽尖星点 */
+  const star = ctx.createRadialGradient(cx + r * 0.72, hy - r * 2.3, 1, cx + r * 0.72, hy - r * 2.3, 7);
+  star.addColorStop(0, 'rgba(255,255,255,.95)');
+  star.addColorStop(0.5, 'rgba(232,214,255,.7)');
+  star.addColorStop(1, 'rgba(198,160,255,0)');
+  ctx.fillStyle = star;
+  ctx.beginPath();
+  ctx.arc(cx + r * 0.72, hy - r * 2.3, 7, 0, 6.283);
+  ctx.fill();
+}
+
 function qsHead(ph, look, fem, p) {
   const cx = 3;
   const hy = fem ? -64 : -68;
@@ -2730,12 +3146,15 @@ function qsHead(ph, look, fem, p) {
 }
 function drawRunPose() {
   const id = state.char;
-  const fem = id === 'female';
+  const fem = id === 'female' || id === 'mage';
   QS_SCI = id === 'sci';
+  QS_MAGE = id === 'mage';
   const look = QS_LOOK[id];
   const p = QS_BODY[id];
   const air = !player.onGround;
   const flying = CHARS[id].fly && state.dashT > 0;
+  const gliding = !!player.gliding;
+  QS_FLY = flying;
   const ph = state.mode === 'start' ? 0.55 : state.time * (fem ? 11.4 : 12.6) + state.worldX * 0.02;
   const sw = Math.sin(ph);
   const bob = air ? 0 : Math.abs(sw) * p.bounce;
@@ -2746,22 +3165,37 @@ function drawRunPose() {
     ctx.translate(0, -6 + Math.sin(state.time * 6) * 1.8);
     ctx.rotate(-0.2);
   }
-  if (!fem && !QS_SCI) qsSword(look);
+  if (gliding) {
+    ctx.translate(0, -4 + Math.sin(state.time * 4) * 2);
+    ctx.rotate(-0.24);
+  }
+  if (!fem && !QS_SCI && !QS_MAGE) qsSword(look);
   qsRibbons(look, ph, fem);
   qsHairBack(look, fem, ph);
   const st = p.stride;
-  qsLeg(-6, air ? -0.42 : -sw * st, air ? (fem ? -0.7 : -1.05) : -0.75 - Math.max(0, -sw) * 0.3, look, true, p, fem);
-  qsLeg(4, air ? 0.6 : sw * st, air ? (fem ? -0.5 : -0.8) : -0.75 + Math.max(0, sw) * 0.32, look, false, p, fem);
+  if (gliding) {
+    /* 滑翔：双腿并拢后摆，法袍被风托住 */
+    qsLeg(-6, -0.62, -1.24, look, true, p, fem);
+    qsLeg(4, -0.3, -1.1, look, false, p, fem);
+  } else {
+    qsLeg(-6, air ? -0.42 : -sw * st, air ? (fem ? -0.7 : -1.05) : -0.75 - Math.max(0, -sw) * 0.3, look, true, p, fem);
+    qsLeg(4, air ? 0.6 : sw * st, air ? (fem ? -0.5 : -0.8) : -0.75 + Math.max(0, sw) * 0.32, look, false, p, fem);
+  }
   qsBody(air ? (fem ? -0.02 : -0.05) : p.lean, look, p, fem, ph);
-  qsArm(-4, air ? (fem ? 2.2 : 1.9) : 0.5 + sw * 0.8, look, true, p, fem);
+  if (gliding) qsArm(-14, 1.05, look, true, p, fem);
+  else qsArm(-4, air ? (fem ? 2.2 : 1.9) : 0.5 + sw * 0.8, look, true, p, fem);
   qsHead(ph, look, fem, p);
-  qsArm(6, air ? (fem ? 2.1 : 1.3) : 0.5 - sw * 0.85, look, false, p, fem);
+  if (QS_MAGE) qsHat(look, p, fem);
+  if (gliding) qsArm(16, 0.6, look, false, p, fem);
+  else qsArm(6, air ? (fem ? 2.1 : 1.3) : 0.5 - sw * 0.85, look, false, p, fem);
+  if (QS_MAGE) qsStaff(look, ph, gliding);
   ctx.restore();
 }
 function drawSlidePose() {
   const id = state.char;
-  const fem = id === 'female';
+  const fem = id === 'female' || id === 'mage';
   QS_SCI = id === 'sci';
+  QS_MAGE = id === 'mage';
   const look = QS_LOOK[id];
   const p = QS_BODY[id];
   ctx.save();
@@ -2774,7 +3208,9 @@ function drawSlidePose() {
   qsBody(-0.06, look, p, fem, 0);
   qsArm(-4, 2.0, look, true, p, fem);
   qsHead(0, look, fem, p);
+  if (QS_MAGE) qsHat(look, p, fem);
   qsArm(6, 1.2, look, false, p, fem);
+  if (QS_MAGE) qsStaff(look, 0, false);
   ctx.restore();
 }
 function drawPlayer() {
@@ -2839,12 +3275,16 @@ function drawPlayer() {
       }
     }
   }
+  if (state.char === 'sci') drawDrone(sx, sy);
   ctx.save();
   ctx.translate(sx, sy);
   if (state.mode === 'crash') ctx.rotate(player.crashRot);
   if (player.sliding) drawSlidePose();
   else drawRunPose();
   ctx.restore();
+  if (state.staffT > 0) drawStaffSwing(sx, sy);
+  if (state.swordT > 0) drawSword(sx, sy);
+  if (state.char === 'female' && state.dashT > 0) drawBambooLeaves(sx, sy);
   /* 护盾罩 */
   if (state.shield) {
     const cy = sy - 50;
@@ -2887,6 +3327,212 @@ function drawPlayer() {
     ctx.fill();
     ctx.globalAlpha = 1;
   }
+}
+
+/* 齐衡的随行无人机：纯装饰 */
+function drawDrone(sx, sy) {
+  const t = state.time;
+  const dx = sx - 76;
+  const dy = sy - 128 + Math.sin(t * 2.1) * 7;
+  ctx.save();
+  ctx.translate(dx, dy);
+  ctx.rotate(Math.sin(t * 1.3) * 0.08);
+  /* 光晕 */
+  const g = ctx.createRadialGradient(0, 0, 2, 0, 0, 26);
+  g.addColorStop(0, 'rgba(255,217,79,.34)');
+  g.addColorStop(1, 'rgba(255,217,79,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(0, 0, 26, 0, 6.283);
+  ctx.fill();
+  /* 机臂 */
+  ctx.strokeStyle = '#2f3540';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-13, -2); ctx.lineTo(-4, 0);
+  ctx.moveTo(13, -2); ctx.lineTo(4, 0);
+  ctx.stroke();
+  /* 旋翼 */
+  ctx.strokeStyle = 'rgba(255,240,168,.85)';
+  ctx.lineWidth = 1.6;
+  for (let i = 0; i < 2; i++) {
+    const rx = i === 0 ? -16 : 16;
+    ctx.beginPath();
+    ctx.ellipse(rx, -3, 8, 2.4, Math.sin(t * 22 + i) * 0.3, 0, 6.283);
+    ctx.stroke();
+  }
+  /* 机身 */
+  const body = ctx.createLinearGradient(0, -7, 0, 7);
+  body.addColorStop(0, '#fff0a8');
+  body.addColorStop(0.5, '#ffd94f');
+  body.addColorStop(1, '#c79212');
+  ctx.fillStyle = body;
+  roundRect(ctx, -9, -7, 18, 14, 5);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(34,26,20,.45)';
+  ctx.lineWidth = 1.2;
+  roundRect(ctx, -9, -7, 18, 14, 5);
+  ctx.stroke();
+  /* 镜头与信号灯 */
+  ctx.fillStyle = '#2f3540';
+  ctx.beginPath();
+  ctx.arc(3, 0, 3.4, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(62,201,176,.95)';
+  ctx.beginPath();
+  ctx.arc(3, 0, 1.7, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = Math.sin(t * 6) > 0 ? 'rgba(255,133,116,.95)' : 'rgba(255,133,116,.3)';
+  ctx.beginPath();
+  ctx.arc(-6, -4, 1.5, 0, 6.283);
+  ctx.fill();
+  /* 下方投影 */
+  ctx.fillStyle = 'rgba(255,217,79,.12)';
+  ctx.beginPath();
+  ctx.ellipse(0, 30, 14, 4, 0, 0, 6.283);
+  ctx.fill();
+  ctx.restore();
+}
+/* 阿隼的飞剑 */
+function drawSword(sx, sy) {
+  const t = state.time;
+  const bx = sx + 150;
+  const by = sy - 84 + Math.sin(t * 3.4) * 8;
+  ctx.save();
+  ctx.translate(bx, by);
+  ctx.rotate(-0.08 + Math.sin(t * 5) * 0.05);
+  /* 剑气拖尾 */
+  const trail = ctx.createLinearGradient(-120, 0, 0, 0);
+  trail.addColorStop(0, 'rgba(255,194,102,0)');
+  trail.addColorStop(0.6, 'rgba(255,194,102,.28)');
+  trail.addColorStop(1, 'rgba(255,240,168,.55)');
+  ctx.fillStyle = trail;
+  ctx.beginPath();
+  ctx.moveTo(-120, -3);
+  ctx.lineTo(-4, -9);
+  ctx.lineTo(-4, 9);
+  ctx.lineTo(-120, 3);
+  ctx.closePath();
+  ctx.fill();
+  /* 剑光 */
+  const glow = ctx.createRadialGradient(14, 0, 2, 14, 0, 52);
+  glow.addColorStop(0, 'rgba(255,240,168,.5)');
+  glow.addColorStop(1, 'rgba(255,240,168,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(14, 0, 52, 0, 6.283);
+  ctx.fill();
+  /* 剑身 */
+  const blade = ctx.createLinearGradient(0, -6, 0, 6);
+  blade.addColorStop(0, '#ffffff');
+  blade.addColorStop(0.5, '#dfe9ef');
+  blade.addColorStop(1, '#9fb5c2');
+  ctx.fillStyle = blade;
+  ctx.beginPath();
+  ctx.moveTo(4, -6);
+  ctx.lineTo(74, -3.4);
+  ctx.lineTo(94, 0);
+  ctx.lineTo(74, 3.4);
+  ctx.lineTo(4, 6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,194,102,.9)';
+  ctx.lineWidth = 1.4;
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,.9)';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(10, -1.6);
+  ctx.lineTo(80, -0.6);
+  ctx.stroke();
+  /* 护手与剑柄 */
+  ctx.fillStyle = '#3a2a1c';
+  roundRect(ctx, -10, -10, 6, 20, 2.4);
+  ctx.fill();
+  ctx.fillStyle = '#c9a24a';
+  roundRect(ctx, -3, -15, 8, 30, 3);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(95,227,200,.9)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-22, -12);
+  ctx.quadraticCurveTo(-34, -2, -30, 12);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* 小满飞升时身旁纷飞的竹叶 */
+function drawBambooLeaves(sx, sy) {
+  const t = state.time;
+  for (let i = 0; i < 11; i++) {
+    const seed = i * 1.73;
+    const p = ((t * 0.85 + i * 0.137) % 1);
+    const px = sx - 34 - p * 210 + Math.sin(t * 2.2 + seed) * 12;
+    const py = sy - 52 + Math.sin(seed * 1.4) * 40 - p * 74 + Math.sin(t * 3.1 + seed) * 10;
+    const alpha = Math.sin(Math.PI * p) * 0.9;
+    if (alpha <= 0.03) continue;
+    const size = 8 + (i % 3) * 2.4;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(px, py);
+    ctx.rotate(-0.5 + p * 2.6 + Math.sin(t * 2.4 + seed) * 0.5);
+    const g = ctx.createLinearGradient(-size, 0, size, 0);
+    g.addColorStop(0, 'rgba(168,214,128,.95)');
+    g.addColorStop(0.55, 'rgba(120,190,104,.9)');
+    g.addColorStop(1, 'rgba(70,140,86,.75)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(-size, 0);
+    ctx.quadraticCurveTo(0, -size * 0.52, size, 0);
+    ctx.quadraticCurveTo(0, size * 0.34, -size, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(232,247,214,.7)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-size * 0.9, 0);
+    ctx.lineTo(size * 0.9, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
+/* 法师挥杖：紫色法阵弧光 */
+function drawStaffSwing(sx, sy) {
+  const k = state.staffT / 0.5;
+  const cy = sy - 56;
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, k * 1.5);
+  /* 弧形杖光 */
+  ctx.strokeStyle = 'rgba(198,160,255,.85)';
+  ctx.lineWidth = 7 * k + 2;
+  ctx.beginPath();
+  ctx.arc(sx, cy, 74, -2.0 + (1 - k) * 1.4, -0.2 + (1 - k) * 1.4);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(240,232,255,.7)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(sx, cy, 88, -2.1 + (1 - k) * 1.4, -0.1 + (1 - k) * 1.4);
+  ctx.stroke();
+  /* 法阵环 */
+  ctx.save();
+  ctx.translate(sx, cy);
+  ctx.rotate((1 - k) * 2.4);
+  ctx.strokeStyle = 'rgba(198,160,255,' + (0.55 * k).toFixed(2) + ')';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.arc(0, 0, 62 * (1.1 - k * 0.3), 0, 6.283);
+  ctx.stroke();
+  for (let i = 0; i < 6; i++) {
+    const a = i * Math.PI / 3;
+    ctx.beginPath();
+    ctx.arc(Math.cos(a) * 62 * (1.1 - k * 0.3), Math.sin(a) * 62 * (1.1 - k * 0.3), 4.2, 0, 6.283);
+    ctx.stroke();
+  }
+  ctx.restore();
+  ctx.globalAlpha = 1;
+  ctx.restore();
 }
 
 /* ===== 绘制：特效层 ===== */
@@ -3000,7 +3646,7 @@ state.mode = 'start';
 startBestEl.textContent = state.best.dist ? state.best.dist + ' 米' : '—';
 hudBestEl.textContent = state.best.dist;
 energyFill.style.width = '0%';
-energyVal.textContent = '0';
+energyVal.textContent = '0/' + meterCap();
 syncMute();
 applyChar();
 requestAnimationFrame(function boot(now) {
