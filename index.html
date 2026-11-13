@@ -470,7 +470,7 @@ kbd{
 .relic{
   position:absolute;
   left:clamp(10px,1.6vw,20px);
-  top:clamp(82px,12vh,124px);
+  top:clamp(150px,21vh,206px);
   width:clamp(44px,5vw,56px);
   display:flex;
   flex-direction:column;
@@ -501,7 +501,7 @@ kbd{
 .relic.off{opacity:.42}
 .relic.off .relic-cd{color:rgba(243,236,221,.55)}
 @media (max-width:760px), (hover:none) and (pointer:coarse){
-  .relic{top:56px;left:8px;width:40px}
+  .relic{top:92px;left:8px;width:40px}
   .relic-cd{font-size:9px}
 }
 .char-card{
@@ -779,10 +779,10 @@ kbd{
     <div class="hero-rail" aria-hidden="true">天台夜行<span></span></div>
     <div class="start-grid">
       <div class="start-copy">
-        <div class="eyebrow">无尽跑酷 · 天台与街巷</div>
+        <div class="eyebrow">无尽跑酷 · 天台 · 街巷 · 高架</div>
         <h1 class="hero-title"><b>夜行</b><em>跑酷</em></h1>
         <div class="hero-sub">endless rooftop run</div>
-        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过低矮的悬梁与门架，跨过楼缝，把散落的能量攒满，再在整座城市的上方放出绝招。跑到 3000 米时天台尽头会浮出一道传送门，穿过去白拿 10000 分，脚下的风景也会换成深夜的人行街道。</p>
+        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过低矮的悬梁与门架，跨过楼缝，把散落的能量攒满，再在整座城市的上方放出绝招。跑到 3000 米时天台尽头会浮出一道传送门，穿过去白拿 10000 分，脚下的风景也会换成深夜的人行街道；再跑 3000 米，第二道传送门把你送上夜里的高架桥。</p>
         <div class="char-pick" id="charPick" role="radiogroup" aria-label="选择跑者">
           <button type="button" class="char-card is-on" data-char="male" role="radio" aria-checked="true">
             <span class="char-face">
@@ -1047,7 +1047,7 @@ kbd{
                   <circle cx="20" cy="29.4" r="2.4" fill="#b8863c"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>羽扇</b><em>每 15 秒起风清场</em></span>
+              <span class="char-meta"><b>羽扇</b><em>每 10 秒起风清场</em></span>
             </button>
             <button type="button" class="char-card" data-treasure="necklace" role="radio" aria-checked="false">
               <span class="char-face">
@@ -1095,7 +1095,7 @@ kbd{
                   <path d="M19 9l-3-5 5 1z" stroke="#e9fffb" stroke-width="1.6" fill="none" stroke-linecap="round"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>水晶</b><em>三段跳后落雷劈障碍 · 冷却 8 秒</em></span>
+              <span class="char-meta"><b>水晶</b><em>三段跳后落雷劈障碍 · 冷却 7 秒</em></span>
             </button>
             <button type="button" class="char-card" data-treasure="amulet" role="radio" aria-checked="false">
               <span class="char-face">
@@ -1109,7 +1109,7 @@ kbd{
                   <path d="M20 31v4M18.4 35h3.2" stroke="#a9762f" stroke-width="1.2" stroke-linecap="round"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>护符</b><em>受击自动施法 · 每局 2 次</em></span>
+              <span class="char-meta"><b>护符</b><em>受击自动施法 · 每局 3 次</em></span>
             </button>
             <button type="button" class="char-card" data-treasure="crown" role="radio" aria-checked="false">
               <span class="char-face">
@@ -1122,7 +1122,7 @@ kbd{
                   <path d="M9 30h22" stroke="#a9762f" stroke-width="1.6" stroke-linecap="round"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>王冠</b><em>最终得分 +5%</em></span>
+              <span class="char-meta"><b>王冠</b><em>最终得分 +10%</em></span>
             </button>
             <button type="button" class="char-card" data-treasure="grail" role="radio" aria-checked="false">
               <span class="char-face">
@@ -1136,7 +1136,7 @@ kbd{
                   <path d="M14.6 13.4q5.4 3.6 10.8 0" stroke="#fff6dd" stroke-width="1.2" fill="none" opacity=".7"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>圣杯</b><em>复活后获得 0.5 秒飞行</em></span>
+              <span class="char-meta"><b>圣杯</b><em>复活后获得 0.7 秒飞行</em></span>
             </button>
           </div>
         </div>
@@ -1198,7 +1198,7 @@ kbd{
   <div class="overlay" id="pauseScreen">
     <div class="pause-card">
       <h2 class="pause-title">暂停</h2>
-      <p class="pause-sub">天台上的风还在吹，跑者先歇一会儿。<br>按 P（或点下方按钮）回到跑道。</p>
+      <p class="pause-sub">风声还在，跑者先歇一会儿。<br>按 P（或点下方按钮）回到跑道。</p>
       <button class="btn-primary" id="resumeBtn">继续</button>
     </div>
   </div>
@@ -1382,12 +1382,12 @@ const CHAR_IDS = ['male', 'female', 'sci', 'mage', 'bone', 'wuxia'];
 /* ===== 宝物：每位跑者可搭配一件 ===== */
 const TREASURES = {
   '': { id: '', name: '未携带', desc: '不带宝物' },
-  fan: { id: 'fan', name: '羽扇', desc: '每 15 秒挥出一阵风，摧毁当前场上的障碍' },
+  fan: { id: 'fan', name: '羽扇', desc: '每 10 秒挥出一阵风，摧毁当前场上的障碍' },
   necklace: { id: 'necklace', name: '项链', desc: '死亡后复活一次，并立刻充满能量槽（每局限一次）' },
   ring: { id: 'ring', name: '戒指', desc: '能量槽上限降低 10%' },
-  amulet: { id: 'amulet', name: '护符', desc: '受击时自动释放角色技能（能量需满），每局最多 2 次' },
-  crown: { id: 'crown', name: '王冠', desc: '最终得分提升 5%' },
-  grail: { id: 'grail', name: '圣杯', desc: '每次复活后获得 0.5 秒飞行' },
+  amulet: { id: 'amulet', name: '护符', desc: '受击时自动释放角色技能（能量需满），每局最多 3 次' },
+  crown: { id: 'crown', name: '王冠', desc: '最终得分提升 10%' },
+  grail: { id: 'grail', name: '圣杯', desc: '每次复活后获得 0.7 秒飞行' },
   diamond: { id: 'diamond', name: '钻石', desc: '释放技能后有 20% 概率不消耗能量' },
   crystal: { id: 'crystal', name: '水晶', desc: '三段跳后召唤闪电，消灭前方一个障碍物' }
 };
@@ -1656,13 +1656,14 @@ const state = {
   crashReason: 'hit',
   map: 0,
   bonusPts: 0,
-  portalUsed: false,
+  portalIdx: 0,
+  portalRevive: 0,
   portalX: 0,
   flashT: 0,
   mapBannerT: 0,
   char: savedChar,
   treasure: savedTreasure,
-  fanT: 15,
+  fanT: 10,
   necklaceUsed: false,
   amuletUsed: 0,
   windT: 0,
@@ -1685,7 +1686,7 @@ let genCursor = 1700;
 let lastObstacleEnd = 1212;
 
 /* ===== 关卡生成 ===== */
-const PORTAL_METERS = 3000;
+const PORTALS = [3000, 6000];
 function difficulty(wx) {
   return clamp((wx / RULESET.pxPerMeter) / 900, 0, 1);
 }
@@ -1700,14 +1701,14 @@ function addShardArc(cx, count, span, peak, baseY) {
       y: baseY - peak * Math.sin(Math.PI * t) - 26,
       phase: Math.random() * 6.283,
       dead: false,
-      purple: state.map === 1 && Math.random() < 0.20
+      purple: state.map > 0 && Math.random() < 0.20
     });
   }
 }
 function addShardLine(cx, count, gap, y) {
   const total = (count - 1) * gap;
   for (let i = 0; i < count; i++) {
-    world.shards.push({ x: cx - total / 2 + i * gap, y, phase: Math.random() * 6.283, dead: false, purple: state.map === 1 && Math.random() < 0.20 });
+    world.shards.push({ x: cx - total / 2 + i * gap, y, phase: Math.random() * 6.283, dead: false, purple: state.map > 0 && Math.random() < 0.20 });
   }
 }
 function addObstacle(type, x, diff) {
@@ -1782,8 +1783,8 @@ function generateAhead() {
     const len = 500 - diff * 120 + Math.random() * 250;
     world.platforms.push({ start: genCursor, end: genCursor + len });
     addFeatures(genCursor, genCursor + len, diff);
-    /* 夜街：隔一段距离随机出现一个道具 */
-    if (state.map === 1) {
+    /* 夜街 / 高架：隔一段距离随机出现一个道具 */
+    if (state.map > 0) {
       const lastItem = world.items.length ? world.items[world.items.length - 1].x : -1e9;
       if (genCursor - lastItem > 900 && Math.random() < 0.5) {
         const kinds = ['grow', 'fly', 'shield'];
@@ -1807,9 +1808,11 @@ function generateAhead() {
       }
     }
     if (Math.random() < 0.55) {
-      const dType = state.map === 1
-        ? (Math.random() < 0.5 ? 'hydrant' : 'planter')
-        : (Math.random() < 0.5 ? 'tank' : 'antenna');
+      const dType = state.map === 2
+        ? (Math.random() < 0.5 ? 'gantry' : 'bridgesign')
+        : state.map === 1
+          ? (Math.random() < 0.5 ? 'hydrant' : 'planter')
+          : (Math.random() < 0.5 ? 'tank' : 'antenna');
       world.decor.push({ x: genCursor + rand(30, 90), type: dType });
     }
     genCursor += len;
@@ -1913,7 +1916,7 @@ function crystalStrike() {
   state.boltX = best ? bestSx + (best.w || 60) * 0.5 : PLAYER_X + 260;
   state.boltY = best ? (best.type === 'beam' || best.type === 'gate' ? GROUND - 40 : GROUND - best.h) : GROUND;
   state.shake = Math.max(state.shake, 8);
-  state.crystalCd = 8;
+  state.crystalCd = 7;
   sfx('break');
   if (best) {
     best.dead = true;
@@ -2202,12 +2205,12 @@ function syncRelic() {
       txt = '待命';
     }
   } else if (t === 'amulet') {
-    txt = (2 - state.amuletUsed) + '次';
-    off = state.amuletUsed >= 2;
+    txt = (3 - state.amuletUsed) + '次';
+    off = state.amuletUsed >= 3;
   } else if (t === 'crown') {
-    txt = '5%';
+    txt = '10%';
   } else if (t === 'grail') {
-    txt = state.itemFlyT > 0 ? state.itemFlyT.toFixed(1) + 's' : '0.5s';
+    txt = state.itemFlyT > 0 ? state.itemFlyT.toFixed(1) + 's' : '0.7s';
     off = state.itemFlyT > 0;
   } else {
     txt = '−10%';
@@ -2297,7 +2300,7 @@ function resetRun() {
   state.shield = false;
   state.shieldT = 0;
   state.invulnT = 0;
-  state.fanT = 15;
+  state.fanT = 10;
   state.necklaceUsed = false;
   state.shards = 0;
   state.shardPts = 0;
@@ -2315,8 +2318,9 @@ function resetRun() {
   state.crashReason = 'hit';
   state.map = 0;
   state.bonusPts = 0;
-  state.portalUsed = false;
-  state.portalX = PORTAL_METERS * RULESET.pxPerMeter;
+  state.portalIdx = 0;
+  state.portalRevive = 0;
+  state.portalX = PORTALS[0] * RULESET.pxPerMeter;
   state.flashT = 0;
   state.mapBannerT = 0;
   state.shake = 0;
@@ -2390,20 +2394,22 @@ function crash(reason) {
 }
 function finishRun() {
   state.mode = 'over';
-  const crownBonus = state.treasure === 'crown' ? 1.05 : 1;
+  const crownBonus = state.treasure === 'crown' ? 1.10 : 1;
   state.score = Math.floor((Math.floor(state.worldX / RULESET.pxPerMeter) + Math.floor(state.shardPts) + state.bonusPts) * crownBonus);
   const dist = Math.floor(state.worldX / RULESET.pxPerMeter);
   if (dist > state.best.dist) {
     saveBest({ dist: dist, score: Math.max(state.score, state.best.score) });
   }
-  overKicker.textContent = state.crashReason === 'fall' ? '坠下天台' : '撞上障碍';
+  overKicker.textContent = state.crashReason === 'fall'
+    ? (state.map === 2 ? '坠下高架' : state.map === 1 ? '摔进街巷' : '坠下天台')
+    : '撞上障碍';
   overTitle.textContent = dist >= state.best.dist && dist > 0 ? '新纪录，跑得漂亮' : '这一程结束了';
   overScoreEl.textContent = state.score;
   overDistEl.textContent = dist + ' 米';
   overShardsEl.textContent = state.shards + ' 颗';
   overBestEl.textContent = state.best.dist + ' 米';
   overFoot.textContent = '角色 ' + CHARS[state.char].name + ' · 最高连击 ×' + state.maxCombo + ' · 本局用时 ' + state.elapsed.toFixed(1) + ' 秒'
-    + (state.treasure === 'crown' ? ' · 王冠加成 +5%' : '');
+    + (state.treasure === 'crown' ? ' · 王冠加成 +10%' : '');
   overScreen.classList.add('show');
   hudBestEl.textContent = state.best.dist;
   startBestEl.textContent = state.best.dist ? state.best.dist + ' 米' : '—';
@@ -2427,9 +2433,11 @@ function syncHud() {
     hudCache.dist = dist;
     distEl.textContent = dist;
   }
-  const mapText = state.map === 1
-    ? '夜街 · 已穿越 +10000'
-    : '天台 · 传送门 ' + Math.max(0, Math.ceil(PORTAL_METERS - dist)) + ' 米';
+  const mapText = state.map === 2
+    ? '高架桥 · 无尽夜驰'
+    : state.map === 1
+      ? '夜街 · 传送门 ' + Math.max(0, Math.ceil(PORTALS[1] - dist)) + ' 米'
+      : '天台 · 传送门 ' + Math.max(0, Math.ceil(PORTALS[0] - dist)) + ' 米';
   if (mapLineEl && mapLineEl.textContent !== mapText) mapLineEl.textContent = mapText;
   if (state.best.dist !== hudCache.best) {
     hudCache.best = state.best.dist;
@@ -2471,12 +2479,14 @@ function syncHud() {
   const growOn = state.growT > 0;
   const itemFlyOn = state.itemFlyT > 0;
   const itemShieldOn = !!state.itemShield;
-  const chipOn = dashing || shieldOn || armed || gourdFly || fanOn || boneFly || boneIdle || growOn || itemFlyOn || itemShieldOn || (!!spec.wuxia && !state.gourdAlive);
+  const portalReviveOn = state.portalRevive > 0;
+  const chipOn = dashing || shieldOn || armed || gourdFly || fanOn || boneFly || boneIdle || portalReviveOn || growOn || itemFlyOn || itemShieldOn || (!!spec.wuxia && !state.gourdAlive);
   const chipText = boneFly ? '白骨羽化 ' + state.boneFlyT.toFixed(1) + 's'
     : growOn ? '巨化 ' + state.growT.toFixed(1) + 's'
     : itemFlyOn ? '飞行 ' + state.itemFlyT.toFixed(1) + 's'
     : itemShieldOn ? '道具护盾 · 待命'
     : boneIdle ? '白骨 ' + state.bones + '/9'
+    : portalReviveOn ? '复活 ×' + state.portalRevive
     : dashing ? spec.dashName + ' ' + state.dashT.toFixed(1) + 's'
     : (shieldOn ? '护盾 ' + state.shieldT.toFixed(1) + 's'
       : (armed ? '回生法阵待命'
@@ -2516,7 +2526,7 @@ function doJump(stage, cost) {
     burst(PLAYER_X, player.feetY - 26, 14, 'rgba(255,194,102,.9)', 220, 0);
     floatText(PLAYER_X, player.feetY - 118, '三段跳', 'rgba(255,194,102,.95)');
   }
-  /* 水晶：三段跳落地前召唤闪电，劈掉前方一个障碍（8 秒冷却） */
+  /* 水晶：三段跳落地前召唤闪电，劈掉前方一个障碍（7 秒冷却） */
   if (stage === 3 && state.treasure === 'crystal' && state.mode === 'run' && state.crystalCd <= 0) crystalStrike();
 }
 function updatePlayer(dt) {
@@ -2693,15 +2703,34 @@ function wuxiaArmed() {
 function necklaceArmed() {
   return state.treasure === 'necklace' && !state.necklaceUsed && state.mode === 'run';
 }
-/* 圣杯：任何一次复活之后，送上 0.5 秒飞行 */
+/* 传送门奖励：穿门换来的复活，稳定触发 */
+function portalReviveArmed() {
+  return state.portalRevive > 0 && state.mode === 'run';
+}
+function doPortalRevive() {
+  state.portalRevive -= 1;
+  state.invulnT = Math.max(state.invulnT, 1);
+  state.shake = Math.max(state.shake, 13);
+  player.crashRot = 0;
+  player.crashSpin = 0;
+  clearObstacles();
+  climbBackToRoof();
+  sfx('dash');
+  burst(PLAYER_X, player.feetY - 54, 26, 'rgba(190,255,244,.95)', 330, 30);
+  burst(PLAYER_X, player.feetY - 96, 14, 'rgba(255,214,150,.9)', 240, 40);
+  floatText(PLAYER_X, player.feetY - 152, '传送门复生', 'rgba(190,255,244,1)');
+  floatText(PLAYER_X, player.feetY - 118, '剩余复活 ' + state.portalRevive + ' 次', 'rgba(243,236,221,.78)');
+  grailFlight();
+}
+/* 圣杯：任何一次复活之后，送上 0.7 秒飞行 */
 function grailFlight() {
   if (state.treasure !== 'grail') return;
-  state.itemFlyT = Math.max(state.itemFlyT || 0, 0.5);
-  state.invulnT = Math.max(state.invulnT || 0, 0.5);
+  state.itemFlyT = Math.max(state.itemFlyT || 0, 0.7);
+  state.invulnT = Math.max(state.invulnT || 0, 0.7);
   sfx('dash');
   burst(PLAYER_X, player.feetY - 50, 18, 'rgba(255,232,160,.92)', 250, 30);
   burst(PLAYER_X, player.feetY - 96, 10, 'rgba(255,246,214,.9)', 210, 40);
-  floatText(PLAYER_X, player.feetY - 122, '圣杯 · 复生羽翼 0.5s', 'rgba(255,232,160,1)');
+  floatText(PLAYER_X, player.feetY - 122, '圣杯 · 复生羽翼 0.7s', 'rgba(255,232,160,1)');
 }
 function doNecklaceRevive() {
   state.necklaceUsed = true;
@@ -2719,11 +2748,11 @@ function doNecklaceRevive() {
   floatText(PLAYER_X, player.feetY - 108, '复活 · 能量充满', 'rgba(240,215,154,.95)');
   grailFlight();
 }
-/* 护符：受击时自动释放角色技能，每局 2 次 */
+/* 护符：受击时自动释放角色技能，每局 3 次 */
 function amuletArmed() {
   const spec = CHARS[state.char];
   if (state.treasure !== 'amulet') return false;
-  if (state.amuletUsed >= 2) return false;
+  if (state.amuletUsed >= 3) return false;
   if (state.mode !== 'run') return false;
   if (spec.passive || spec.wuxia) return false;
   return state.meter >= meterCap();
@@ -2747,7 +2776,7 @@ function doAmuletSkill() {
   burst(PLAYER_X, player.feetY - 52, 26, spec.burst, 340, 50);
   burst(PLAYER_X, player.feetY - 20, 14, 'rgba(240,215,154,.9)', 220, 30);
   floatText(PLAYER_X, player.feetY - 146, '护符 · ' + spec.ult, 'rgba(240,215,154,1)');
-  floatText(PLAYER_X, player.feetY - 110, '自动施法 ' + (2 - state.amuletUsed) + '/2', 'rgba(243,236,221,.7)');
+  floatText(PLAYER_X, player.feetY - 110, '自动施法 ' + (3 - state.amuletUsed) + '/3', 'rgba(243,236,221,.7)');
 }
 
 /* ===== 白骨：点化障碍 / 九骨羽化 / 白骨不死 ===== */
@@ -2979,6 +3008,11 @@ function collide() {
         o.dead = true;
         doAmuletSkill();
         return;
+      } else if (portalReviveArmed()) {
+        /* 传送门复生：穿过传送门换来的一次复活 */
+        o.dead = true;
+        doPortalRevive();
+        return;
       } else if (boneReviveArmed()) {
         o.dead = true;
         if (!boneTryRevive()) crash('hit');
@@ -3119,11 +3153,11 @@ function updateRun(dt) {
   }
   /* 羽扇：起风后 1.5 秒内持续清场 */
   if (state.treasure === 'fan' && state.windT > 0 && state.mode === 'run') clearObstacles();
-  /* 羽扇：每 15 秒自动挥出一阵风 */
+  /* 羽扇：每 10 秒自动挥出一阵风 */
   if (state.treasure === 'fan' && state.mode === 'run') {
     state.fanT -= dt;
     if (state.fanT <= 0) {
-      state.fanT = 15;
+      state.fanT = 10;
       fanGust();
     }
   }
@@ -3148,7 +3182,7 @@ function updateRun(dt) {
   if (state.boneFlyT > 0) mul = 2;
   if (state.swordT > 0) mul = Math.max(mul, 1.18);
   state.worldX += state.speed * mul * dt;
-  if (!state.portalUsed && state.worldX + PLAYER_X >= state.portalX) enterStreet();
+  if (state.portalIdx < PORTALS.length && state.worldX + PLAYER_X >= state.portalX) enterNextMap();
   updatePlayer(dt);
   if (state.mode !== 'run') return;
   swordSweep();
@@ -3315,20 +3349,26 @@ const purpleSprite = (function () {
 
 /* ===== 绘制：背景 ===== */
 
-/* ===== 穿越传送门 → 夜街 ===== */
-function enterStreet() {
-  state.portalUsed = true;
+/* ===== 穿越传送门 → 下一张地图（夜街 / 夜高架） ===== */
+function enterNextMap() {
+  state.portalIdx += 1;
+  state.map = Math.min(2, state.map + 1);
   state.bonusPts += 10000;
-  state.map = 1;
+  state.portalRevive += 1;
+  state.portalX = state.portalIdx < PORTALS.length ? PORTALS[state.portalIdx] * RULESET.pxPerMeter : Infinity;
   state.flashT = 1;
   state.mapBannerT = 2.8;
   state.shake = Math.max(state.shake, 12);
   state.invulnT = Math.max(state.invulnT, 1.2);
   clearObstacles();
+  /* 落点保底：传送门可能正好压在自己生成的楼缝 / 桥面断口上 */
+  climbBackToRoof();
   sfx('dash');
-  burst(PLAYER_X + 46, GROUND - 96, 30, 'rgba(150,255,238,.95)', 420, 70);
+  const burstCol = state.map === 2 ? 'rgba(255,206,138,.95)' : 'rgba(150,255,238,.95)';
+  burst(PLAYER_X + 46, GROUND - 96, 30, burstCol, 420, 70);
   burst(PLAYER_X + 46, GROUND - 40, 18, 'rgba(255,214,150,.9)', 300, 40);
   floatText(PLAYER_X + 70, GROUND - 206, '穿越传送门 · +10000', 'rgba(240,255,248,1)');
+  floatText(PLAYER_X + 70, GROUND - 174, '获得 1 次复活 · 共 ' + state.portalRevive + ' 次', 'rgba(190,255,244,.92)');
 }
 /* ===== 夜街：背景外墙与街灯 ===== */
 function drawStreetBack() {
@@ -3724,9 +3764,348 @@ function drawStreetScaffold(x, o) {
   ctx.fill();
 }
 
+/* ===== 夜高架：远景城市与桥墩 ===== */
+function drawBridgeBack() {
+  /* 远处城市天际线 */
+  const far = state.worldX * 0.10;
+  const fu = 128;
+  const fbase = Math.floor(far / fu);
+  for (let i = -1; i <= Math.ceil(W / fu) + 2; i++) {
+    const idx = fbase + i;
+    const x = idx * fu - far;
+    const h = 90 + hash(idx * 4.3) * 200;
+    const top = GROUND - 70 - h;
+    ctx.fillStyle = 'rgba(8,15,21,.96)';
+    ctx.fillRect(x, top, fu - 8, h + 130);
+    ctx.fillStyle = 'rgba(95,227,200,.07)';
+    ctx.fillRect(x, top, fu - 8, 2);
+    const lights = 2 + Math.floor(hash(idx * 7.7) * 3);
+    for (let k = 0; k < lights; k++) {
+      const hs = hash(idx * 31.3 + k * 9.7);
+      const wx = x + 8 + hs * (fu - 34);
+      const wy = top + 14 + hash(idx * 57.1 + k * 3.3) * (h - 24);
+      ctx.fillStyle = hs > 0.55 ? 'rgba(255,201,132,.28)' : 'rgba(118,214,198,.18)';
+      ctx.fillRect(wx, wy, 6, 4);
+    }
+  }
+  /* 邻桥与桥墩剪影 */
+  const off2 = state.worldX * 0.32;
+  const unit2 = 320;
+  const b2 = Math.floor(off2 / unit2);
+  for (let i = -1; i <= Math.ceil(W / unit2) + 2; i++) {
+    const idx = b2 + i;
+    const x = idx * unit2 - off2;
+    ctx.fillStyle = 'rgba(13,21,27,.92)';
+    ctx.fillRect(x + 30, GROUND + 66, 62, 12);
+    ctx.fillRect(x + 42, GROUND + 78, 38, H - GROUND);
+  }
+}
+/* ===== 夜高架：桥面、护栏与断口 ===== */
+function drawBridgeGround() {
+  const lip = 24;
+  const deep = ctx.createLinearGradient(0, GROUND + lip, 0, H);
+  deep.addColorStop(0, '#0b141a');
+  deep.addColorStop(0.45, '#070d12');
+  deep.addColorStop(1, '#03070a');
+  ctx.fillStyle = deep;
+  ctx.fillRect(0, GROUND + lip, W, H - GROUND - lip);
+  ctx.fillStyle = 'rgba(4,8,11,.85)';
+  ctx.fillRect(0, GROUND + lip, W, 22);
+  for (let i = 0; i < world.platforms.length; i++) {
+    const p2 = world.platforms[i];
+    const x0 = p2.start - state.worldX;
+    const x1 = p2.end - state.worldX;
+    if (x1 < -160 || x0 > W + 160) continue;
+    /* 车道面 */
+    const road = ctx.createLinearGradient(0, GROUND, 0, GROUND + lip);
+    road.addColorStop(0, '#26333b');
+    road.addColorStop(1, '#161f25');
+    ctx.fillStyle = road;
+    ctx.fillRect(x0, GROUND, x1 - x0, lip);
+    /* 桥缘混凝土 */
+    ctx.fillStyle = '#32434c';
+    ctx.fillRect(x0, GROUND + lip - 3, x1 - x0, 9);
+    ctx.fillStyle = 'rgba(6,11,15,.55)';
+    ctx.fillRect(x0, GROUND + lip + 6, x1 - x0, 3);
+    /* 车道虚线 */
+    const seam = Math.ceil((p2.start + 30) / 96) * 96;
+    for (let sx = seam; sx < p2.end - 24; sx += 96) {
+      const sxp = sx - state.worldX;
+      if (sxp < -30 || sxp > W + 30) continue;
+      ctx.fillStyle = 'rgba(240,236,214,.20)';
+      ctx.fillRect(sxp, GROUND + 12, 44, 3);
+    }
+    ctx.fillStyle = 'rgba(95,227,200,.18)';
+    ctx.fillRect(x0, GROUND - 1, x1 - x0, 1);
+    /* 护栏：立柱 + 双横杆（画在角色身后） */
+    const post = Math.ceil((p2.start + 24) / 52) * 52;
+    for (let sx = post; sx < p2.end - 12; sx += 52) {
+      const sxp = sx - state.worldX;
+      if (sxp < -20 || sxp > W + 20) continue;
+      ctx.fillStyle = 'rgba(58,76,86,.92)';
+      ctx.fillRect(sxp, GROUND - 56, 5, 56);
+      ctx.fillStyle = 'rgba(255,214,150,.30)';
+      ctx.fillRect(sxp + 1, GROUND - 60, 3, 2);
+    }
+    ctx.fillStyle = 'rgba(88,110,120,.85)';
+    ctx.fillRect(x0, GROUND - 58, x1 - x0, 5);
+    ctx.fillStyle = 'rgba(118,142,152,.7)';
+    ctx.fillRect(x0, GROUND - 34, x1 - x0, 3);
+  }
+  /* 桥面断口：检修区 */
+  for (let i = 0; i < world.platforms.length - 1; i++) {
+    const a = world.platforms[i];
+    const b = world.platforms[i + 1];
+    const gap = b.start - a.end;
+    if (gap <= 6) continue;
+    const gx0 = a.end - state.worldX;
+    const gx1 = b.start - state.worldX;
+    if (gx1 < -90 || gx0 > W + 90) continue;
+    const pit = ctx.createLinearGradient(0, GROUND, 0, H);
+    pit.addColorStop(0, 'rgba(5,9,12,1)');
+    pit.addColorStop(1, 'rgba(1,3,5,1)');
+    ctx.fillStyle = pit;
+    ctx.fillRect(gx0, GROUND, gx1 - gx0, H - GROUND);
+    ctx.fillStyle = 'rgba(255,178,90,.85)';
+    ctx.fillRect(gx0 - 2, GROUND - 66, 3, 66);
+    ctx.fillRect(gx1 - 1, GROUND - 66, 3, 66);
+    ctx.fillStyle = 'rgba(255,178,90,.18)';
+    ctx.fillRect(gx0, GROUND - 3, gx1 - gx0, 3);
+    for (let k = 0; k < 3; k++) {
+      const t2 = (state.time * 1.6 + k / 3) % 1;
+      ctx.fillStyle = 'rgba(255,190,110,' + (0.5 - t2 * 0.4).toFixed(2) + ')';
+      ctx.beginPath();
+      ctx.arc(gx0 + (gx1 - gx0) / 2, GROUND - 30 - t2 * 40, 3, 0, 6.283);
+      ctx.fill();
+    }
+  }
+}
+/* ===== 夜高架：高杆灯 ===== */
+function drawBridgeLamps() {
+  /* 灯光只落在桥面，不渗到桥下的空腔里 */
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, W, GROUND + 26);
+  ctx.clip();
+  const spacing = 330;
+  const first = Math.floor(state.worldX / spacing) - 1;
+  for (let i = first; i <= first + Math.ceil(W / spacing) + 2; i++) {
+    const lx = i * spacing - state.worldX + 120;
+    if (lx < -130 || lx > W + 130) continue;
+    const glow = ctx.createRadialGradient(lx, GROUND + 4, 12, lx, GROUND + 4, 210);
+    glow.addColorStop(0, 'rgba(255,206,146,.16)');
+    glow.addColorStop(1, 'rgba(255,206,146,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.ellipse(lx, GROUND + 4, 210, 64, 0, 0, 6.283);
+    ctx.fill();
+    ctx.fillStyle = '#22323b';
+    ctx.fillRect(lx - 5, GROUND - 292, 10, 292);
+    ctx.fillStyle = 'rgba(95,227,200,.20)';
+    ctx.fillRect(lx + 3, GROUND - 286, 2, 280);
+    ctx.strokeStyle = '#22323b';
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.moveTo(lx, GROUND - 288);
+    ctx.quadraticCurveTo(lx + 46, GROUND - 302, lx + 78, GROUND - 268);
+    ctx.stroke();
+    const cone = ctx.createLinearGradient(0, GROUND - 268, 0, GROUND);
+    cone.addColorStop(0, 'rgba(255,220,164,.20)');
+    cone.addColorStop(0.5, 'rgba(255,208,140,.07)');
+    cone.addColorStop(1, 'rgba(255,208,140,0)');
+    ctx.fillStyle = cone;
+    ctx.beginPath();
+    ctx.moveTo(lx + 64, GROUND - 268);
+    ctx.lineTo(lx + 96, GROUND - 268);
+    ctx.lineTo(lx + 150, GROUND);
+    ctx.lineTo(lx + 10, GROUND);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,222,168,.95)';
+    ctx.fillRect(lx + 66, GROUND - 272, 26, 6);
+  }
+  ctx.restore();
+}
+/* ===== 夜高架：桥面障碍换装 ===== */
+function drawBridgeBarrier(x, o) {
+  /* 混凝土隔离墩：跳过去 */
+  const top = GROUND - o.h;
+  const g = ctx.createLinearGradient(0, top, 0, GROUND);
+  g.addColorStop(0, '#6a757c');
+  g.addColorStop(0.55, '#4c585f');
+  g.addColorStop(1, '#333d43');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(x + 6, GROUND);
+  ctx.lineTo(x + 2, top + 10);
+  ctx.lineTo(x + o.w - 2, top + 10);
+  ctx.lineTo(x + o.w - 6, GROUND);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#849298';
+  ctx.fillRect(x + 1, top + 6, o.w - 2, 4);
+  /* 反光斜纹 */
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x + 6, GROUND);
+  ctx.lineTo(x + 2, top + 10);
+  ctx.lineTo(x + o.w - 2, top + 10);
+  ctx.lineTo(x + o.w - 6, GROUND);
+  ctx.closePath();
+  ctx.clip();
+  for (let k = -o.h; k < o.w + o.h; k += 26) {
+    ctx.fillStyle = 'rgba(255,196,96,.38)';
+    ctx.beginPath();
+    ctx.moveTo(x + k, GROUND);
+    ctx.lineTo(x + k + 10, GROUND);
+    ctx.lineTo(x + k + 10 + o.h, top);
+    ctx.lineTo(x + k + o.h, top);
+    ctx.fill();
+  }
+  ctx.restore();
+  const blink = 0.5 + 0.5 * Math.sin(state.time * 3 + o.seed * 9);
+  ctx.fillStyle = 'rgba(255,150,110,' + (0.35 + blink * 0.5).toFixed(2) + ')';
+  ctx.beginPath();
+  ctx.arc(x + o.w / 2, top + 3, 3.4, 0, 6.283);
+  ctx.fill();
+}
+function drawBridgeConeRow(x, o) {
+  /* 锥桶路障：跳过去 */
+  for (let i = 0; i < 2; i++) {
+    const cx2 = x + 18 + i * (o.w - 36);
+    ctx.fillStyle = '#3a464d';
+    ctx.beginPath();
+    ctx.ellipse(cx2, GROUND, 15, 5, 0, 0, 6.283);
+    ctx.fill();
+    ctx.fillStyle = '#e8792f';
+    ctx.beginPath();
+    ctx.moveTo(cx2 - 9, GROUND - 4);
+    ctx.lineTo(cx2 + 9, GROUND - 4);
+    ctx.lineTo(cx2 + 4, GROUND - o.h);
+    ctx.lineTo(cx2 - 4, GROUND - o.h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(246,244,236,.82)';
+    ctx.fillRect(cx2 - 7, GROUND - o.h * 0.5, 14, 6);
+    ctx.fillStyle = 'rgba(255,220,150,.9)';
+    ctx.beginPath();
+    ctx.arc(cx2, GROUND - o.h - 2, 2.6, 0, 6.283);
+    ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(232,121,47,.9)';
+  ctx.fillRect(x + 12, GROUND - 22, o.w - 24, 4);
+}
+function drawBridgeGate(x, o) {
+  /* 限高龙门架：滑过去 */
+  const bottom = GROUND - 78;
+  const postW = 16;
+  const pg = ctx.createLinearGradient(x, 0, x + postW, 0);
+  pg.addColorStop(0, '#2e3d47');
+  pg.addColorStop(0.5, '#5a7180');
+  pg.addColorStop(1, '#2a3841');
+  ctx.fillStyle = pg;
+  ctx.fillRect(x, 0, postW, bottom);
+  ctx.fillRect(x + o.w - postW, 0, postW, bottom);
+  ctx.fillStyle = 'rgba(255,196,96,.28)';
+  ctx.fillRect(x + postW - 3, 0, 3, bottom);
+  ctx.fillRect(x + o.w - postW, 0, 3, bottom);
+  const beamG = ctx.createLinearGradient(0, bottom - 46, 0, bottom);
+  beamG.addColorStop(0, '#33454f');
+  beamG.addColorStop(1, '#20303a');
+  ctx.fillStyle = beamG;
+  ctx.fillRect(x, bottom - 46, o.w, 46);
+  for (let k = 0; k < o.w; k += 28) {
+    ctx.fillStyle = 'rgba(255,196,96,.5)';
+    ctx.beginPath();
+    ctx.moveTo(x + k, bottom - 4);
+    ctx.lineTo(x + k + 12, bottom - 4);
+    ctx.lineTo(x + k + 22, bottom - 46);
+    ctx.lineTo(x + k + 10, bottom - 46);
+    ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(10,16,20,.9)';
+  roundRect(ctx, x + o.w / 2 - 46, bottom - 92, 92, 38, 4);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,196,96,.6)';
+  ctx.lineWidth = 1.4;
+  ctx.stroke();
+  ctx.font = '700 15px "PingFang SC","Microsoft YaHei",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,214,140,.95)';
+  ctx.fillText('限高 4.5m', x + o.w / 2, bottom - 67);
+  ctx.textAlign = 'left';
+  const blink = 0.5 + 0.5 * Math.sin(state.time * 4 + o.seed * 7);
+  for (let i = 0; i < 3; i++) {
+    ctx.fillStyle = 'rgba(255,150,110,' + (0.3 + blink * 0.6).toFixed(2) + ')';
+    ctx.beginPath();
+    ctx.arc(x + 20 + i * ((o.w - 40) / 2), bottom - 52, 3, 0, 6.283);
+    ctx.fill();
+  }
+}
+function drawBridgeBeam(x, o) {
+  /* 桥检横梁：滑过去 */
+  const bottom = GROUND - 80;
+  ctx.fillStyle = '#3e515c';
+  ctx.fillRect(x + 2, 0, 12, bottom);
+  ctx.fillRect(x + o.w - 14, 0, 12, bottom);
+  ctx.fillStyle = 'rgba(95,227,200,.22)';
+  ctx.fillRect(x + 11, 0, 2, bottom);
+  ctx.fillRect(x + o.w - 3, 0, 2, bottom);
+  const bg = ctx.createLinearGradient(0, bottom - 34, 0, bottom);
+  bg.addColorStop(0, '#4a5c66');
+  bg.addColorStop(0.5, '#33454f');
+  bg.addColorStop(1, '#25333c');
+  ctx.fillStyle = bg;
+  ctx.fillRect(x, bottom - 34, o.w, 34);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, bottom - 34, o.w, 34);
+  ctx.clip();
+  for (let k = -34; k < o.w; k += 30) {
+    ctx.fillStyle = 'rgba(255,196,96,.30)';
+    ctx.beginPath();
+    ctx.moveTo(x + k, bottom);
+    ctx.lineTo(x + k + 12, bottom);
+    ctx.lineTo(x + k + 12 + 34, bottom - 34);
+    ctx.lineTo(x + k + 34, bottom - 34);
+    ctx.fill();
+  }
+  ctx.restore();
+  const blink = 0.5 + 0.5 * Math.sin(state.time * 2.6 + o.seed * 5);
+  for (let i = 0; i < 3; i++) {
+    ctx.fillStyle = 'rgba(255,160,120,' + (0.3 + blink * 0.55).toFixed(2) + ')';
+    ctx.beginPath();
+    ctx.arc(x + 24 + i * ((o.w - 48) / 2), bottom + 8, 3, 0, 6.283);
+    ctx.fill();
+  }
+}
+/* ===== 夜高架：桥面标牌 ===== */
+function drawBridgeProp(d, x) {
+  if (d.type === 'gantry') {
+    ctx.fillStyle = '#2a3a42';
+    ctx.fillRect(x + 6, GROUND - 128, 8, 128);
+    ctx.fillRect(x + 78, GROUND - 128, 8, 128);
+    ctx.fillStyle = '#1e4d3c';
+    roundRect(ctx, x - 4, GROUND - 168, 100, 44, 4);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(150,240,210,.35)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(226,250,240,.75)';
+    ctx.fillRect(x + 10, GROUND - 154, 52, 4);
+    ctx.fillRect(x + 10, GROUND - 142, 36, 3);
+  } else {
+    ctx.fillStyle = '#3a4a44';
+    ctx.fillRect(x + 18, GROUND - 46, 6, 46);
+    ctx.fillStyle = '#2a3a34';
+    roundRect(ctx, x + 4, GROUND - 74, 44, 30, 3);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,196,96,.5)';
+    ctx.fillRect(x + 10, GROUND - 66, 32, 3);
+  }
+}
 /* ===== 传送门 ===== */
 function drawPortal() {
-  if (state.portalUsed || state.mode !== 'run') return;
+  if (state.portalIdx >= PORTALS.length || state.mode !== 'run') return;
   const px = state.portalX - state.worldX;
   if (px < -320 || px > W + 320) return;
   const cx = px + 46;
@@ -3809,7 +4188,7 @@ function drawPortal() {
   ctx.font = '600 14px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(240,255,248,.94)';
-  ctx.fillText('传送门 +10000', cx, GROUND + 35);
+  ctx.fillText((state.portalIdx === 0 ? '传送门 · 夜街' : '传送门 · 高架') + ' +10000', cx, GROUND + 35);
   ctx.textAlign = 'left';
 }
 /* ===== 切换闪白与横幅 ===== */
@@ -3827,9 +4206,9 @@ function drawMapBanner() {
   ctx.textAlign = 'center';
   ctx.font = '600 40px "Songti SC","Noto Serif SC",serif';
   ctx.fillStyle = 'rgba(243,236,221,.96)';
-  ctx.fillText('夜 街 · 人 行 道', W / 2, 176);
+  ctx.fillText(state.map === 2 ? '夜 高 架 · 桥 面' : '夜 街 · 人 行 道', W / 2, 176);
   ctx.font = '600 13px "PingFang SC","Microsoft YaHei",sans-serif';
-  ctx.fillStyle = 'rgba(95,227,200,.9)';
+  ctx.fillStyle = state.map === 2 ? 'rgba(255,206,138,.9)' : 'rgba(95,227,200,.9)';
   ctx.fillText('穿越传送门 +10000 · 继续向前', W / 2, 206);
   ctx.textAlign = 'left';
   ctx.restore();
@@ -4024,6 +4403,8 @@ function drawDecor() {
       ctx.beginPath();
       ctx.arc(x + 6, GROUND - 99, 2.4, 0, 6.283);
       ctx.fill();
+    } else if (d.type === 'gantry' || d.type === 'bridgesign') {
+      drawBridgeProp(d, x);
     } else if (d.type === 'hydrant' || d.type === 'planter') {
       drawStreetProp(d, x);
     } else {
@@ -4160,7 +4541,12 @@ function drawObstacles() {
     if (o.dead) continue;
     const x = o.x - state.worldX;
     if (x > W + 80 || x + o.w < -80) continue;
-    if (state.map === 1) {
+    if (state.map === 2) {
+      if (o.type === 'crate') drawBridgeBarrier(x, o);
+      else if (o.type === 'duct') drawBridgeConeRow(x, o);
+      else if (o.type === 'gate') drawBridgeGate(x, o);
+      else drawBridgeBeam(x, o);
+    } else if (state.map === 1) {
       if (o.type === 'crate') drawDumpster(x, o);
       else if (o.type === 'duct') drawLowBarrier(x, o);
       else if (o.type === 'gate') drawStreetGate(x, o);
@@ -6412,7 +6798,12 @@ function render() {
     ctx.translate((Math.random() - 0.5) * state.shake, (Math.random() - 0.5) * state.shake * 0.7);
   }
   drawSky();
-  if (state.map === 1) {
+  if (state.map === 2) {
+    drawBridgeBack();
+    drawBridgeGround();
+    drawBridgeLamps();
+    drawDecor();
+  } else if (state.map === 1) {
     drawStreetBack();
     drawStreetGround();
     drawStreetLamps();
