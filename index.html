@@ -1047,7 +1047,7 @@ kbd{
                   <circle cx="20" cy="29.4" r="2.4" fill="#b8863c"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>羽扇</b><em>每 10 秒起风清场</em></span>
+              <span class="char-meta"><b>羽扇</b><em>每 8 秒起风清场</em></span>
             </button>
             <button type="button" class="char-card" data-treasure="necklace" role="radio" aria-checked="false">
               <span class="char-face">
@@ -1095,7 +1095,7 @@ kbd{
                   <path d="M19 9l-3-5 5 1z" stroke="#e9fffb" stroke-width="1.6" fill="none" stroke-linecap="round"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>水晶</b><em>三段跳后落雷劈障碍 · 冷却 7 秒</em></span>
+              <span class="char-meta"><b>水晶</b><em>三段跳后落雷劈障碍 · 冷却 5 秒</em></span>
             </button>
             <button type="button" class="char-card" data-treasure="amulet" role="radio" aria-checked="false">
               <span class="char-face">
@@ -1136,7 +1136,7 @@ kbd{
                   <path d="M14.6 13.4q5.4 3.6 10.8 0" stroke="#fff6dd" stroke-width="1.2" fill="none" opacity=".7"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>圣杯</b><em>复活后获得 0.7 秒飞行</em></span>
+              <span class="char-meta"><b>圣杯</b><em>复活后获得 1 秒飞行</em></span>
             </button>
           </div>
         </div>
@@ -1382,12 +1382,12 @@ const CHAR_IDS = ['male', 'female', 'sci', 'mage', 'bone', 'wuxia'];
 /* ===== 宝物：每位跑者可搭配一件 ===== */
 const TREASURES = {
   '': { id: '', name: '未携带', desc: '不带宝物' },
-  fan: { id: 'fan', name: '羽扇', desc: '每 10 秒挥出一阵风，摧毁当前场上的障碍' },
+  fan: { id: 'fan', name: '羽扇', desc: '每 8 秒挥出一阵风，摧毁当前场上的障碍' },
   necklace: { id: 'necklace', name: '项链', desc: '死亡后复活一次，并立刻充满能量槽（每局限一次）' },
   ring: { id: 'ring', name: '戒指', desc: '能量槽上限降低 10%' },
   amulet: { id: 'amulet', name: '护符', desc: '受击时自动释放角色技能（能量需满），每局最多 3 次' },
   crown: { id: 'crown', name: '王冠', desc: '最终得分提升 10%' },
-  grail: { id: 'grail', name: '圣杯', desc: '每次复活后获得 0.7 秒飞行' },
+  grail: { id: 'grail', name: '圣杯', desc: '每次复活后获得 1 秒飞行' },
   diamond: { id: 'diamond', name: '钻石', desc: '释放技能后有 20% 概率不消耗能量' },
   crystal: { id: 'crystal', name: '水晶', desc: '三段跳后召唤闪电，消灭前方一个障碍物' }
 };
@@ -1663,7 +1663,7 @@ const state = {
   mapBannerT: 0,
   char: savedChar,
   treasure: savedTreasure,
-  fanT: 10,
+  fanT: 8,
   necklaceUsed: false,
   amuletUsed: 0,
   windT: 0,
@@ -1916,7 +1916,7 @@ function crystalStrike() {
   state.boltX = best ? bestSx + (best.w || 60) * 0.5 : PLAYER_X + 260;
   state.boltY = best ? (best.type === 'beam' || best.type === 'gate' ? GROUND - 40 : GROUND - best.h) : GROUND;
   state.shake = Math.max(state.shake, 8);
-  state.crystalCd = 7;
+  state.crystalCd = 5;
   sfx('break');
   if (best) {
     best.dead = true;
@@ -2210,7 +2210,7 @@ function syncRelic() {
   } else if (t === 'crown') {
     txt = '10%';
   } else if (t === 'grail') {
-    txt = state.itemFlyT > 0 ? state.itemFlyT.toFixed(1) + 's' : '0.7s';
+    txt = state.itemFlyT > 0 ? state.itemFlyT.toFixed(1) + 's' : '1.0s';
     off = state.itemFlyT > 0;
   } else {
     txt = '−10%';
@@ -2300,7 +2300,7 @@ function resetRun() {
   state.shield = false;
   state.shieldT = 0;
   state.invulnT = 0;
-  state.fanT = 10;
+  state.fanT = 8;
   state.necklaceUsed = false;
   state.shards = 0;
   state.shardPts = 0;
@@ -2526,7 +2526,7 @@ function doJump(stage, cost) {
     burst(PLAYER_X, player.feetY - 26, 14, 'rgba(255,194,102,.9)', 220, 0);
     floatText(PLAYER_X, player.feetY - 118, '三段跳', 'rgba(255,194,102,.95)');
   }
-  /* 水晶：三段跳落地前召唤闪电，劈掉前方一个障碍（7 秒冷却） */
+  /* 水晶：三段跳落地前召唤闪电，劈掉前方一个障碍（5 秒冷却） */
   if (stage === 3 && state.treasure === 'crystal' && state.mode === 'run' && state.crystalCd <= 0) crystalStrike();
 }
 function updatePlayer(dt) {
@@ -2722,15 +2722,15 @@ function doPortalRevive() {
   floatText(PLAYER_X, player.feetY - 118, '剩余复活 ' + state.portalRevive + ' 次', 'rgba(243,236,221,.78)');
   grailFlight();
 }
-/* 圣杯：任何一次复活之后，送上 0.7 秒飞行 */
+/* 圣杯：任何一次复活之后，送上 1 秒飞行 */
 function grailFlight() {
   if (state.treasure !== 'grail') return;
-  state.itemFlyT = Math.max(state.itemFlyT || 0, 0.7);
-  state.invulnT = Math.max(state.invulnT || 0, 0.7);
+  state.itemFlyT = Math.max(state.itemFlyT || 0, 1);
+  state.invulnT = Math.max(state.invulnT || 0, 1);
   sfx('dash');
   burst(PLAYER_X, player.feetY - 50, 18, 'rgba(255,232,160,.92)', 250, 30);
   burst(PLAYER_X, player.feetY - 96, 10, 'rgba(255,246,214,.9)', 210, 40);
-  floatText(PLAYER_X, player.feetY - 122, '圣杯 · 复生羽翼 0.7s', 'rgba(255,232,160,1)');
+  floatText(PLAYER_X, player.feetY - 122, '圣杯 · 复生羽翼 1s', 'rgba(255,232,160,1)');
 }
 function doNecklaceRevive() {
   state.necklaceUsed = true;
@@ -3153,11 +3153,11 @@ function updateRun(dt) {
   }
   /* 羽扇：起风后 1.5 秒内持续清场 */
   if (state.treasure === 'fan' && state.windT > 0 && state.mode === 'run') clearObstacles();
-  /* 羽扇：每 10 秒自动挥出一阵风 */
+  /* 羽扇：每 8 秒自动挥出一阵风 */
   if (state.treasure === 'fan' && state.mode === 'run') {
     state.fanT -= dt;
     if (state.fanT <= 0) {
-      state.fanT = 10;
+      state.fanT = 8;
       fanGust();
     }
   }
