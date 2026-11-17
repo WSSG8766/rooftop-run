@@ -1720,7 +1720,7 @@ function addObstacle(type, x, diff) {
     lastObstacleEnd = x + w;
   } else if (type === 'duct') {
     const w = 88;
-    world.obstacles.push({ type: 'duct', x, w, h: 36, dead: false, seed: Math.random() });
+    world.obstacles.push({ type: 'duct', x, w: state.map === 1 ? 104 : 88, h: state.map === 1 ? 48 : 36, dead: false, seed: Math.random() });
     addShardArc(x + w / 2, 4, 132, 94, GROUND);
     lastObstacleEnd = x + w;
   } else if (type === 'gate') {
@@ -3599,60 +3599,188 @@ function drawStreetProp(d, x) {
   }
 }
 /* ===== 夜街：障碍换装 ===== */
-function drawDumpster(x, o) {
-  const y = GROUND - o.h;
-  ctx.fillStyle = 'rgba(0,0,0,.35)';
+/* ===== 第二关：障碍可读性组件（亮边分离 + 地面投影 + 动作箭头） ===== */
+function rrPath(x, y, w, h, r) {
+  const q = r || 4;
   ctx.beginPath();
-  ctx.ellipse(x + o.w / 2, GROUND + 4, o.w * 0.56, 6, 0, 0, 6.283);
-  ctx.fill();
-  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
-  g.addColorStop(0, '#1e564b');
-  g.addColorStop(0.5, '#2c7566');
-  g.addColorStop(1, '#1a4a41');
-  ctx.fillStyle = g;
-  roundRect(ctx, x, y + 8, o.w, o.h - 10, 4);
-  ctx.fill();
-  ctx.fillStyle = '#317f6f';
-  roundRect(ctx, x - 4, y, o.w + 8, 12, 3);
-  ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,.10)';
-  ctx.fillRect(x - 2, y + 2, o.w + 4, 3);
-  ctx.fillStyle = 'rgba(6,26,22,.5)';
-  ctx.fillRect(x + 8, y + 24, o.w - 16, 3);
-  ctx.fillRect(x + 8, y + 44, o.w - 16, 3);
-  ctx.fillStyle = '#0c1a1d';
-  ctx.beginPath(); ctx.arc(x + 12, GROUND - 3, 5, 0, 6.283); ctx.fill();
-  ctx.beginPath(); ctx.arc(x + o.w - 12, GROUND - 3, 5, 0, 6.283); ctx.fill();
-  ctx.fillStyle = 'rgba(255,194,102,.7)';
-  ctx.fillRect(x + o.w / 2 - 9, y + 26, 18, 12);
-  ctx.fillStyle = 'rgba(12,20,26,.8)';
-  ctx.fillRect(x + o.w / 2 - 6, y + 29, 12, 2);
-  ctx.fillRect(x + o.w / 2 - 6, y + 33, 8, 2);
+  ctx.moveTo(x + q, y);
+  ctx.lineTo(x + w - q, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + q);
+  ctx.lineTo(x + w, y + h - q);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - q, y + h);
+  ctx.lineTo(x + q, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - q);
+  ctx.lineTo(x, y + q);
+  ctx.quadraticCurveTo(x, y, x + q, y);
+  ctx.closePath();
 }
-function drawLowBarrier(x, o) {
-  const y = GROUND - o.h;
-  ctx.fillStyle = '#39474f';
-  roundRect(ctx, x, y, o.w, o.h, 3);
+/* 障碍轮廓：亮描边把深色剪影从深色楼体里剥出来 */
+function obstacleRim(x, y, w, h, r, col) {
+  ctx.save();
+  ctx.strokeStyle = col || 'rgba(196,238,250,.62)';
+  ctx.lineWidth = 2;
+  rrPath(x, y, w, h, r || 4);
+  ctx.stroke();
+  ctx.restore();
+}
+/* 地面投影：让障碍"站"在街面上 */
+function obstacleShadow(x, w) {
+  const g = ctx.createRadialGradient(x + w / 2, GROUND + 3, 2, x + w / 2, GROUND + 3, w * 0.62);
+  g.addColorStop(0, 'rgba(0,0,0,.5)');
+  g.addColorStop(0.6, 'rgba(0,0,0,.28)');
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.ellipse(x + w / 2, GROUND + 3, w * 0.62, 8, 0, 0, 6.283);
   ctx.fill();
-  ctx.fillStyle = '#4d5d66';
-  ctx.fillRect(x, y, o.w, 5);
+}
+/* 亮钢：第二关的门架/脚手架用它，比背景楼亮一档 */
+function drawSteelB(x, y0, y1, w) {
+  const g = ctx.createLinearGradient(x, 0, x + w, 0);
+  g.addColorStop(0, '#2c404a');
+  g.addColorStop(0.34, '#7c9dab');
+  g.addColorStop(0.55, '#a8c8d6');
+  g.addColorStop(0.78, '#5f7f8d');
+  g.addColorStop(1, '#243640');
+  ctx.fillStyle = g;
+  ctx.fillRect(x, y0, w, y1 - y0);
+  ctx.fillStyle = 'rgba(220,246,255,.62)';
+  ctx.fillRect(x + 1, y0, 1.8, y1 - y0);
+  ctx.fillStyle = 'rgba(4,12,18,.35)';
+  ctx.fillRect(x + w - 2, y0, 2, y1 - y0);
+}
+/* 奶油底黑纹警示条：夜里比深色底更醒目 */
+function drawHazardBarBright(x, y, w, h) {
+  ctx.fillStyle = '#f2e7d2';
+  ctx.fillRect(x, y, w, h);
   ctx.save();
   ctx.beginPath();
-  ctx.rect(x, y + 8, o.w, o.h - 8);
+  ctx.rect(x, y, w, h);
   ctx.clip();
-  ctx.strokeStyle = 'rgba(255,133,116,.65)';
-  ctx.lineWidth = 4;
-  for (let i = -20; i < o.w + 30; i += 16) {
+  ctx.strokeStyle = '#1c2a32';
+  ctx.lineWidth = 6;
+  for (let i = -20; i < w + 40; i += 22) {
     ctx.beginPath();
-    ctx.moveTo(x + i, y + o.h);
-    ctx.lineTo(x + i + 14, y + 8);
+    ctx.moveTo(x + i, y + h);
+    ctx.lineTo(x + i + h, y);
     ctx.stroke();
   }
   ctx.restore();
-  ctx.fillStyle = 'rgba(255,214,150,.85)';
-  ctx.fillRect(x + 2, y - 3, o.w - 4, 3);
+  ctx.fillStyle = 'rgba(255,255,255,.55)';
+  ctx.fillRect(x, y, w, 2);
+  ctx.fillStyle = 'rgba(20,30,36,.35)';
+  ctx.fillRect(x, y + h - 2, w, 2);
+}
+/* 动作箭头：跳 = 上箭头（琥珀），滑铲 = 下箭头（青） */
+function actionChevron(cx, cy, dir, up) {
+  ctx.save();
+  ctx.strokeStyle = up ? 'rgba(255,206,138,.95)' : 'rgba(120,240,214,.95)';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  for (let k = 0; k < 2; k++) {
+    const y = cy + (dir === 'up' ? k * 8 : k * 8);
+    ctx.beginPath();
+    ctx.moveTo(cx - 9, y);
+    ctx.lineTo(cx, y + (dir === 'up' ? -8 : 8));
+    ctx.lineTo(cx + 9, y);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
+function drawDumpster(x, o) {
+  const y = GROUND - o.h;
+  obstacleShadow(x, o.w);
+  /* 箱体：亮青绿渐变，从深色楼体里一眼跳出来 */
+  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
+  g.addColorStop(0, '#379b85');
+  g.addColorStop(0.3, '#63d8ba');
+  g.addColorStop(0.62, '#4ac0a4');
+  g.addColorStop(1, '#2a8571');
+  ctx.fillStyle = g;
+  rrPath(x, y + 9, o.w, o.h - 12, 5);
+  ctx.fill();
+  /* 顶盖 */
+  ctx.fillStyle = '#8bf0d6';
+  rrPath(x - 5, y, o.w + 10, 14, 4);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.62)';
+  ctx.fillRect(x - 3, y + 2, o.w + 6, 3);
+  ctx.fillStyle = 'rgba(9,44,38,.35)';
+  ctx.fillRect(x - 5, y + 12, o.w + 10, 3);
+  /* 正面标识牌：琥珀底黑条纹，街上一眼认出是"要跳的箱子" */
+  drawHazardBarBright(x + o.w / 2 - 17, y + o.h * 0.38, 34, 20);
+  /* 左侧竖向高光 */
+  ctx.fillStyle = 'rgba(255,255,255,.30)';
+  ctx.fillRect(x + 5, y + 16, 3, o.h - 26);
+  /* 轮子 */
+  ctx.fillStyle = '#10262f';
+  ctx.beginPath(); ctx.arc(x + 13, GROUND - 4, 5.6, 0, 6.283); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + o.w - 13, GROUND - 4, 5.6, 0, 6.283); ctx.fill();
+  ctx.fillStyle = 'rgba(200,238,250,.5)';
+  ctx.beginPath(); ctx.arc(x + 13, GROUND - 4, 2.2, 0, 6.283); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + o.w - 13, GROUND - 4, 2.2, 0, 6.283); ctx.fill();
+  obstacleRim(x, y + 9, o.w, o.h - 12, 5);
+  obstacleRim(x - 5, y, o.w + 10, 14, 4, 'rgba(230,255,250,.8)');
+  /* 跳跃提示 */
+  actionChevron(x + o.w / 2, y - 18, 'up', true);
+}
+
+function drawLowBarrier(x, o) {
+  const y = GROUND - o.h;
+  obstacleShadow(x, o.w);
+  /* 两侧立柱：让人一眼看出这是"拦路的路障" */
+  for (let k = 0; k < 2; k++) {
+    const px = k === 0 ? x - 6 : x + o.w - 4;
+    ctx.fillStyle = '#20303a';
+    rrPath(px, y - 14, 10, o.h + 14, 3);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(210,240,252,.55)';
+    ctx.fillRect(px + 1.5, y - 13, 2, o.h + 11);
+    ctx.fillStyle = 'rgba(255,206,138,.9)';
+    ctx.fillRect(px, y - 16, 10, 4);
+  }
+  /* 底座 */
+  ctx.fillStyle = '#22303a';
+  rrPath(x - 5, GROUND - 9, o.w + 10, 10, 3);
+  ctx.fill();
+  /* 主体：亮橙塑料护栏 */
+  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
+  g.addColorStop(0, '#e0724b');
+  g.addColorStop(0.28, '#ffa877');
+  g.addColorStop(0.6, '#f58f5e');
+  g.addColorStop(1, '#c95e3c');
+  ctx.fillStyle = g;
+  rrPath(x, y, o.w, o.h - 5, 4);
+  ctx.fill();
+  /* 白色反光斜条 */
+  ctx.save();
+  rrPath(x, y, o.w, o.h - 5, 4);
+  ctx.clip();
+  ctx.strokeStyle = 'rgba(255,250,240,.9)';
+  ctx.lineWidth = 7;
+  for (let i = -24; i < o.w + 30; i += 26) {
+    ctx.beginPath();
+    ctx.moveTo(x + i, y + o.h);
+    ctx.lineTo(x + i + 16, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+  /* 顶沿高光 + 两颗闪烁警示灯 */
+  ctx.fillStyle = 'rgba(255,246,232,.95)';
+  ctx.fillRect(x + 2, y, o.w - 4, 3);
+  const blink = 0.45 + 0.55 * Math.sin(state.time * 4 + (o.seed || 0) * 9);
+  for (let k = 0; k < 2; k++) {
+    const lx = x + 12 + k * (o.w - 24);
+    ctx.fillStyle = 'rgba(255,150,110,' + (0.4 + blink * 0.55).toFixed(2) + ')';
+    ctx.beginPath(); ctx.arc(lx, y - 2, 4.6, 0, 6.283); ctx.fill();
+    ctx.fillStyle = 'rgba(255,240,225,.85)';
+    ctx.beginPath(); ctx.arc(lx, y - 3, 1.8, 0, 6.283); ctx.fill();
+  }
+  obstacleRim(x, y, o.w, o.h - 5, 4, 'rgba(255,226,205,.72)');
+  actionChevron(x + o.w / 2, y - 30, 'up', true);
+}
 function drawSteel(x, y0, y1, w) {
   const g = ctx.createLinearGradient(x, 0, x + w, 0);
   g.addColorStop(0, '#18242c');
@@ -3680,91 +3808,116 @@ function drawHazardBar(x, y, w, h) {
   ctx.fillStyle = 'rgba(243,236,221,.18)';
   ctx.fillRect(x, y, w, 2);
 }
+
 function drawStreetGate(x, o) {
   const barBottom = GROUND - 78;
   const top = GROUND - 268;
-  /* 立柱 */
-  drawSteel(x - 2, top, GROUND, 14);
-  drawSteel(x + o.w - 12, top, GROUND, 14);
-  /* 顶部横梁与吊杆 */
-  drawSteel(x - 8, top, top + 10, o.w + 16);
-  ctx.strokeStyle = 'rgba(122,148,158,.35)';
+  obstacleShadow(x, o.w);
+  /* 立柱：亮钢，明显比背后楼体亮 */
+  drawSteelB(x - 3, top, GROUND, 16);
+  drawSteelB(x + o.w - 13, top, GROUND, 16);
+  /* 顶部横梁 */
+  drawSteelB(x - 12, top, top + 12, o.w + 24);
+  /* 吊杆 */
+  ctx.strokeStyle = 'rgba(150,186,200,.55)';
   ctx.lineWidth = 2;
   for (let i = 0; i < 3; i++) {
-    const hx = x + 26 + i * (o.w - 52) / 2;
+    const hx = x + 30 + i * (o.w - 60) / 2;
     ctx.beginPath();
-    ctx.moveTo(hx, top + 10);
-    ctx.lineTo(hx, barBottom - 30);
+    ctx.moveTo(hx, top + 12);
+    ctx.lineTo(hx, barBottom - 34);
     ctx.stroke();
   }
-  /* 低位横杆：必须滑铲 */
-  drawHazardBar(x - 8, barBottom - 32, o.w + 16, 32);
+  /* 低位横杆：必须滑铲（奶油底黑纹，夜里最醒目） */
+  drawHazardBarBright(x - 10, barBottom - 34, o.w + 20, 34);
+  /* 横杆下方灯带 */
+  ctx.fillStyle = 'rgba(255,206,138,.85)';
+  ctx.fillRect(x - 10, barBottom - 2, o.w + 20, 3);
   /* 斜撑 */
-  ctx.strokeStyle = 'rgba(70,96,108,.9)';
+  ctx.strokeStyle = 'rgba(160,198,212,.85)';
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(x + 6, top + 12);
-  ctx.lineTo(x + 40, barBottom - 40);
-  ctx.moveTo(x + o.w - 12, top + 12);
-  ctx.lineTo(x + o.w - 46, barBottom - 40);
+  ctx.moveTo(x + 8, top + 14);
+  ctx.lineTo(x + 44, barBottom - 42);
+  ctx.moveTo(x + o.w - 14, top + 14);
+  ctx.lineTo(x + o.w - 50, barBottom - 42);
   ctx.stroke();
-  /* 警示灯 */
-  const blink = 0.5 + 0.5 * Math.sin(state.time * 3 + o.seed * 7);
-  ctx.fillStyle = 'rgba(255,133,116,' + (0.4 + blink * 0.5).toFixed(2) + ')';
-  ctx.beginPath();
-  ctx.arc(x + o.w / 2, top + 4, 4.4, 0, 6.283);
-  ctx.fill();
-  /* 下滑提示 */
-  ctx.strokeStyle = 'rgba(95,227,200,.7)';
-  ctx.lineWidth = 2.2;
-  ctx.beginPath();
-  ctx.moveTo(x + o.w / 2 + 12, barBottom - 22);
-  ctx.lineTo(x + o.w / 2 + 20, barBottom - 2);
-  ctx.lineTo(x + o.w / 2 + 4, barBottom - 2);
-  ctx.closePath();
-  ctx.stroke();
+  /* 顶部警示灯 */
+  const blink = 0.5 + 0.5 * Math.sin(state.time * 3 + (o.seed || 0) * 7);
+  ctx.fillStyle = 'rgba(255,133,116,' + (0.45 + blink * 0.55).toFixed(2) + ')';
+  ctx.beginPath(); ctx.arc(x + o.w / 2, top + 2, 5.2, 0, 6.283); ctx.fill();
+  ctx.fillStyle = 'rgba(255,240,230,.9)';
+  ctx.beginPath(); ctx.arc(x + o.w / 2, top + 1, 2.2, 0, 6.283); ctx.fill();
+  /* 滑铲提示：横杆正下方的双下箭头 */
+  actionChevron(x + o.w / 2, barBottom + 4, 'down', false);
+  obstacleRim(x + o.w - 13, top, 16, GROUND - top, 3, 'rgba(214,246,255,.5)');
+  obstacleRim(x - 3, top, 16, GROUND - top, 3, 'rgba(214,246,255,.5)');
 }
+
 function drawStreetScaffold(x, o) {
   const bottom = GROUND - 80;
   const top = GROUND - 300;
-  drawSteel(x + 4, top, GROUND, 10);
-  drawSteel(x + o.w - 14, top, GROUND, 10);
-  /* 横杆 */
-  ctx.fillStyle = 'rgba(52,74,84,.9)';
-  for (let y = top + 26; y < bottom - 60; y += 66) ctx.fillRect(x + 2, y, o.w - 4, 5);
+  obstacleShadow(x, o.w);
+  /* 立杆 */
+  drawSteelB(x + 2, top, GROUND, 12);
+  drawSteelB(x + o.w - 14, top, GROUND, 12);
+  /* 横杆：亮钢，别沉进楼里 */
+  ctx.fillStyle = 'rgba(158,196,212,.9)';
+  for (let y = top + 28; y < bottom - 60; y += 66) ctx.fillRect(x, y, o.w, 6);
+  ctx.fillStyle = 'rgba(236,252,255,.5)';
+  for (let y = top + 28; y < bottom - 60; y += 66) ctx.fillRect(x, y, o.w, 2);
   /* 斜撑 */
-  ctx.strokeStyle = 'rgba(64,88,98,.8)';
+  ctx.strokeStyle = 'rgba(150,190,206,.7)';
   ctx.lineWidth = 3;
-  for (let y = top + 26; y < bottom - 120; y += 132) {
+  for (let y = top + 30; y < bottom - 110; y += 132) {
     ctx.beginPath();
-    ctx.moveTo(x + 6, y);
-    ctx.lineTo(x + o.w - 6, y + 64);
-    ctx.moveTo(x + o.w - 6, y);
-    ctx.lineTo(x + 6, y + 64);
+    ctx.moveTo(x + 8, y);
+    ctx.lineTo(x + o.w - 8, y + 62);
+    ctx.moveTo(x + o.w - 8, y);
+    ctx.lineTo(x + 8, y + 62);
     ctx.stroke();
   }
-  /* 低位横杆 */
-  drawHazardBar(x, bottom - 30, o.w, 30);
-  /* 安全网 */
-  ctx.fillStyle = 'rgba(95,227,200,.08)';
-  ctx.fillRect(x + 8, bottom - 150, o.w - 16, 110);
-  ctx.strokeStyle = 'rgba(95,227,200,.16)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < o.w - 16; i += 18) {
-    ctx.beginPath();
-    ctx.moveTo(x + 8 + i, bottom - 150);
-    ctx.lineTo(x + 8 + i, bottom - 40);
-    ctx.stroke();
-  }
-  /* 指示灯 */
-  const blink = 0.5 + 0.5 * Math.sin(state.time * 3 + o.seed * 9);
-  ctx.fillStyle = 'rgba(255,133,116,' + (0.35 + blink * 0.55).toFixed(2) + ')';
+  /* 低位横杆：滑铲 */
+  drawHazardBarBright(x - 10, bottom - 34, o.w + 20, 34);
+  ctx.fillStyle = 'rgba(120,240,214,.8)';
+  ctx.fillRect(x - 10, bottom - 2, o.w + 20, 3);
+  /* 防尘网：整片半透明青色网，把"棚架"和"门架"分开 */
+  ctx.save();
   ctx.beginPath();
-  ctx.arc(x + o.w / 2, bottom + 12, 3.4, 0, 6.283);
+  ctx.rect(x + 10, top + 26, o.w - 20, bottom - 40 - (top + 26));
+  ctx.clip();
+  ctx.fillStyle = 'rgba(95,227,200,.10)';
+  ctx.fillRect(x, top, o.w, bottom - top);
+  ctx.strokeStyle = 'rgba(120,240,214,.20)';
+  ctx.lineWidth = 1;
+  for (let gx = x + 10; gx < x + o.w - 10; gx += 12) {
+    ctx.beginPath(); ctx.moveTo(gx, top); ctx.lineTo(gx, bottom); ctx.stroke();
+  }
+  for (let gy = top + 26; gy < bottom; gy += 12) {
+    ctx.beginPath(); ctx.moveTo(x + 10, gy); ctx.lineTo(x + o.w - 10, gy); ctx.stroke();
+  }
+  ctx.restore();
+  /* 顶部挑檐 */
+  ctx.fillStyle = 'rgba(120,240,214,.55)';
+  ctx.fillRect(x - 6, top - 8, o.w + 12, 8);
+  ctx.fillStyle = 'rgba(220,255,250,.35)';
+  ctx.fillRect(x - 6, top - 8, o.w + 12, 2);
+  /* 悬挂小警示牌 */
+  ctx.strokeStyle = 'rgba(170,205,220,.6)';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(x + o.w / 2 - 30, bottom - 96);
+  ctx.lineTo(x + o.w / 2 - 30, bottom - 78);
+  ctx.stroke();
+  ctx.fillStyle = '#f2e7d2';
+  roundRect(ctx, x + o.w / 2 - 48, bottom - 78, 38, 24, 3);
   ctx.fill();
+  ctx.fillStyle = '#1c2a32';
+  ctx.fillRect(x + o.w / 2 - 44, bottom - 70, 30, 3);
+  ctx.fillRect(x + o.w / 2 - 44, bottom - 64, 20, 3);
+  actionChevron(x + o.w / 2, bottom + 4, 'down', false);
+  obstacleRim(x, bottom - 34, o.w, 34, 3, 'rgba(255,240,220,.55)');
 }
-
-/* ===== 夜高架：远景城市与桥墩 ===== */
 function drawBridgeBack() {
   /* 远处城市天际线 */
   const far = state.worldX * 0.10;
