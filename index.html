@@ -965,6 +965,49 @@ kbd{
             </span>
             <span class="char-meta"><b>白骨</b><em>白骨 · 骨化 + 九骨羽化 + 骰运复生</em></span>
           </button>
+          <button type="button" class="char-card" data-char="explorer" role="radio" aria-checked="false">
+            <span class="char-face">
+              <svg viewBox="0 0 40 40" aria-hidden="true">
+                <ellipse cx="20" cy="37.6" rx="9" ry="2" fill="rgba(0,0,0,.28)"/>
+                <!-- 卡其探险装 -->
+                <path d="M12.4 40c0-6.6 3.2-10.4 7.6-10.4s7.6 3.8 7.6 10.4z" fill="#d9c18c"/>
+                <path d="M14 32.4q6-3.6 12 0" stroke="#a98c58" stroke-width="1.4" fill="none"/>
+                <!-- 背包带 -->
+                <path d="M13.2 30.4l3.4 6.6" stroke="#8a6a3e" stroke-width="2.2" stroke-linecap="round"/>
+                <!-- 头发 -->
+                <path d="M10.8 15.4c0-5.2 4.2-8.8 9.4-8.8 5 0 9.2 3.6 9.2 8.6-2.8 1.4-4.4 1-5.8 0-1.6 1.8-4.2 2.6-7.2.8z" fill="#3a2c1e"/>
+                <!-- 脸 -->
+                <ellipse cx="20.4" cy="17" rx="7" ry="7.4" fill="#f0c39c"/>
+                <!-- 护目镜（额上） -->
+                <path d="M11.8 12.6q8.6-4 17 0" stroke="#6b4f2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                <rect x="13" y="8.6" width="6.4" height="4.8" rx="2.2" fill="#9fe0d2" stroke="#6b4f2a" stroke-width="1.2"/>
+                <rect x="21.4" y="8.6" width="6.4" height="4.8" rx="2.2" fill="#9fe0d2" stroke="#6b4f2a" stroke-width="1.2"/>
+                <path d="M15.6 10.2l1.4-.2" stroke="#ffffff" stroke-width="1" opacity=".85"/>
+                <path d="M24 10.2l1.4-.2" stroke="#ffffff" stroke-width="1" opacity=".85"/>
+                <!-- 眼睛 -->
+                <circle cx="17.6" cy="17.4" r="1.5" fill="#2a1d12"/>
+                <circle cx="23.4" cy="17.4" r="1.5" fill="#2a1d12"/>
+                <circle cx="17.1" cy="16.8" r=".5" fill="#fff"/>
+                <circle cx="22.9" cy="16.8" r=".5" fill="#fff"/>
+                <!-- 笑 -->
+                <path d="M19.2 21q1.8 1.8 3.6 0" stroke="#8b5a3c" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                <!-- 领巾 -->
+                <path d="M13.6 26q7-2.8 14 0l-1.4 3.4q-5.8-2-11.2 0z" fill="#ffc266"/>
+                <!-- 小狗 -->
+                <g transform="translate(2.6,0)">
+                <ellipse cx="6.6" cy="35" rx="4.6" ry="2.8" fill="#c98a4b"/>
+                <circle cx="10" cy="32.8" r="3.2" fill="#e8b277"/>
+                <path d="M8 30.4l-.6-2.6 2 .8z" fill="#8a5a2e"/>
+                <circle cx="9" cy="31.8" r=".7" fill="#2a1d12"/>
+                <path d="M5.4 36.8q1.8 1.4 3.6.4" stroke="#8a5a2e" stroke-width="1" fill="none"/>
+                <path d="M2.6 33.6l-1.8-2.4" stroke="#c98a4b" stroke-width="2" stroke-linecap="round"/>
+                <rect x="7.8" y="35.2" width="1.2" height="2.4" rx=".6" fill="#8a5a2e"/>
+                <rect x="3.6" y="35.4" width="1.2" height="2.2" rx=".6" fill="#8a5a2e"/>
+                </g>
+              </svg>
+            </span>
+            <span class="char-meta"><b>探险家</b><em>每 15 秒磁吸 · 满能量五段跳 + 金钥匙</em></span>
+          </button>
         </div>
         <div class="start-actions">
           <button class="btn-ghost" id="charBtn" type="button">选择角色<b id="charBtnName">阿隼</b></button>
@@ -1136,7 +1179,7 @@ kbd{
                   <path d="M14.6 13.4q5.4 3.6 10.8 0" stroke="#fff6dd" stroke-width="1.2" fill="none" opacity=".7"/>
                 </svg>
               </span>
-              <span class="char-meta"><b>圣杯</b><em>复活后获得 1 秒飞行</em></span>
+              <span class="char-meta"><b>圣杯</b><em>复活后 1.5 倍速飞行 1 秒 · 结束清场</em></span>
             </button>
           </div>
         </div>
@@ -1376,6 +1419,29 @@ const CHARS = {
     scarfSoft: 'rgba(224,177,90,.5)',
     rgb: '224,177,90',
     burst: 'rgba(224,177,90,.9)'
+  },
+  explorer: {
+    id: 'explorer',
+    name: '探险家',
+    fly: false,
+    explorer: true,
+    meterMax: 200,
+    dashDur: 0,
+    dashName: '寻宝中',
+    energyName: '探索能量',
+    ult: '寻宝时刻',
+    tipIdle: '探索能量攒满 200 按 E 寻宝',
+    tipFull: 'E 寻宝时刻已就绪',
+    skillHTML: '<b>磁吸</b>：每 15 秒自动触发一次磁吸，3 秒内把附近金币吸到身边。<br><b>寻宝时刻</b>：探索能量攒满 200 按 E，耗尽全部能量，5 秒内解禁 <b>五段跳</b>（每段都不耗能量），并把场上与期间出现的金币全部化作 <b>金钥匙</b>，金钥匙得分为金币的 1.3 倍。',
+    jacket: '#d9c18c',
+    jacketLight: '#f4e7c4',
+    jacketDeep: '#a98c58',
+    pantsA: '#41503f',
+    pantsB: '#2c382b',
+    scarf: '#5fe3c8',
+    scarfSoft: 'rgba(95,227,200,.5)',
+    rgb: '255,214,140',
+    burst: 'rgba(255,214,140,.9)'
   }
 };
 const CHAR_IDS = ['male', 'female', 'sci', 'mage', 'bone', 'wuxia'];
@@ -1387,7 +1453,7 @@ const TREASURES = {
   ring: { id: 'ring', name: '戒指', desc: '能量槽上限降低 10%' },
   amulet: { id: 'amulet', name: '护符', desc: '受击时自动释放角色技能（能量需满），每局最多 3 次' },
   crown: { id: 'crown', name: '王冠', desc: '最终得分提升 10%' },
-  grail: { id: 'grail', name: '圣杯', desc: '每次复活后获得 1 秒飞行' },
+  grail: { id: 'grail', name: '圣杯', desc: '每次复活后获得 1 秒 1.5 倍速飞行，飞行结束时清除场上障碍' },
   diamond: { id: 'diamond', name: '钻石', desc: '释放技能后有 20% 概率不消耗能量' },
   crystal: { id: 'crystal', name: '水晶', desc: '三段跳后召唤闪电，消灭前方一个障碍物' }
 };
@@ -1676,6 +1742,10 @@ const state = {
   reviveCount: 0,
   growT: 0,
   itemFlyT: 0,
+  grailFlyT: 0,
+  explorerT: 0,
+  magnetT: 0,
+  magnetClock: 15,
   itemShield: false,
   shake: 0,
   elapsed: 0,
@@ -1701,6 +1771,7 @@ function addShardArc(cx, count, span, peak, baseY) {
       y: baseY - peak * Math.sin(Math.PI * t) - 26,
       phase: Math.random() * 6.283,
       dead: false,
+      key: state.explorerT > 0,
       purple: state.map > 0 && Math.random() < 0.20
     });
   }
@@ -1708,7 +1779,7 @@ function addShardArc(cx, count, span, peak, baseY) {
 function addShardLine(cx, count, gap, y) {
   const total = (count - 1) * gap;
   for (let i = 0; i < count; i++) {
-    world.shards.push({ x: cx - total / 2 + i * gap, y, phase: Math.random() * 6.283, dead: false, purple: state.map > 0 && Math.random() < 0.20 });
+    world.shards.push({ x: cx - total / 2 + i * gap, y, phase: Math.random() * 6.283, dead: false, key: state.explorerT > 0, purple: state.map > 0 && Math.random() < 0.20 });
   }
 }
 function addObstacle(type, x, diff) {
@@ -1931,6 +2002,27 @@ function requestDash() {
   if (state.dashT > 0) return;
   const spec = CHARS[state.char];  if (spec.passive) {
     floatText(PLAYER_X, player.feetY - 126, '法阵自动待命', 'rgba(198,160,255,.9)');
+    return;
+  }
+  if (spec.explorer) {
+    if (state.explorerT > 0) {
+      floatText(PLAYER_X, player.feetY - 126, '寻宝时刻 ' + state.explorerT.toFixed(1) + 's', 'rgba(255,214,140,.9)');
+      return;
+    }
+    if (state.meter < meterCap()) {
+      if (state.meter > 0) floatText(PLAYER_X, player.feetY - 120, '探索能量未满 ' + Math.round(state.meter) + '/' + meterCap(), 'rgba(243,236,221,.75)');
+      return;
+    }
+    paySkillCost(state.meter);
+    state.explorerT = 5;
+    for (let i = 0; i < world.shards.length; i++) {
+      if (!world.shards[i].dead) world.shards[i].key = true;
+    }
+    state.shake = Math.max(state.shake, 8);
+    sfx('dash');
+    burst(PLAYER_X + 20, player.feetY - 54, 24, 'rgba(255,214,140,.95)', 320, 40);
+    burst(PLAYER_X + 20, player.feetY - 104, 12, 'rgba(255,246,214,.9)', 240, 30);
+    floatText(PLAYER_X, player.feetY - 136, '寻宝时刻 5s · 五段跳 + 金钥匙', 'rgba(255,214,140,1)');
     return;
   }
   if (spec.wuxia) {
@@ -2309,6 +2401,10 @@ function resetRun() {
   state.reviveCount = 0;
   state.growT = 0;
   state.itemFlyT = 0;
+  state.grailFlyT = 0;
+  state.explorerT = 0;
+  state.magnetT = 0;
+  state.magnetClock = 15;
   state.itemShield = false;
   state.combo = 1;
   state.comboT = 0;
@@ -2480,8 +2576,12 @@ function syncHud() {
   const itemFlyOn = state.itemFlyT > 0;
   const itemShieldOn = !!state.itemShield;
   const portalReviveOn = state.portalRevive > 0;
-  const chipOn = dashing || shieldOn || armed || gourdFly || fanOn || boneFly || boneIdle || portalReviveOn || growOn || itemFlyOn || itemShieldOn || (!!spec.wuxia && !state.gourdAlive);
-  const chipText = boneFly ? '白骨羽化 ' + state.boneFlyT.toFixed(1) + 's'
+  const magnetOn = state.char === 'explorer' && state.magnetT > 0;
+  const exploreOn = state.char === 'explorer' && state.explorerT > 0;
+  const chipOn = dashing || shieldOn || armed || gourdFly || fanOn || boneFly || boneIdle || portalReviveOn || growOn || itemFlyOn || itemShieldOn || magnetOn || exploreOn || (!!spec.wuxia && !state.gourdAlive);
+  const chipText = exploreOn ? '寻宝时刻 ' + state.explorerT.toFixed(1) + 's'
+    : magnetOn ? '磁吸 ' + state.magnetT.toFixed(1) + 's'
+    : boneFly ? '白骨羽化 ' + state.boneFlyT.toFixed(1) + 's'
     : growOn ? '巨化 ' + state.growT.toFixed(1) + 's'
     : itemFlyOn ? '飞行 ' + state.itemFlyT.toFixed(1) + 's'
     : itemShieldOn ? '道具护盾 · 待命'
@@ -2606,12 +2706,12 @@ function updatePlayer(dt) {
   /* 跳跃（含缓冲与土狼时间）：二段免费，三段扣能量（侠客第三段免费），侠客可四段跳；能量满槽时全免费 */
   if (input.jumpBuffer > 0) {
     const spec = CHARS[state.char];
-    const maxJumps = spec.jumps || 3;
+    const maxJumps = state.explorerT > 0 ? 5 : (spec.jumps || 3);
     if (player.onGround || player.coyote > 0) {
       if (!player.sliding) doJump(1, 0);
     } else if (player.jumps < maxJumps) {
       const stage = Math.max(2, player.jumps + 1);
-      const freeJump = state.meter >= meterCap();
+      const freeJump = state.meter >= meterCap() || state.explorerT > 0;
       const freeStage = stage === 2 || (stage === 3 && spec.freeThird);
       const cost = freeJump || freeStage ? 0 : RULESET.tripleJumpCost;
       if (state.meter >= cost) doJump(stage, cost);
@@ -2722,15 +2822,16 @@ function doPortalRevive() {
   floatText(PLAYER_X, player.feetY - 118, '剩余复活 ' + state.portalRevive + ' 次', 'rgba(243,236,221,.78)');
   grailFlight();
 }
-/* 圣杯：任何一次复活之后，送上 1 秒飞行 */
+/* 圣杯：任何一次复活之后，送上 1 秒 1.5 倍速飞行，结束时清场 */
 function grailFlight() {
   if (state.treasure !== 'grail') return;
   state.itemFlyT = Math.max(state.itemFlyT || 0, 1);
+  state.grailFlyT = Math.max(state.grailFlyT || 0, 1);
   state.invulnT = Math.max(state.invulnT || 0, 1);
   sfx('dash');
   burst(PLAYER_X, player.feetY - 50, 18, 'rgba(255,232,160,.92)', 250, 30);
   burst(PLAYER_X, player.feetY - 96, 10, 'rgba(255,246,214,.9)', 210, 40);
-  floatText(PLAYER_X, player.feetY - 122, '圣杯 · 复生羽翼 1s', 'rgba(255,232,160,1)');
+  floatText(PLAYER_X, player.feetY - 122, '圣杯 · 复生羽翼 1.5×', 'rgba(255,232,160,1)');
 }
 function doNecklaceRevive() {
   state.necklaceUsed = true;
@@ -3027,7 +3128,8 @@ function collide() {
 function collect() {
   const px = PLAYER_X;
   const cy = player.feetY - (player.sliding ? 26 : 48);
-  const magnet = (state.dashT > 0 || state.boneFlyT > 0) ? RULESET.dashMagnet : 0;
+  let magnet = (state.dashT > 0 || state.boneFlyT > 0) ? RULESET.dashMagnet : 0;
+  if (state.magnetT > 0) magnet = Math.max(magnet, 340);
   for (let i = 0; i < world.shards.length; i++) {
     const s = world.shards[i];
     if (s.dead) continue;
@@ -3041,7 +3143,8 @@ function collect() {
       state.shards++;
       const isBone = !!s.bone;
       const isPurple = !!s.purple;
-      const pts = RULESET.shardScore * state.combo * (isBone ? 2 : 1) * (isPurple ? 1.5 : 1);
+      const isKey = !!s.key && !isBone;
+      const pts = RULESET.shardScore * state.combo * (isBone ? 2 : 1) * (isPurple ? 1.5 : 1) * (isKey ? 1.3 : 1);
       state.shardPts += pts;
       state.combo = Math.min(RULESET.comboMax, state.combo + 1);
       state.maxCombo = Math.max(state.maxCombo, state.combo);
@@ -3057,6 +3160,9 @@ function collect() {
           state.bones -= 9;
           startBoneFlight();
         }
+      } else if (isKey) {
+        burst(sx, s.y, 9, 'rgba(255,214,140,.95)', 180, 0);
+        floatText(sx, s.y - 18, '+' + pts, 'rgba(255,232,160,1)');
       } else if (isPurple) {
         burst(sx, s.y, 8, 'rgba(202,168,255,.95)', 160, 0);
         floatText(sx, s.y - 18, '+' + pts, 'rgba(214,186,255,1)');
@@ -3145,6 +3251,14 @@ function updateRun(dt) {
     floatText(PLAYER_X, player.feetY - 140, '落地', 'rgba(240,246,238,.8)');
   }
   const itemFlyWas = state.itemFlyT || 0;
+  const grailFlyWas = state.grailFlyT || 0;
+  state.grailFlyT = Math.max(0, grailFlyWas - dt);
+  if (grailFlyWas > 0 && state.grailFlyT <= 0) {
+    clearObstacles();
+    burst(PLAYER_X + 40, player.feetY - 40, 22, 'rgba(255,232,160,.95)', 320, 34);
+    burst(PLAYER_X + 40, player.feetY - 96, 12, 'rgba(255,248,222,.9)', 260, 40);
+    floatText(PLAYER_X, player.feetY - 142, '圣杯 · 落地清场', 'rgba(255,232,160,1)');
+  }
   state.growT = Math.max(0, (state.growT || 0) - dt);
   state.itemFlyT = Math.max(0, itemFlyWas - dt);
   if (itemFlyWas > 0 && state.itemFlyT <= 0) {
@@ -3160,6 +3274,23 @@ function updateRun(dt) {
       state.fanT = 8;
       fanGust();
     }
+  }
+  /* 探险家：每 15 秒磁吸 3 秒；寻宝时刻 3 秒 */
+  if (state.char === 'explorer') {
+    state.magnetClock -= dt;
+    if (state.magnetClock <= 0) {
+      state.magnetClock = 15;
+      state.magnetT = 3;
+      state.shake = Math.max(state.shake, 4);
+      sfx('djump');
+      burst(PLAYER_X, player.feetY - 52, 16, 'rgba(255,214,140,.9)', 260, 16);
+      floatText(PLAYER_X, player.feetY - 132, '探险家 · 磁吸 3 秒', 'rgba(255,214,140,1)');
+    }
+    if (state.magnetT > 0) state.magnetT = Math.max(0, state.magnetT - dt);
+  }
+  if (state.explorerT > 0) {
+    state.explorerT = Math.max(0, state.explorerT - dt);
+    if (state.explorerT <= 0) floatText(PLAYER_X, player.feetY - 132, '寻宝时刻结束', 'rgba(255,214,140,.8)');
   }
   if (dashing && state.dashT <= 0) clearObstacles();
   state.shake = Math.max(0, state.shake - dt * 36);
@@ -3180,6 +3311,7 @@ function updateRun(dt) {
     }
   }
   if (state.boneFlyT > 0) mul = 2;
+  if (state.grailFlyT > 0) mul = Math.max(mul, 1.5);
   if (state.swordT > 0) mul = Math.max(mul, 1.18);
   state.worldX += state.speed * mul * dt;
   if (state.portalIdx < PORTALS.length && state.worldX + PLAYER_X >= state.portalX) enterNextMap();
@@ -4610,6 +4742,7 @@ function drawShards() {
     if (sx < -40 || sx > W + 40) continue;
     const bob = Math.sin(state.time * 3.1 + s.phase) * 3.4;
     if (s.bone) { drawBoneToken(sx, s.y + bob, s.phase); continue; }
+    if (s.key) { drawKeyToken(sx, s.y + bob, s.phase); continue; }
     ctx.save();
     ctx.translate(sx, s.y + bob);
     ctx.rotate(Math.sin(state.time * 1.7 + s.phase) * 0.4);
@@ -4951,6 +5084,14 @@ const QS_LOOK = {
     ribbon: 'rgba(224,177,90,.8)', ribbon2: 'rgba(240,208,140,.45)',
     cape: 'rgba(224,177,90,.34)', metal: '#e8b45c',
     gourd: '#f2c877', gourdDeep: '#e8b45c', gourdShade: '#a9762f'
+  },
+  explorer: {
+    robe: '#d9c18c', robeLight: '#f4e7c4', robeDeep: '#a98c58',
+    trim: '#5fe3c8', sash: '#6b4f2a', boot: '#8a6a3e', bootDeep: '#5d4526',
+    hair: '#2f2519', hairHi: '#5a4630', skin: '#f0c39c', skinDeep: '#c4895f',
+    ribbon: 'rgba(95,227,200,.8)', ribbon2: 'rgba(150,240,214,.45)',
+    cape: 'rgba(255,194,102,.3)', metal: '#ffc266',
+    dog: '#c98a4b', dogLight: '#e8b277'
   }
 };
 const QS_BODY = {
@@ -4959,10 +5100,12 @@ const QS_BODY = {
   sci: { headR: 24, hipY: -18.8, thigh: 9.4, shin: 8.6, shoulder: 11.8, stride: 0.72, bounce: 2.6, lean: -0.1, sleeveR: 6.8 },
   mage: { headR: 25, hipY: -18.2, thigh: 8.9, shin: 8, shoulder: 8.8, stride: 0.6, bounce: 3.4, lean: -0.04, sleeveR: 9.4 },
   bone: { headR: 25, hipY: -18.2, thigh: 8.9, shin: 8, shoulder: 8.9, stride: 0.62, bounce: 3.4, lean: -0.05, sleeveR: 7.2 },
-  wuxia: { headR: 24, hipY: -19, thigh: 9.6, shin: 8.8, shoulder: 11, stride: 0.74, bounce: 2.4, lean: -0.12, sleeveR: 7.4 }
+  wuxia: { headR: 24, hipY: -19, thigh: 9.6, shin: 8.8, shoulder: 11, stride: 0.74, bounce: 2.4, lean: -0.12, sleeveR: 7.4 },
+  explorer: { headR: 24, hipY: -19, thigh: 9.6, shin: 8.8, shoulder: 11, stride: 0.78, bounce: 2.5, lean: -0.12, sleeveR: 6.6 }
 };
 let QS_SCI = false;
 let QS_BONE = false;
+let QS_EXPLORER = false;
 let QS_MAGE = false;
 let QS_WUXIA = false;
 let QS_FLY = false;
@@ -5735,7 +5878,7 @@ function qsHead(ph, look, fem, p) {
   ctx.lineWidth = 1.1;
   ctx.stroke();
   /* 发髻 */
-  if (!QS_SCI && !QS_BONE) {
+  if (!QS_SCI && !QS_BONE && !QS_EXPLORER) {
   const bun = ctx.createRadialGradient(cx - r * 0.5, hy - r * 1.3, 2, cx - r * 0.4, hy - r * 1.1, r * 0.6);
   bun.addColorStop(0, look.hairHi);
   bun.addColorStop(0.55, look.hair);
@@ -5778,11 +5921,11 @@ function qsHead(ph, look, fem, p) {
     ctx.arc(cx - r * 0.4, hy - r * 1.1, r * 0.11, 0, 6.283);
     ctx.fill();
   }
-  } else if (QS_SCI) {
+  } else if (QS_SCI || QS_EXPLORER) {
     qsGoggles(look, cx, hy, r);
   }
   /* 马尾 */
-  if (!QS_SCI && !QS_BONE) qsPonytail(look, ph, fem);
+  if (!QS_SCI && !QS_BONE && !QS_EXPLORER) qsPonytail(look, ph, fem);
   /* 头发高光 */
   ctx.strokeStyle = 'rgba(200,228,255,.3)';
   ctx.lineWidth = 3.2;
@@ -6291,6 +6434,7 @@ function drawRunPose() {
   QS_MAGE = id === 'mage';
   QS_WUXIA = id === 'wuxia';
   QS_BONE = id === 'bone';
+  QS_EXPLORER = id === 'explorer';
   const look = QS_LOOK[id];
   const p = QS_BODY[id];
   const air = !player.onGround;
@@ -6311,9 +6455,9 @@ function drawRunPose() {
     ctx.translate(0, -4 + Math.sin(state.time * 4) * 2);
     ctx.rotate(-0.24);
   }
-  if (!fem && !QS_SCI && !QS_MAGE && !QS_WUXIA && !QS_BONE) qsSword(look);
-  if (!QS_BONE) qsRibbons(look, ph, fem);
-  if (!QS_BONE) qsHairBack(look, fem, ph);
+  if (!fem && !QS_SCI && !QS_MAGE && !QS_WUXIA && !QS_BONE && !QS_EXPLORER) qsSword(look);
+  if (!QS_BONE && !QS_EXPLORER) qsRibbons(look, ph, fem);
+  if (!QS_BONE && !QS_EXPLORER) qsHairBack(look, fem, ph);
   if (QS_BONE) qsBoneHairBack(ph);
   const st = p.stride;
   if (gliding) {
@@ -6351,13 +6495,14 @@ function drawSlidePose() {
   QS_MAGE = id === 'mage';
   QS_WUXIA = id === 'wuxia';
   QS_BONE = id === 'bone';
+  QS_EXPLORER = id === 'explorer';
   const look = QS_LOOK[id];
   const p = QS_BODY[id];
   ctx.save();
   ctx.translate(0, -12);
   ctx.rotate(1.0);
-  if (!QS_BONE) qsRibbons(look, state.time * 6, fem);
-  if (!QS_BONE) qsHairBack(look, fem, 0);
+  if (!QS_BONE && !QS_EXPLORER) qsRibbons(look, state.time * 6, fem);
+  if (!QS_BONE && !QS_EXPLORER) qsHairBack(look, fem, 0);
   if (QS_BONE) qsBoneHairBack(state.time * 6);
   qsLeg(-5, -0.5, -0.9, look, true, p, fem);
   qsLeg(5, 0.4, -0.35, look, false, p, fem);
@@ -6467,6 +6612,38 @@ function drawPlayer() {
     ctx.ellipse(sx, sy - 2, 48 * pulse, 9 * pulse, 0, 0, 6.283);
     ctx.stroke();
   }
+  if (state.char === 'explorer') {
+    if (state.magnetT > 0) {
+      const pulse = 1 + Math.sin(state.time * 5) * 0.06;
+      const rr = 116 * pulse;
+      const mg = ctx.createRadialGradient(sx, sy - 50, 22, sx, sy - 50, rr);
+      mg.addColorStop(0, 'rgba(255,214,140,.03)');
+      mg.addColorStop(0.74, 'rgba(255,214,140,.10)');
+      mg.addColorStop(1, 'rgba(255,214,140,.34)');
+      ctx.fillStyle = mg;
+      ctx.beginPath();
+      ctx.arc(sx, sy - 50, rr, 0, 6.283);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,232,160,.5)';
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([10, 8]);
+      ctx.beginPath();
+      ctx.arc(sx, sy - 50, rr * 0.94, 0, 6.283);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    if (state.explorerT > 0) {
+      const g2 = ctx.createRadialGradient(sx, sy - 62, 8, sx, sy - 62, 102);
+      g2.addColorStop(0, 'rgba(255,214,140,.22)');
+      g2.addColorStop(0.6, 'rgba(255,214,140,.08)');
+      g2.addColorStop(1, 'rgba(255,214,140,0)');
+      ctx.fillStyle = g2;
+      ctx.beginPath();
+      ctx.arc(sx, sy - 62, 102, 0, 6.283);
+      ctx.fill();
+    }
+    drawExplorerDog(sx, sy);
+  }
   ctx.save();
   ctx.translate(sx, sy);
   if (state.mode === 'crash') ctx.rotate(player.crashRot);
@@ -6523,6 +6700,180 @@ function drawPlayer() {
     ctx.fill();
     ctx.globalAlpha = 1;
   }
+}
+
+/* 金钥匙：探险家寻宝时刻的金币形态 */
+function drawKeyToken(x, y, phase) {
+  const t = state.time;
+  const rot = Math.sin(t * 1.9 + phase) * 0.5;
+  const pulse = 1 + Math.sin(t * 4.6 + phase) * 0.07;
+  /* 外层大光晕 + 内层亮芯，充分从背景里跳出来 */
+  const glow = ctx.createRadialGradient(x, y, 3, x, y, 42);
+  glow.addColorStop(0, 'rgba(255,236,170,.72)');
+  glow.addColorStop(0.42, 'rgba(255,196,84,.30)');
+  glow.addColorStop(1, 'rgba(255,196,84,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(x, y, 42, 0, 6.283);
+  ctx.fill();
+  /* 旋转光刺 */
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(t * 1.2 + phase);
+  ctx.strokeStyle = 'rgba(255,232,160,.5)';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2;
+    const r1 = 22 * pulse;
+    const r2 = 33 * pulse;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a) * r1, Math.sin(a) * r1);
+    ctx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
+    ctx.stroke();
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.scale(1.26 * pulse, 1.26 * pulse);
+  const gold = ctx.createLinearGradient(-10, -10, 10, 10);
+  gold.addColorStop(0, '#fff2c8');
+  gold.addColorStop(0.45, '#ffd269');
+  gold.addColorStop(1, '#d99b21');
+  ctx.fillStyle = gold;
+  ctx.strokeStyle = 'rgba(120,78,16,.55)';
+  ctx.lineWidth = 1.2;
+  /* 钥匙环 */
+  ctx.beginPath();
+  ctx.arc(-4.6, -4.6, 6.4, 0, 6.283);
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(120,78,16,.5)';
+  ctx.beginPath();
+  ctx.arc(-4.6, -4.6, 3.4, 0, 6.283);
+  ctx.stroke();
+  /* 钥匙杆 */
+  ctx.fillStyle = gold;
+  ctx.strokeStyle = 'rgba(120,78,16,.55)';
+  roundRect(ctx, -0.6, -0.8, 11.6, 3.2, 1.6);
+  ctx.fill();
+  ctx.stroke();
+  /* 齿 */
+  roundRect(ctx, 6.4, 2.2, 3.2, 5.4, 1.2);
+  ctx.fill();
+  ctx.stroke();
+  roundRect(ctx, 9.6, 2.2, 2.4, 3.8, 1.2);
+  ctx.fill();
+  ctx.stroke();
+  /* 高亮描一圈亮边，轮廓更硬 */
+  ctx.strokeStyle = 'rgba(255,250,224,.85)';
+  ctx.lineWidth = 1.1;
+  ctx.beginPath();
+  ctx.arc(-4.6, -4.6, 6.4, 0, 6.283);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,.9)';
+  ctx.beginPath();
+  ctx.arc(-6.8, -6.8, 1.9, 0, 6.283);
+  ctx.fill();
+  ctx.restore();
+}
+/* 探险家的小狗：跟在身后小跑 */
+function drawExplorerDog(sx, sy) {
+  const wx = state.worldX + sx;
+  if (!groundAt(wx - 66)) return;
+  const look = QS_LOOK.explorer;
+  const t = state.time;
+  const speedK = Math.min(1, (state.speed || 300) / 420);
+  const ph = t * (7 + speedK * 6) + state.worldX * 0.02;
+  const bob = Math.abs(Math.sin(ph)) * 2.4;
+  ctx.save();
+  ctx.translate(sx - 64, GROUND + 2 - bob);
+  ctx.scale(1.14, 1.14);
+  /* 影子 */
+  ctx.globalAlpha = 0.32;
+  ctx.fillStyle = '#04080b';
+  ctx.beginPath();
+  ctx.ellipse(0, 1.6, 15, 3.4, 0, 0, 6.283);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  const legSw = Math.sin(ph);
+  /* 后腿 */
+  ctx.strokeStyle = '#8a5a2e';
+  ctx.lineWidth = 2.6;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-8, -6); ctx.lineTo(-8 + legSw * 4, 0);
+  ctx.moveTo(-2, -5); ctx.lineTo(-2 - legSw * 4, 0);
+  ctx.stroke();
+  /* 尾巴 */
+  ctx.strokeStyle = look.dog;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-13, -11);
+  ctx.quadraticCurveTo(-19, -15 + Math.sin(ph * 2) * 2.4, -16, -20);
+  ctx.stroke();
+  /* 身体 */
+  const gr = ctx.createLinearGradient(-14, -18, 8, -4);
+  gr.addColorStop(0, look.dogLight);
+  gr.addColorStop(1, look.dog);
+  ctx.fillStyle = gr;
+  ctx.beginPath();
+  ctx.ellipse(-2, -10, 13, 7.4, -0.08, 0, 6.283);
+  ctx.fill();
+  /* 肚皮 */
+  ctx.fillStyle = '#f3ddba';
+  ctx.beginPath();
+  ctx.ellipse(2, -7.2, 5.4, 3.6, 0, 0, 6.283);
+  ctx.fill();
+  /* 前腿 */
+  ctx.strokeStyle = look.dog;
+  ctx.lineWidth = 2.8;
+  ctx.beginPath();
+  ctx.moveTo(6, -6); ctx.lineTo(6 - legSw * 4.4, 0);
+  ctx.moveTo(10, -5.6); ctx.lineTo(10 + legSw * 3.4, 0);
+  ctx.stroke();
+  /* 项圈 */
+  ctx.fillStyle = '#ffc266';
+  roundRect(ctx, 8.4, -15, 4.4, 9.6, 2);
+  ctx.fill();
+  /* 头 */
+  ctx.fillStyle = look.dogLight;
+  ctx.beginPath();
+  ctx.ellipse(15.4, -15.8, 7, 6.2, 0.12, 0, 6.283);
+  ctx.fill();
+  /* 吻部 */
+  ctx.fillStyle = '#f3ddba';
+  ctx.beginPath();
+  ctx.ellipse(20.4, -13.6, 3.6, 2.8, 0.2, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = '#2a1d12';
+  ctx.beginPath();
+  ctx.arc(22.8, -14.2, 1.5, 0, 6.283);
+  ctx.fill();
+  /* 耳朵 */
+  ctx.fillStyle = look.dog;
+  ctx.save();
+  ctx.translate(12.4, -20.6);
+  ctx.rotate(-0.5 + Math.sin(ph) * 0.16);
+  ctx.beginPath();
+  ctx.ellipse(0, 2.6, 2.6, 5.4, 0.2, 0, 6.283);
+  ctx.fill();
+  ctx.restore();
+  /* 眼睛 */
+  ctx.fillStyle = '#241608';
+  ctx.beginPath();
+  ctx.arc(17.6, -16.6, 1.25, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.9)';
+  ctx.beginPath();
+  ctx.arc(17.2, -17.1, 0.45, 0, 6.283);
+  ctx.fill();
+  /* 小围巾 */
+  ctx.fillStyle = 'rgba(95,227,200,.85)';
+  roundRect(ctx, 6.8, -11.8, 6, 3.2, 1.4);
+  ctx.fill();
+  ctx.restore();
 }
 
 /* 白骨的羽化：身后展开骨白羽翼 */
