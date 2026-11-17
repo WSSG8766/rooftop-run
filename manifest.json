@@ -1,0 +1,18 @@
+{
+  "name": "夜行跑酷",
+  "short_name": "夜行跑酷",
+  "description": "霓虹夜色下的无尽跑酷：天台、夜街、夜高架三张地图，七名角色与九件宝物",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "background_color": "#070c11",
+  "theme_color": "#070c11",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
