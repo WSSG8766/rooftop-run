@@ -9711,26 +9711,32 @@ function drawAngelSlashFx(sx, sy) {
   ctx.arc(0, 0, reach - 34, ang0 + 0.04, ang1 - 0.04);
   ctx.stroke();
   /* 外层柔光 */
-  ctx.strokeStyle = 'rgba(255,214,140,' + (0.20 * a).toFixed(3) + ')';
-  ctx.lineWidth = 40 * (0.45 + a * 0.55);
+  ctx.strokeStyle = 'rgba(255,196,96,' + (0.40 * a).toFixed(3) + ')';
+  ctx.lineWidth = 46 * (0.45 + a * 0.55);
   ctx.beginPath();
   ctx.arc(0, 0, reach, ang0, ang1);
   ctx.stroke();
   /* 暖金外晕 */
-  ctx.strokeStyle = 'rgba(255,198,106,' + (0.24 * a).toFixed(3) + ')';
-  ctx.lineWidth = 22 * (0.4 + a * 0.6);
+  ctx.strokeStyle = 'rgba(255,214,132,' + (0.52 * a).toFixed(3) + ')';
+  ctx.lineWidth = 26 * (0.4 + a * 0.6);
   ctx.beginPath();
   ctx.arc(0, 0, reach + 6, ang0 - 0.03, ang1 + 0.03);
   ctx.stroke();
-  /* 主光带 */
+  /* 主光带（金） */
+  ctx.strokeStyle = 'rgba(255,206,116,' + (0.92 * a).toFixed(3) + ')';
+  ctx.lineWidth = 24 * (0.35 + a * 0.65);
+  ctx.beginPath();
+  ctx.arc(0, 0, reach, ang0, ang1);
+  ctx.stroke();
+  /* 主光带（白芯渐变） */
   const gMain = ctx.createLinearGradient(0, -reach, reach, reach * 0.5);
-  gMain.addColorStop(0, 'rgba(255,252,236,0)');
-  gMain.addColorStop(0.30, 'rgba(255,244,206,' + (0.55 * a).toFixed(3) + ')');
-  gMain.addColorStop(0.56, 'rgba(255,255,250,' + (0.95 * a).toFixed(3) + ')');
-  gMain.addColorStop(0.80, 'rgba(255,228,162,' + (0.50 * a).toFixed(3) + ')');
-  gMain.addColorStop(1, 'rgba(255,214,140,0)');
+  gMain.addColorStop(0, 'rgba(255,252,236,0.20)');
+  gMain.addColorStop(0.30, 'rgba(255,250,226,' + (0.62 * a).toFixed(3) + ')');
+  gMain.addColorStop(0.56, 'rgba(255,255,252,' + (0.95 * a).toFixed(3) + ')');
+  gMain.addColorStop(0.80, 'rgba(255,238,190,' + (0.60 * a).toFixed(3) + ')');
+  gMain.addColorStop(1, 'rgba(255,220,150,0.18)');
   ctx.strokeStyle = gMain;
-  ctx.lineWidth = 15 * (0.35 + a * 0.65);
+  ctx.lineWidth = 11 * (0.35 + a * 0.65);
   ctx.beginPath();
   ctx.arc(0, 0, reach, ang0, ang1);
   ctx.stroke();
