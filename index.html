@@ -1716,14 +1716,17 @@ function addFeatures(start, end, diff) {
   let x = start + 185;
   let last = '';
   const limit = end - 60;
-  /* 长平台保底一道门架：一定要有需要滑铲的地方 */
-  if (len > 520 && Math.random() < 0.28) {
+  /* 导弹来袭窗口：迎面障碍出现密度下调 */
+  const calm = state.obstacleCalm > 0;
+  /* 长平台保底一道门架：一定要有需要滑铲的地方（导弹窗口内不强制） */
+  if (!calm && len > 520 && Math.random() < 0.28) {
     const gx = start + 250 + Math.random() * 40;
     addObstacle('gate', gx, diff);
     last = 'gate';
     x = gx + 500;
   }
   for (let guard = 0; guard < 5 && x < limit; guard++) {
+    if (calm && Math.random() < 0.42) { x += 320; continue; }
     let type;
     const r = Math.random();
     if (diff < 0.12) type = 'crate';
@@ -1750,7 +1753,7 @@ function generateAhead() {
     let gap = 0;
     const safeRunway = genCursor - lastObstacleEnd;
     const runwayNeed = speedAt(genCursor) * 0.6 + 120;
-    if (safeRunway > runwayNeed && Math.random() < 0.14 + diff * 0.26) {
+    if (state.obstacleCalm <= 0 && safeRunway > runwayNeed && Math.random() < 0.14 + diff * 0.26) {
       const jumpDist = speedAt(genCursor) * (2 * RULESET.jumpV / RULESET.gravity);
       gap = Math.min(320, Math.max(130, jumpDist * (0.44 + Math.random() * 0.16)));
     }
@@ -2402,6 +2405,7 @@ function resetRun() {
   state.magnetClock = 15;
   state.meteorClock = 15;
   state.missileClock = 9;
+  state.obstacleCalm = 0;
   state.meteorT = 0;
   state.meteorEmit = 0;
   state.meteors.length = 0;
@@ -5917,8 +5921,34 @@ function drawBeachProp(d, x) {
 }
 
 /* ===== 神庙 / 海滩：导弹预警与来袭 ===== */
+function missilesOnScreen() {
+  for (let i = 0; i < world.obstacles.length; i++) {
+    const o = world.obstacles[i];
+    if (o.type !== 'missile' || o.dead) continue;
+    const sx = o.x - state.worldX;
+    if (sx > -180 && sx < W + 260) return true;
+  }
+  return false;
+}
+/* 导弹出场前先检查走廊：同一时间只会有一枚，且不和"要求相反操作"的障碍叠在一起 */
+function missileCorridorClear(low) {
+  for (let i = 0; i < world.obstacles.length; i++) {
+    const o = world.obstacles[i];
+    if (o.type === 'missile' || o.dead) continue;
+    const sx = o.x - state.worldX;
+    if (sx < W - 640 || sx > W + 140) continue;
+    const groundObs = o.type === 'crate' || o.type === 'duct';
+    /* 低弹要跳，高弹要滑；与走廊里障碍要求的操作不同就换一枚 */
+    if (low !== groundObs) return false;
+  }
+  return true;
+}
 function spawnMissile() {
-  const low = Math.random() < 0.5;
+  if (missilesOnScreen()) return false;
+  let low = Math.random() < 0.5;
+  let ok = missileCorridorClear(low);
+  if (!ok) { low = !low; ok = missileCorridorClear(low); }
+  if (!ok) return false;
   const h = low ? 34 : 38;
   world.obstacles.push({
     type: 'missile',
@@ -5932,15 +5962,19 @@ function spawnMissile() {
     seed: Math.random(),
     dead: false
   });
+  /* 导弹在飞时压低迎面障碍的生成密度 */
+  state.obstacleCalm = 3.0;
   sfx('warn');
+  return true;
 }
 function updateMissiles(dt) {
   if (state.mode !== 'run') return;
+  state.obstacleCalm = Math.max(0, state.obstacleCalm - dt);
   if (state.map >= 3) {
     state.missileClock -= dt;
     if (state.missileClock <= 0) {
-      state.missileClock = state.map === 4 ? 6.4 : 7.8;
-      spawnMissile();
+      const spawned = spawnMissile();
+      state.missileClock = spawned ? (state.map === 4 ? 6.4 : 7.8) : 1.1;
     }
   }
   for (let i = 0; i < world.obstacles.length; i++) {
