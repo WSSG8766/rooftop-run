@@ -809,10 +809,10 @@ kbd{
     <div class="hero-rail" aria-hidden="true">天台夜行<span></span></div>
     <div class="start-grid">
       <div class="start-copy">
-        <div class="eyebrow">无尽跑酷 · 天台 · 街巷 · 高架</div>
+        <div class="eyebrow">无尽跑酷 · 天台 · 街巷 · 森林 · 神庙</div>
         <h1 class="hero-title"><b>夜行</b><em>跑酷</em></h1>
         <div class="hero-sub">endless rooftop run</div>
-        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过低矮的悬梁与门架，跨过楼缝，把散落的能量攒满，再在整座城市的上方放出绝招。跑到 3000 米时天台尽头会浮出一道传送门，穿过去白拿 10000 分，脚下的风景也会换成深夜的人行街道；再跑 3000 米，第二道传送门把你送上夜里的高架桥。</p>
+        <p class="lede">在高楼之间一路狂奔。跳过货箱，滑过低矮的悬梁与门架，跨过楼缝，把散落的能量攒满，再在整座城市的上方放出绝招。四道传送门串起五段路：3000 米的第一道通往深夜街巷，穿过去白拿 20000 分；6000 米的第二道把你送进黑夜里枝影交错的老林，奖励 30000 分；9000 米的第三道推开神庙的石门，奖励 50000 分；12000 米的第四道冲向夜里的海滩，奖励 6000 分。后两段路开始加压，会从右侧飞来带感叹号预警的导弹，一发贴地要跳、一发齐胸要滑。捡到那张会飞的符纸，能一路吸着金币加速冲过去，只是飞行途中攒不了能量。</p>
         <div class="char-pick" id="charPick" role="radiogroup" aria-label="选择跑者">
           <button type="button" class="char-card is-on" data-char="male" role="radio" aria-checked="true">
             <span class="char-face">
@@ -1458,6 +1458,7 @@ function sfx(name) {
     case 'hit': noise(0.24, 0.18, 260); beep(96, 0.3, 'sine', 0.16, 48); break;
     case 'land': noise(0.09, 0.05, 320); break;
     case 'break': noise(0.16, 0.09, 420); beep(140, 0.1, 'square', 0.08, 70); break;
+    case 'warn': beep(760, 0.2, 'square', 0.09, 420); break;
   }
 }
 
@@ -1644,12 +1645,26 @@ let genCursor = 1700;
 let lastObstacleEnd = 1212;
 
 /* ===== 关卡生成 ===== */
-const PORTALS = [3000, 6000];
+const PORTALS = [3000, 6000, 9000, 12000];
+/* 四道传送门的通关奖励：2 万 / 3 万 / 5 万 / 6 千 */
+const PORTAL_PTS = [20000, 30000, 50000, 6000];
+const MAP_CN = ['天台', '夜街', '黑夜森林', '黑夜神庙', '黑夜海滩'];
+const MAP_BANNER = ['夜 街 · 人 行 道', '黑 夜 森 林 · 林 间 小 径', '黑 夜 神 庙 · 石 阶 长 廊', '黑 夜 海 滩 · 潮 线 长 堤'];
+const MAP_SKY = {
+  2: { top: [4, 12, 14], mid: [10, 32, 26], low: [18, 46, 34], sun: [176, 240, 208] },
+  3: { top: [7, 7, 20], mid: [22, 18, 42], low: [46, 32, 52], sun: [255, 210, 168] },
+  4: { top: [5, 12, 26], mid: [14, 36, 54], low: [32, 66, 74], sun: [206, 244, 238] }
+};
 function difficulty(wx) {
-  return clamp((wx / RULESET.pxPerMeter) / 900, 0, 1);
+  /* 基础难度随距离拉满；神庙（map 3）与海滩（map 4）再叠一层 */
+  const base = clamp((wx / RULESET.pxPerMeter) / 900, 0, 1);
+  const late = state.map >= 3 ? 0.16 + (state.map >= 4 ? 0.12 : 0) : 0;
+  return clamp(base + late, 0, 1.34);
 }
 function speedAt(wx) {
-  return Math.min(RULESET.maxSpeed, RULESET.baseSpeed + (wx / RULESET.pxPerMeter) * RULESET.speedPerMeter);
+  const base = Math.min(RULESET.maxSpeed, RULESET.baseSpeed + (wx / RULESET.pxPerMeter) * RULESET.speedPerMeter);
+  const late = state.map >= 4 ? 130 : state.map >= 3 ? 70 : 0;
+  return Math.min(RULESET.maxSpeed + 180, base + late);
 }
 function addShardArc(cx, count, span, peak, baseY) {
   for (let i = 0; i < count; i++) {
@@ -1679,7 +1694,9 @@ function addObstacle(type, x, diff) {
     lastObstacleEnd = x + w;
   } else if (type === 'duct') {
     const w = 88;
-    world.obstacles.push({ type: 'duct', x, w: state.map === 1 ? 104 : 88, h: state.map === 1 ? 48 : 36, dead: false, seed: Math.random() });
+    const ductW = state.map === 1 ? 104 : state.map === 2 ? 112 : state.map === 3 ? 108 : 88;
+    const ductH = state.map === 1 ? 48 : state.map === 2 ? 42 : state.map === 3 ? 44 : 36;
+    world.obstacles.push({ type: 'duct', x, w: ductW, h: ductH, dead: false, seed: Math.random() });
     addShardArc(x + w / 2, 4, 132, 94, GROUND);
     lastObstacleEnd = x + w;
   } else if (type === 'gate') {
@@ -1742,10 +1759,11 @@ function generateAhead() {
     const len = 500 - diff * 120 + Math.random() * 250;
     world.platforms.push({ start: genCursor, end: genCursor + len });
     addFeatures(genCursor, genCursor + len, diff);
-    /* 夜街 / 高架：隔一段距离随机出现一个道具 */
+    /* 夜街 / 森林 / 神庙：隔一段距离随机出现一个道具；森林与神庙概率 +10% */
     if (state.map > 0) {
       const lastItem = world.items.length ? world.items[world.items.length - 1].x : -1e9;
-      if (genCursor - lastItem > 900 && Math.random() < 0.5) {
+      const itemChance = state.map >= 3 ? 0.60 : 0.50;
+      if (genCursor - lastItem > 900 && Math.random() < itemChance) {
         const kinds = ['grow', 'fly', 'shield'];
         const kind = kinds[Math.floor(Math.random() * 3)];
         /* 在平台内挑一个不与障碍重叠的落点 */
@@ -1767,11 +1785,15 @@ function generateAhead() {
       }
     }
     if (Math.random() < 0.55) {
-      const dType = state.map === 2
-        ? (Math.random() < 0.5 ? 'gantry' : 'bridgesign')
-        : state.map === 1
-          ? (Math.random() < 0.5 ? 'hydrant' : 'planter')
-          : (Math.random() < 0.5 ? 'tank' : 'antenna');
+      const dType = state.map === 4
+        ? (Math.random() < 0.5 ? 'parasol' : 'driftwood')
+        : state.map === 3
+          ? (Math.random() < 0.5 ? 'templepillar' : 'brazier')
+          : state.map === 2
+          ? (Math.random() < 0.5 ? 'treefern' : 'stump')
+            : state.map === 1
+              ? (Math.random() < 0.5 ? 'hydrant' : 'planter')
+              : (Math.random() < 0.5 ? 'tank' : 'antenna');
       world.decor.push({ x: genCursor + rand(30, 90), type: dType });
     }
     genCursor += len;
@@ -2379,6 +2401,7 @@ function resetRun() {
   state.magnetT = 0;
   state.magnetClock = 15;
   state.meteorClock = 15;
+  state.missileClock = 9;
   state.meteorT = 0;
   state.meteorEmit = 0;
   state.meteors.length = 0;
@@ -2476,7 +2499,8 @@ function finishRun() {
     saveBest({ dist: dist, score: Math.max(state.score, state.best.score) });
   }
   overKicker.textContent = state.crashReason === 'fall'
-    ? (state.map === 2 ? '坠下高架' : state.map === 1 ? '摔进街巷' : '坠下天台')
+    ? (state.map === 4 ? '沉进夜海' : state.map === 3 ? '跌下神庙石阶'
+      : state.map === 2 ? '坠入林间深谷' : state.map === 1 ? '摔进街巷' : '坠下天台')
     : '撞上障碍';
   overTitle.textContent = dist >= state.best.dist && dist > 0 ? '新纪录，跑得漂亮' : '这一程结束了';
   overScoreEl.textContent = state.score;
@@ -2528,11 +2552,15 @@ function syncHud() {
     hudCache.dist = dist;
     distEl.textContent = dist;
   }
-  const mapText = state.map === 2
-    ? '高架桥 · 无尽夜驰'
-    : state.map === 1
-      ? '夜街 · 传送门 ' + Math.max(0, Math.ceil(PORTALS[1] - dist)) + ' 米'
-      : '天台 · 传送门 ' + Math.max(0, Math.ceil(PORTALS[0] - dist)) + ' 米';
+  const mapText = state.map === 4
+    ? '黑夜海滩 · 潮线尽头'
+    : state.map === 3
+      ? '黑夜神庙 · 传送门 ' + Math.max(0, Math.ceil(PORTALS[3] - dist)) + ' 米'
+      : state.map === 2
+        ? '黑夜森林 · 传送门 ' + Math.max(0, Math.ceil(PORTALS[2] - dist)) + ' 米'
+        : state.map === 1
+          ? '夜街 · 传送门 ' + Math.max(0, Math.ceil(PORTALS[1] - dist)) + ' 米'
+          : '天台 · 传送门 ' + Math.max(0, Math.ceil(PORTALS[0] - dist)) + ' 米';
   if (mapLineEl && mapLineEl.textContent !== mapText) mapLineEl.textContent = mapText;
   if (state.best.dist !== hudCache.best) {
     hudCache.best = state.best.dist;
@@ -3045,7 +3073,7 @@ function swordSweep() {
     if (sx + o.w < from || sx > to) continue;
     o.dead = true;
     const overhead = o.type === 'beam' || o.type === 'gate';
-    const oy = overhead ? 70 : GROUND - o.h;
+    const oy = o.type === 'missile' ? o.oy : (overhead ? 70 : GROUND - o.h);
     state.shardPts += 20;
     state.shake = Math.max(state.shake, 5);
     sfx('break');
@@ -3067,7 +3095,7 @@ function collide() {
     const sx = o.x - state.worldX;
     if (sx > W + 120 || sx + o.w < -120) continue;
     const overhead = o.type === 'beam' || o.type === 'gate';
-    const oy = overhead ? 0 : GROUND - o.h;
+    const oy = o.type === 'missile' ? o.oy : (overhead ? 0 : GROUND - o.h);
     const oh = o.h;
     if (box.x + box.w > sx + 4 && box.x < sx + o.w - 4 && box.y + box.h > oy + 2 && box.y < oy + oh - 2) {
       if (state.dashT > 0) {
@@ -3249,7 +3277,7 @@ function drawMeteors() {
 function collect() {
   const px = PLAYER_X;
   const cy = player.feetY - (player.sliding ? 26 : 48);
-  let magnet = (state.dashT > 0 || state.boneFlyT > 0) ? RULESET.dashMagnet : 0;
+  let magnet = (state.dashT > 0 || state.boneFlyT > 0 || state.itemFlyT > 0) ? RULESET.dashMagnet : 0;
   if (state.magnetT > 0) magnet = Math.max(magnet, 340);
   /* 黑金御剑挥砍期间不主动吸取金币、道具与流星，贴身碰到仍照常拾取 */
   if (state.swordT > 0) magnet = 0;
@@ -3273,7 +3301,7 @@ function collect() {
       state.maxCombo = Math.max(state.maxCombo, state.combo);
       state.comboT = RULESET.comboWindow;
       /* 技能生效期间不吸收能量 */
-      if (state.dashT <= 0 && !state.meterLocked) gainMeter(RULESET.shardGain);
+      if (state.dashT <= 0 && state.itemFlyT <= 0 && !state.meterLocked) gainMeter(RULESET.shardGain);
       sfx('coin');
       if (isBone) {
         state.bones++;
@@ -3326,7 +3354,7 @@ function collect() {
       state.maxCombo = Math.max(state.maxCombo, state.combo);
       state.comboT = RULESET.comboWindow;
       /* 流星雨回能：普通金币的 2 倍 */
-      if (state.dashT <= 0 && !state.meterLocked) gainMeter(RULESET.shardGain * 2);
+      if (state.dashT <= 0 && state.itemFlyT <= 0 && !state.meterLocked) gainMeter(RULESET.shardGain * 2);
       sfx('coin');
       burst(sx, m.y, 10, 'rgba(206,255,248,.95)', 190, 10);
       floatText(sx, m.y - 20, '+' + pts, 'rgba(206,255,248,1)');
@@ -3341,7 +3369,7 @@ function applyItem(type, sx, sy) {
     burst(sx, sy, 18, 'rgba(255,194,102,.95)', 240, 20);
   } else if (type === 'fly') {
     state.itemFlyT = 1.5;
-    floatText(sx, sy - 34, '道具 · 飞行 1.5 秒', 'rgba(198,255,246,1)');
+    floatText(sx, sy - 34, '道具 · 飞行 1.5 秒 · 吸金不回能', 'rgba(198,255,246,1)');
     burst(sx, sy, 18, 'rgba(95,227,200,.95)', 240, 20);
   } else {
     state.itemShield = true;
@@ -3472,6 +3500,7 @@ function updateRun(dt) {
     state.comboT -= dt;
     if (state.comboT <= 0) state.combo = 1;
   }
+  updateMissiles(dt);
   const target = speedAt(state.worldX);
   state.speed += (target - state.speed) * Math.min(1, dt * 2.4);
   let mul = 1;
@@ -3487,6 +3516,8 @@ function updateRun(dt) {
   if (state.boneFlyT > 0) mul = 2;
   if (state.grailFlyT > 0) mul = Math.max(mul, 1.5);
   if (state.swordT > 0) mul = Math.max(mul, 1.18);
+  /* 道具「飞行」：速度提升到 1.5 倍，时长不变 */
+  if (state.itemFlyT > 0) mul = Math.max(mul, 1.5);
   state.worldX += state.speed * mul * dt;
   if (state.portalIdx < PORTALS.length && state.worldX + PLAYER_X >= state.portalX) enterNextMap();
   updatePlayer(dt);
@@ -3658,8 +3689,9 @@ const purpleSprite = (function () {
 /* ===== 穿越传送门 → 下一张地图（夜街 / 夜高架） ===== */
 function enterNextMap() {
   state.portalIdx += 1;
-  state.map = Math.min(2, state.map + 1);
-  state.bonusPts += 10000;
+  const reward = PORTAL_PTS[Math.min(PORTAL_PTS.length - 1, state.portalIdx - 1)];
+  state.map = Math.min(4, state.map + 1);
+  state.bonusPts += reward;
   state.portalRevive += 1;
   state.portalX = state.portalIdx < PORTALS.length ? PORTALS[state.portalIdx] * RULESET.pxPerMeter : Infinity;
   state.flashT = 1;
@@ -3670,10 +3702,12 @@ function enterNextMap() {
   /* 落点保底：传送门可能正好压在自己生成的楼缝 / 桥面断口上 */
   climbBackToRoof();
   sfx('dash');
-  const burstCol = state.map === 2 ? 'rgba(255,206,138,.95)' : 'rgba(150,255,238,.95)';
+  const burstCol = state.map === 4 ? 'rgba(206,246,238,.95)'
+    : state.map === 3 ? 'rgba(255,206,138,.95)'
+      : state.map === 2 ? 'rgba(150,246,196,.95)' : 'rgba(150,255,238,.95)';
   burst(PLAYER_X + 46, GROUND - 96, 30, burstCol, 420, 70);
   burst(PLAYER_X + 46, GROUND - 40, 18, 'rgba(255,214,150,.9)', 300, 40);
-  floatText(PLAYER_X + 70, GROUND - 206, '穿越传送门 · +10000', 'rgba(240,255,248,1)');
+  floatText(PLAYER_X + 70, GROUND - 206, '穿越传送门 · +' + reward, 'rgba(240,255,248,1)');
   floatText(PLAYER_X + 70, GROUND - 174, '获得 1 次复活 · 共 ' + state.portalRevive + ' 次', 'rgba(190,255,244,.92)');
 }
 /* ===== 夜街：背景外墙与街灯 ===== */
@@ -4562,6 +4596,1464 @@ function drawBridgeProp(d, x) {
     ctx.fillRect(x + 10, GROUND - 66, 32, 3);
   }
 }
+/* ===== 黑夜森林：三层树影、树干与萤火 ===== */
+function drawForestBack() {
+  const far = state.worldX * 0.07;
+  const fu = 210;
+  const fbase = Math.floor(far / fu);
+  for (let i = -1; i <= Math.ceil(W / fu) + 2; i++) {
+    const idx = fbase + i;
+    const x = idx * fu - far;
+    const h = 200 + hash(idx * 4.11) * 150;
+    const top = GROUND - h;
+    ctx.fillStyle = 'rgba(4,14,16,.88)';
+    ctx.fillRect(x + fu * 0.44, top + 70, fu * 0.1, GROUND - top - 60);
+    for (let c = 0; c < 4; c++) {
+      const cx2 = x + fu * 0.5 + (hash(idx * 7.7 + c * 2.3) - 0.5) * 74;
+      const cy2 = top + 26 + c * 30;
+      const cw2 = fu * 0.46 - c * 8;
+      ctx.beginPath();
+      ctx.ellipse(cx2, cy2, cw2, 42, hash(idx + c) * 0.5 - 0.25, 0, 6.283);
+      ctx.fill();
+    }
+  }
+  const mid2 = state.worldX * 0.17;
+  const mu = 260;
+  const mbase = Math.floor(mid2 / mu);
+  for (let i = -1; i <= Math.ceil(W / mu) + 2; i++) {
+    const idx = mbase + i;
+    const x = idx * mu - mid2 + (hash(idx * 2.7) - 0.5) * 60;
+    const wtr = 24 + hash(idx * 5.9) * 26;
+    const top = GROUND - (320 + hash(idx * 9.3) * 150);
+    const g = ctx.createLinearGradient(x, 0, x + wtr, 0);
+    g.addColorStop(0, '#07120f');
+    g.addColorStop(0.45, '#102320');
+    g.addColorStop(1, '#050e0c');
+    ctx.fillStyle = g;
+    ctx.fillRect(x, top, wtr, GROUND - top);
+    ctx.fillStyle = 'rgba(74,110,92,.16)';
+    for (let k = 0; k < 7; k++) {
+      const bx = x + 4 + hash(idx * 13.7 + k * 3.1) * (wtr - 8);
+      ctx.fillRect(bx, top + 18 + hash(idx * 17.3 + k) * 110, 2, 56 + hash(idx + k * 2.2) * 90);
+    }
+    ctx.fillStyle = 'rgba(104,196,150,.13)';
+    ctx.fillRect(x + wtr - 3, top + 12, 2, GROUND - top - 24);
+    ctx.strokeStyle = 'rgba(28,54,44,.9)';
+    ctx.lineWidth = 2;
+    for (let k = 0; k < 3; k++) {
+      const vx = x + 6 + k * (wtr / 3);
+      ctx.beginPath();
+      ctx.moveTo(vx, top + 40 + k * 30);
+      ctx.quadraticCurveTo(vx + (hash(idx * 3.3 + k) - 0.5) * 40, top + 92 + k * 26, vx + (hash(idx * 5.1 + k) - 0.5) * 62, top + 134 + k * 30);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(30,64,48,.55)';
+      ctx.beginPath();
+      ctx.ellipse(vx + 6, top + 138 + k * 30, 5, 9, 0.5, 0, 6.283);
+      ctx.fill();
+    }
+  }
+  const nearOff = state.worldX * 0.46;
+  const nu = 168;
+  const nbase = Math.floor(nearOff / nu);
+  for (let i = -1; i <= Math.ceil(W / nu) + 2; i++) {
+    const idx = nbase + i;
+    const x = idx * nu - nearOff;
+    const hh = 42 + hash(idx * 3.9) * 38;
+    ctx.fillStyle = 'rgba(3,10,10,.92)';
+    for (let k = 0; k < 5; k++) {
+      ctx.beginPath();
+      ctx.ellipse(x + 18 + k * 26 + (hash(idx * 9.1 + k) - 0.5) * 16, GROUND - hh * 0.42, 22 + hash(idx + k) * 14, hh * 0.7, 0, 0, 6.283);
+      ctx.fill();
+    }
+  }
+  for (let i = 0; i < 26; i++) {
+    const drift = (state.time * 12 + i * 37) % (W + 220);
+    let xx = hash(i * 4.3) * (W + 220) - drift;
+    if (xx < -40) xx += W + 220;
+    const yy = 150 + hash(i * 7.9) * 320 + Math.sin(state.time * 0.8 + i) * 12;
+    const a = 0.22 + 0.34 * (0.5 + 0.5 * Math.sin(state.time * 1.6 + i * 2.1));
+    ctx.fillStyle = 'rgba(168,255,196,' + a.toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.arc(xx, yy, 1.7, 0, 6.283);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(168,255,196,' + (a * 0.16).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.arc(xx, yy, 7, 0, 6.283);
+    ctx.fill();
+  }
+  const fog = ctx.createLinearGradient(0, GROUND - 210, 0, GROUND + 20);
+  fog.addColorStop(0, 'rgba(12,30,26,0)');
+  fog.addColorStop(1, 'rgba(14,36,30,.40)');
+  ctx.fillStyle = fog;
+  ctx.fillRect(0, GROUND - 210, W, 230);
+}
+/* ===== 黑夜森林：林间泥土路与断口 ===== */
+function drawForestGround() {
+  const lip = 26;
+  const deep = ctx.createLinearGradient(0, GROUND + lip, 0, H);
+  deep.addColorStop(0, '#06110f');
+  deep.addColorStop(0.5, '#030a09');
+  deep.addColorStop(1, '#010504');
+  ctx.fillStyle = deep;
+  ctx.fillRect(0, GROUND + lip, W, H - GROUND - lip);
+  for (let i = 0; i < world.platforms.length; i++) {
+    const p = world.platforms[i];
+    const x0 = p.start - state.worldX;
+    const x1 = p.end - state.worldX;
+    if (x1 < -160 || x0 > W + 160) continue;
+    const soil = ctx.createLinearGradient(0, GROUND, 0, GROUND + lip);
+    soil.addColorStop(0, '#2f4436');
+    soil.addColorStop(0.45, '#22332a');
+    soil.addColorStop(1, '#101c18');
+    ctx.fillStyle = soil;
+    ctx.fillRect(x0, GROUND, x1 - x0, lip);
+    ctx.fillStyle = 'rgba(126,206,150,.30)';
+    ctx.fillRect(x0, GROUND - 1, x1 - x0, 3);
+    const tuft = Math.ceil((p.start + 20) / 46) * 46;
+    for (let sx = tuft; sx < p.end - 10; sx += 46) {
+      const sxp = sx - state.worldX;
+      if (sxp < -20 || sxp > W + 20) continue;
+      const hh = 8 + hash(sx * 0.37) * 12;
+      ctx.strokeStyle = 'rgba(120,196,146,.34)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(sxp, GROUND);
+      ctx.quadraticCurveTo(sxp + 3, GROUND - hh * 0.7, sxp + (hash(sx * 0.7) - 0.5) * 10, GROUND - hh);
+      ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(3,9,8,.52)';
+    ctx.fillRect(x0, GROUND + lip, x1 - x0, 10);
+    ctx.fillStyle = 'rgba(3,9,8,.3)';
+    ctx.fillRect(x0 - 6, GROUND, 6, lip);
+    ctx.fillRect(x1, GROUND, 6, lip);
+  }
+  for (let i = 0; i < world.platforms.length - 1; i++) {
+    const a = world.platforms[i];
+    const b = world.platforms[i + 1];
+    const gap = b.start - a.end;
+    if (gap <= 6) continue;
+    const gx0 = a.end - state.worldX;
+    const gx1 = b.start - state.worldX;
+    if (gx1 < -90 || gx0 > W + 90) continue;
+    const pit = ctx.createLinearGradient(0, GROUND, 0, H);
+    pit.addColorStop(0, 'rgba(3,8,8,1)');
+    pit.addColorStop(1, 'rgba(1,3,4,1)');
+    ctx.fillStyle = pit;
+    ctx.fillRect(gx0, GROUND, gx1 - gx0, H - GROUND);
+    ctx.fillStyle = 'rgba(132,222,168,.42)';
+    ctx.fillRect(gx0 - 2, GROUND - 40, 2, 40);
+    ctx.fillRect(gx1, GROUND - 40, 2, 40);
+    ctx.fillStyle = 'rgba(132,222,168,.14)';
+    ctx.fillRect(gx0, GROUND - 3, gx1 - gx0, 3);
+    for (let k = 0; k < 3; k++) {
+      const t2 = (state.time * 1.1 + k / 3) % 1;
+      ctx.fillStyle = 'rgba(150,240,190,' + (0.45 - t2 * 0.36).toFixed(2) + ')';
+      ctx.beginPath();
+      ctx.arc(gx0 + (gx1 - gx0) / 2, GROUND - 18 - t2 * 46, 2.6, 0, 6.283);
+      ctx.fill();
+    }
+  }
+}
+/* ===== 黑夜森林：发光菌与月光 ===== */
+function drawForestLamps() {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, W, GROUND + 26);
+  ctx.clip();
+  const spacing = 360;
+  const first = Math.floor(state.worldX / spacing) - 1;
+  for (let i = first; i <= first + Math.ceil(W / spacing) + 2; i++) {
+    const lx = i * spacing - state.worldX + 90;
+    if (lx < -150 || lx > W + 150) continue;
+    const glow = ctx.createRadialGradient(lx, GROUND - 8, 8, lx, GROUND - 8, 170);
+    glow.addColorStop(0, 'rgba(150,246,196,.16)');
+    glow.addColorStop(1, 'rgba(150,246,196,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.ellipse(lx, GROUND - 8, 170, 56, 0, 0, 6.283);
+    ctx.fill();
+    for (let k = 0; k < 3; k++) {
+      const mx = lx - 18 + k * 20 + Math.sin(state.time * 0.9 + k + i) * 4;
+      const mh = 16 + (k % 2) * 10;
+      ctx.fillStyle = 'rgba(226,255,240,.84)';
+      ctx.fillRect(mx - 1.5, GROUND - mh, 3, mh);
+      ctx.fillStyle = 'rgba(140,244,196,.92)';
+      ctx.beginPath();
+      ctx.ellipse(mx, GROUND - mh, 11, 7.5, 0, 0, 6.283);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(238,255,248,.55)';
+      ctx.beginPath();
+      ctx.ellipse(mx - 3, GROUND - mh - 2, 3, 2, 0, 0, 6.283);
+      ctx.fill();
+    }
+  }
+  /* 斜穿林间的月光 */
+  ctx.fillStyle = 'rgba(178,246,212,.05)';
+  for (let i = 0; i < 4; i++) {
+    const sx = ((state.worldX * 0.3 + i * 420) % (W + 420)) - 140;
+    ctx.beginPath();
+    ctx.moveTo(sx, -20);
+    ctx.lineTo(sx + 96, -20);
+    ctx.lineTo(sx + 236, GROUND);
+    ctx.lineTo(sx + 132, GROUND);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+/* ===== 黑夜森林：障碍换装 ===== */
+/* 林间木料：亮木色立杆，夜里能一眼看出轮廓 */
+function drawWoodB(x, y0, y1, w) {
+  const g = ctx.createLinearGradient(x, 0, x + w, 0);
+  g.addColorStop(0, '#3a3020');
+  g.addColorStop(0.3, '#8d7a52');
+  g.addColorStop(0.55, '#c6ad7c');
+  g.addColorStop(0.8, '#6f5c3d');
+  g.addColorStop(1, '#2b2416');
+  ctx.fillStyle = g;
+  ctx.fillRect(x, y0, w, y1 - y0);
+  ctx.fillStyle = 'rgba(240,255,226,.5)';
+  ctx.fillRect(x + 1, y0, 1.6, y1 - y0);
+  ctx.fillStyle = 'rgba(132,238,168,.4)';
+  ctx.fillRect(x + w - 3.4, y0, 2.2, y1 - y0);
+}
+function drawForestLog(x, o) {
+  const top = GROUND - o.h;
+  obstacleShadow(x, o.w);
+  const g = ctx.createLinearGradient(0, top, 0, GROUND);
+  g.addColorStop(0, '#5b875f');
+  g.addColorStop(0.3, '#457049');
+  g.addColorStop(0.72, '#2f4a32');
+  g.addColorStop(1, '#18281b');
+  ctx.fillStyle = g;
+  rrPath(x, top + 3, o.w, o.h - 3, 12);
+  ctx.fill();
+  /* 苔光顶面 */
+  ctx.fillStyle = 'rgba(158,246,178,.78)';
+  rrPath(x + 1, top, o.w - 2, 11, 5);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(240,255,238,.55)';
+  ctx.fillRect(x + 5, top + 2, o.w - 10, 2);
+  /* 树皮竖纹 */
+  ctx.strokeStyle = 'rgba(214,240,190,.3)';
+  ctx.lineWidth = 1.4;
+  for (let i = 0; i < 7; i++) {
+    const bx = x + 9 + i * (o.w - 18) / 6.4;
+    ctx.beginPath();
+    ctx.moveTo(bx, top + 14);
+    ctx.lineTo(bx + 3, GROUND - 3);
+    ctx.stroke();
+  }
+  /* 年轮端面 */
+  ctx.fillStyle = '#dccb9f';
+  ctx.beginPath();
+  ctx.ellipse(x + o.w - 7, top + o.h * 0.5 + 2, 7.5, 12, 0, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(124,98,60,.65)';
+  ctx.beginPath();
+  ctx.ellipse(x + o.w - 7, top + o.h * 0.5 + 2, 3.2, 5.6, 0, 0, 6.283);
+  ctx.fill();
+  obstacleRim(x, top, o.w, o.h, 10, 'rgba(212,255,222,.55)');
+  actionChevron(x + o.w / 2, top - 16, 'up', true);
+}
+function drawForestRoot(x, o) {
+  const y = GROUND - o.h;
+  obstacleShadow(x, o.w);
+  /* 两侧盘根：亮木色，明确"跳过去" */
+  for (let k = 0; k < 2; k++) {
+    const px = k === 0 ? x - 7 : x + o.w - 5;
+    ctx.fillStyle = '#4a3c26';
+    rrPath(px, y - 16, 12, o.h + 16, 4);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(244,255,226,.5)';
+    ctx.fillRect(px + 2, y - 15, 2, o.h + 12);
+    ctx.fillStyle = 'rgba(150,240,170,.9)';
+    ctx.fillRect(px, y - 19, 12, 4);
+  }
+  /* 主体：横倒的根结 */
+  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
+  g.addColorStop(0, '#5a7350');
+  g.addColorStop(0.28, '#96b47c');
+  g.addColorStop(0.62, '#7d9a66');
+  g.addColorStop(1, '#4a5f3f');
+  ctx.fillStyle = g;
+  rrPath(x, y, o.w, o.h - 4, 6);
+  ctx.fill();
+  ctx.save();
+  rrPath(x, y, o.w, o.h - 4, 6);
+  ctx.clip();
+  ctx.strokeStyle = 'rgba(238,255,222,.85)';
+  ctx.lineWidth = 7;
+  for (let i = -24; i < o.w + 30; i += 28) {
+    ctx.beginPath();
+    ctx.moveTo(x + i, y + o.h);
+    ctx.lineTo(x + i + 14, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+  ctx.fillStyle = 'rgba(255,255,240,.92)';
+  ctx.fillRect(x + 2, y, o.w - 4, 3);
+  /* 根部新芽 */
+  const blink = 0.45 + 0.55 * Math.sin(state.time * 3.4 + (o.seed || 0) * 8);
+  for (let k = 0; k < 2; k++) {
+    const lx = x + 14 + k * (o.w - 28);
+    ctx.fillStyle = 'rgba(150,246,178,' + (0.4 + blink * 0.5).toFixed(2) + ')';
+    ctx.beginPath();
+    ctx.arc(lx, y - 3, 4.4, 0, 6.283);
+    ctx.fill();
+  }
+  obstacleRim(x, y, o.w, o.h - 4, 6, 'rgba(226,255,232,.7)');
+  actionChevron(x + o.w / 2, y - 30, 'up', true);
+}
+function drawForestGate(x, o) {
+  const bottom = GROUND - 78;
+  const top = GROUND - 300;
+  obstacleShadow(x, o.w);
+  /* 立柱：亮木，明显比树影亮一档 */
+  drawWoodB(x - 3, top, GROUND, 18);
+  drawWoodB(x + o.w - 15, top, GROUND, 18);
+  /* 顶部横梁 */
+  drawWoodB(x - 12, top, top + 14, o.w + 24);
+  /* 吊藤 */
+  ctx.strokeStyle = 'rgba(150,236,172,.6)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 3; i++) {
+    const hx = x + 28 + i * (o.w - 56) / 2;
+    ctx.beginPath();
+    ctx.moveTo(hx, top + 14);
+    ctx.lineTo(hx, bottom - 36);
+    ctx.stroke();
+  }
+  /* 低位横枝：奶油警示条，夜里最醒目（必须滑铲） */
+  drawHazardBarBright(x - 10, bottom - 34, o.w + 20, 34);
+  ctx.fillStyle = 'rgba(150,240,172,.9)';
+  ctx.fillRect(x - 10, bottom - 37, o.w + 20, 3);
+  /* 上方叶冠 */
+  ctx.fillStyle = 'rgba(20,46,32,.92)';
+  for (let i = 0; i < 6; i++) {
+    ctx.beginPath();
+    ctx.ellipse(x + 14 + i * (o.w - 28) / 5, bottom - 86 - hash(i * 4.3) * 26, 24, 16, 0.3, 0, 6.283);
+    ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(130,232,162,.22)';
+  for (let i = 0; i < 5; i++) {
+    ctx.beginPath();
+    ctx.ellipse(x + 22 + i * (o.w - 44) / 4, bottom - 92 - hash(i * 7.7) * 22, 10, 5.5, 0.4, 0, 6.283);
+    ctx.fill();
+  }
+  /* 滑铲提示 */
+  actionChevron(x + o.w / 2, bottom + 6, 'down', false);
+  obstacleRim(x - 3, top, 18, GROUND - top, 3, 'rgba(226,255,232,.5)');
+  obstacleRim(x + o.w - 15, top, 18, GROUND - top, 3, 'rgba(226,255,232,.5)');
+}
+function drawForestThicket(x, o) {
+  const bottom = GROUND - 80;
+  obstacleShadow(x, o.w);
+  /* 悬垂的藤网：从画面上方压下来（只能滑铲） */
+  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
+  g.addColorStop(0, '#20301f');
+  g.addColorStop(0.35, '#3d5c3a');
+  g.addColorStop(0.7, '#2a4329');
+  g.addColorStop(1, '#16251a');
+  ctx.fillStyle = g;
+  ctx.fillRect(x, 0, o.w, bottom);
+  /* 垂藤 */
+  ctx.strokeStyle = 'rgba(150,232,170,.45)';
+  ctx.lineWidth = 2.2;
+  for (let i = 0; i < 7; i++) {
+    const vx = x + 10 + i * (o.w - 20) / 6;
+    ctx.beginPath();
+    ctx.moveTo(vx, 0);
+    ctx.quadraticCurveTo(vx + 12, bottom * 0.55, vx - 6, bottom - 6);
+    ctx.stroke();
+  }
+  /* 叶簇 */
+  ctx.fillStyle = 'rgba(36,66,44,.95)';
+  for (let r = 0; r < 4; r++) {
+    for (let c = 0; c < 3; c++) {
+      const lx = x + 18 + c * (o.w - 36) / 2 + (hash(r * 3.1 + c) - 0.5) * 16;
+      const ly = 60 + r * (bottom - 90) / 3;
+      ctx.beginPath();
+      ctx.ellipse(lx, ly, 17, 11, 0.4, 0, 6.283);
+      ctx.fill();
+    }
+  }
+  ctx.fillStyle = 'rgba(140,240,168,.18)';
+  for (let i = 0; i < 5; i++) {
+    ctx.beginPath();
+    ctx.ellipse(x + 24 + i * (o.w - 48) / 4, 80 + hash(i * 5.1) * (bottom - 140), 9, 5, 0.4, 0, 6.283);
+    ctx.fill();
+  }
+  /* 底缘：亮苔边 + 霓虹线 */
+  ctx.fillStyle = 'rgba(166,248,182,.9)';
+  ctx.fillRect(x + 2, bottom - 3, o.w - 4, 3);
+  ctx.fillStyle = 'rgba(166,248,182,.22)';
+  ctx.fillRect(x, bottom - 22, o.w, 12);
+  /* 底缘警示斜纹，和门架同一套语言 */
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x - 2, bottom - 16, o.w + 4, 16);
+  ctx.clip();
+  ctx.strokeStyle = 'rgba(255,194,102,.62)';
+  ctx.lineWidth = 5;
+  for (let i = -20; i < o.w + 30; i += 18) {
+    ctx.beginPath();
+    ctx.moveTo(x + i, bottom);
+    ctx.lineTo(x + i + 16, bottom - 16);
+    ctx.stroke();
+  }
+  ctx.restore();
+  actionChevron(x + o.w / 2, bottom + 10, 'down', false);
+}
+
+function drawForestProp(d, x) {
+  if (d.type === 'stump') {
+    ctx.fillStyle = '#1a2820';
+    roundRect(ctx, x, GROUND - 36, 40, 36, 6);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(196,214,182,.22)';
+    ctx.beginPath();
+    ctx.ellipse(x + 20, GROUND - 36, 18, 6, 0, 0, 6.283);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(126,204,150,.3)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.ellipse(x + 20, GROUND - 36, 10, 3.4, 0, 0, 6.283);
+    ctx.stroke();
+  } else {
+    ctx.strokeStyle = 'rgba(38,74,52,.9)';
+    ctx.lineWidth = 2.2;
+    for (let i = -2; i <= 2; i++) {
+      ctx.beginPath();
+      ctx.moveTo(x + 20, GROUND);
+      ctx.quadraticCurveTo(x + 20 + i * 12, GROUND - 34, x + 20 + i * 26, GROUND - 22 - Math.abs(i) * 8);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(126,214,164,.18)';
+      ctx.beginPath();
+      ctx.ellipse(x + 20 + i * 26, GROUND - 24 - Math.abs(i) * 8, 9, 5, i * 0.3, 0, 6.283);
+      ctx.fill();
+    }
+  }
+}
+
+/* ===== 黑夜神庙：塔影、石柱列与悬灯 ===== */
+function drawTempleBack() {
+  /* 最远：三重塔剪影 */
+  const fo = state.worldX * 0.06;
+  const fu = 330;
+  const fbase = Math.floor(fo / fu);
+  for (let i = -1; i <= Math.ceil(W / fu) + 2; i++) {
+    const idx = fbase + i;
+    const x = idx * fu - fo;
+    const h = 190 + hash(idx * 6.3) * 90;
+    const wdt = 96 + hash(idx * 2.9) * 46;
+    const cx3 = x + fu * 0.5;
+    ctx.fillStyle = 'rgba(9,7,18,.9)';
+    for (let t = 0; t < 3; t++) {
+      const tw = wdt - t * 18;
+      const ty = GROUND - h + t * 52;
+      ctx.fillRect(cx3 - tw / 2, ty, tw, 52);
+      /* 翘檐 */
+      ctx.beginPath();
+      ctx.moveTo(cx3 - tw / 2 - 14, ty);
+      ctx.lineTo(cx3 - tw / 2, ty - 16);
+      ctx.lineTo(cx3 + tw / 2, ty - 16);
+      ctx.lineTo(cx3 + tw / 2 + 14, ty);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.fillRect(cx3 - 3, GROUND - h - 52, 6, 54);
+    ctx.fillStyle = 'rgba(255,206,138,.16)';
+    ctx.fillRect(cx3 - 3, GROUND - h - 52, 6, 4);
+  }
+  /* 中景：石柱列与月光边 */
+  const so = state.worldX * 0.18;
+  const su = 250;
+  const sbase = Math.floor(so / su);
+  for (let i = -1; i <= Math.ceil(W / su) + 2; i++) {
+    const idx = sbase + i;
+    const x = idx * su - so;
+    const wcl = 26 + hash(idx * 3.3) * 12;
+    const top = GROUND - (250 + hash(idx * 8.1) * 80);
+    const g = ctx.createLinearGradient(x, 0, x + wcl, 0);
+    g.addColorStop(0, '#100d1a');
+    g.addColorStop(0.4, '#221c30');
+    g.addColorStop(0.72, '#171226');
+    g.addColorStop(1, '#0a0812');
+    ctx.fillStyle = g;
+    ctx.fillRect(x, top, wcl, GROUND - top);
+    /* 柱头与柱础 */
+    ctx.fillStyle = '#2a2440';
+    ctx.fillRect(x - 6, top - 8, wcl + 12, 8);
+    ctx.fillRect(x - 8, GROUND - 12, wcl + 16, 12);
+    ctx.fillStyle = 'rgba(255,222,178,.18)';
+    ctx.fillRect(x + 2, top, 1.6, GROUND - top - 10);
+    /* 悬灯 */
+    if (hash(idx * 11.7) > 0.55) {
+      const ly = top + 40 + hash(idx * 5.1) * 40;
+      ctx.strokeStyle = 'rgba(120,104,140,.5)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(x + wcl - 8, top + 6);
+      ctx.lineTo(x + wcl - 8, ly);
+      ctx.stroke();
+      const lg = ctx.createRadialGradient(x + wcl - 8, ly + 8, 1, x + wcl - 8, ly + 8, 34);
+      lg.addColorStop(0, 'rgba(255,196,120,.32)');
+      lg.addColorStop(1, 'rgba(255,196,120,0)');
+      ctx.fillStyle = lg;
+      ctx.beginPath();
+      ctx.arc(x + wcl - 8, ly + 8, 34, 0, 6.283);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,208,146,.9)';
+      roundRect(ctx, x + wcl - 13, ly, 10, 16, 4);
+      ctx.fill();
+    }
+  }
+  /* 近景：断墙与浮雕剪影 */
+  const no = state.worldX * 0.42;
+  const nu = 210;
+  const nbase = Math.floor(no / nu);
+  for (let i = -1; i <= Math.ceil(W / nu) + 2; i++) {
+    const idx = nbase + i;
+    const x = idx * nu - no;
+    const hh = 60 + hash(idx * 4.7) * 54;
+    ctx.fillStyle = 'rgba(7,6,14,.86)';
+    ctx.fillRect(x, GROUND - hh, 40 + hash(idx * 6.1) * 26, hh);
+    ctx.fillStyle = 'rgba(255,206,138,.08)';
+    ctx.fillRect(x, GROUND - hh, 40 + hash(idx * 6.1) * 26, 2);
+  }
+}
+/* ===== 黑夜神庙：石板长廊与断崖 ===== */
+function drawTempleGround() {
+  const lip = 26;
+  const deep = ctx.createLinearGradient(0, GROUND + lip, 0, H);
+  deep.addColorStop(0, '#0b0a14');
+  deep.addColorStop(0.5, '#06060c');
+  deep.addColorStop(1, '#020206');
+  ctx.fillStyle = deep;
+  ctx.fillRect(0, GROUND + lip, W, H - GROUND - lip);
+  for (let i = 0; i < world.platforms.length; i++) {
+    const p = world.platforms[i];
+    const x0 = p.start - state.worldX;
+    const x1 = p.end - state.worldX;
+    if (x1 < -160 || x0 > W + 160) continue;
+    const stone = ctx.createLinearGradient(0, GROUND, 0, GROUND + lip);
+    stone.addColorStop(0, '#403a52');
+    stone.addColorStop(0.4, '#2a2538');
+    stone.addColorStop(1, '#16131f');
+    ctx.fillStyle = stone;
+    ctx.fillRect(x0, GROUND, x1 - x0, lip);
+    ctx.fillStyle = 'rgba(255,214,150,.26)';
+    ctx.fillRect(x0, GROUND - 1, x1 - x0, 2);
+    /* 石板缝 */
+    const seam = Math.ceil((p.start + 20) / 78) * 78;
+    for (let sx = seam; sx < p.end - 16; sx += 78) {
+      const sxp = sx - state.worldX;
+      if (sxp < -20 || sxp > W + 20) continue;
+      ctx.fillStyle = 'rgba(6,5,12,.6)';
+      ctx.fillRect(sxp, GROUND + 2, 2, lip - 4);
+    }
+    /* 金线浮雕 */
+    const glyph = Math.ceil((p.start + 60) / 234) * 234;
+    for (let sx = glyph; sx < p.end - 30; sx += 234) {
+      const sxp = sx - state.worldX;
+      if (sxp < -30 || sxp > W + 30) continue;
+      ctx.strokeStyle = 'rgba(255,206,138,.24)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(sxp, GROUND + lip - 8);
+      ctx.lineTo(sxp + 9, GROUND + lip - 16);
+      ctx.lineTo(sxp + 18, GROUND + lip - 8);
+      ctx.lineTo(sxp + 9, GROUND + lip - 2);
+      ctx.closePath();
+      ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(3,3,8,.5)';
+    ctx.fillRect(x0, GROUND + lip, x1 - x0, 10);
+    ctx.fillStyle = 'rgba(3,3,8,.32)';
+    ctx.fillRect(x0 - 6, GROUND, 6, lip);
+    ctx.fillRect(x1, GROUND, 6, lip);
+  }
+  for (let i = 0; i < world.platforms.length - 1; i++) {
+    const a = world.platforms[i];
+    const b = world.platforms[i + 1];
+    const gap = b.start - a.end;
+    if (gap <= 6) continue;
+    const gx0 = a.end - state.worldX;
+    const gx1 = b.start - state.worldX;
+    if (gx1 < -90 || gx0 > W + 90) continue;
+    const pit = ctx.createLinearGradient(0, GROUND, 0, H);
+    pit.addColorStop(0, 'rgba(3,3,7,1)');
+    pit.addColorStop(1, 'rgba(1,1,3,1)');
+    ctx.fillStyle = pit;
+    ctx.fillRect(gx0, GROUND, gx1 - gx0, H - GROUND);
+    ctx.fillStyle = 'rgba(255,196,120,.55)';
+    ctx.fillRect(gx0 - 2, GROUND - 46, 2, 46);
+    ctx.fillRect(gx1, GROUND - 46, 2, 46);
+    ctx.fillStyle = 'rgba(255,196,120,.14)';
+    ctx.fillRect(gx0, GROUND - 3, gx1 - gx0, 3);
+    for (let k = 0; k < 5; k++) {
+      const t2 = (state.time * 1.4 + k / 5) % 1;
+      ctx.fillStyle = 'rgba(255,178,110,' + (0.5 - t2 * 0.42).toFixed(2) + ')';
+      ctx.beginPath();
+      ctx.arc(gx0 + (gx1 - gx0) * (0.3 + 0.4 * hash(k * 3.1)), GROUND - 10 - t2 * 70, 2.2, 0, 6.283);
+      ctx.fill();
+    }
+  }
+}
+/* ===== 黑夜神庙：长明火盆 ===== */
+function drawTempleLamps() {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, W, GROUND + 26);
+  ctx.clip();
+  const spacing = 340;
+  const first = Math.floor(state.worldX / spacing) - 1;
+  for (let i = first; i <= first + Math.ceil(W / spacing) + 2; i++) {
+    const lx = i * spacing - state.worldX + 110;
+    if (lx < -150 || lx > W + 150) continue;
+    const flick = 0.86 + Math.sin(state.time * 9 + i * 1.7) * 0.08 + Math.sin(state.time * 17.3 + i) * 0.05;
+    const glow = ctx.createRadialGradient(lx, GROUND - 196, 6, lx, GROUND - 196, 190 * flick);
+    glow.addColorStop(0, 'rgba(255,196,120,.28)');
+    glow.addColorStop(0.4, 'rgba(255,170,90,.10)');
+    glow.addColorStop(1, 'rgba(255,160,80,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.ellipse(lx, GROUND - 190, 190 * flick, 150 * flick, 0, 0, 6.283);
+    ctx.fill();
+    /* 火盆架 */
+    ctx.fillStyle = '#221c30';
+    ctx.fillRect(lx - 4, GROUND - 190, 8, 190);
+    ctx.fillStyle = 'rgba(255,214,150,.2)';
+    ctx.fillRect(lx + 2, GROUND - 184, 1.6, 178);
+    ctx.fillStyle = '#2c2440';
+    roundRect(ctx, lx - 22, GROUND - 210, 44, 16, 5);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,206,138,.32)';
+    ctx.fillRect(lx - 22, GROUND - 210, 44, 3);
+    /* 火焰三层 */
+    const fy = GROUND - 212;
+    const fh = 22 * flick;
+    ctx.fillStyle = 'rgba(255,142,72,.86)';
+    ctx.beginPath();
+    ctx.moveTo(lx - 12, fy);
+    ctx.quadraticCurveTo(lx - 8, fy - fh, lx, fy - fh - 12);
+    ctx.quadraticCurveTo(lx + 8, fy - fh, lx + 12, fy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,206,138,.9)';
+    ctx.beginPath();
+    ctx.moveTo(lx - 6, fy);
+    ctx.quadraticCurveTo(lx - 4, fy - fh * 0.8, lx, fy - fh - 4);
+    ctx.quadraticCurveTo(lx + 4, fy - fh * 0.8, lx + 6, fy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,248,222,.8)';
+    ctx.beginPath();
+    ctx.ellipse(lx, fy - 4, 3, 6, 0, 0, 6.283);
+    ctx.fill();
+    /* 火星 */
+    for (let k = 0; k < 4; k++) {
+      const t3 = (state.time * 1.9 + k / 4 + i * 0.2) % 1;
+      ctx.fillStyle = 'rgba(255,190,120,' + (0.5 - t3 * 0.42).toFixed(2) + ')';
+      ctx.beginPath();
+      ctx.arc(lx + (hash(k * 3.3 + i) - 0.5) * 16, fy - 12 - t3 * 60, 1.8, 0, 6.283);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+/* ===== 黑夜神庙：障碍换装 ===== */
+/* 神殿石料：亮石色立杆 */
+function drawStoneB(x, y0, y1, w) {
+  const g = ctx.createLinearGradient(x, 0, x + w, 0);
+  g.addColorStop(0, '#3b3552');
+  g.addColorStop(0.3, '#8d84a8');
+  g.addColorStop(0.55, '#c3bad6');
+  g.addColorStop(0.8, '#6f6689');
+  g.addColorStop(1, '#2a243c');
+  ctx.fillStyle = g;
+  ctx.fillRect(x, y0, w, y1 - y0);
+  ctx.fillStyle = 'rgba(248,244,255,.55)';
+  ctx.fillRect(x + 1, y0, 1.6, y1 - y0);
+  ctx.fillStyle = 'rgba(255,206,138,.34)';
+  ctx.fillRect(x + w - 3.4, y0, 2.2, y1 - y0);
+}
+function drawTempleStele(x, o) {
+  const top = GROUND - o.h;
+  obstacleShadow(x, o.w);
+  /* 碑身：亮石，只朝右那面反光 */
+  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
+  g.addColorStop(0, '#6b6486');
+  g.addColorStop(0.35, '#a9a1c2');
+  g.addColorStop(0.62, '#cec6de');
+  g.addColorStop(1, '#7a7396');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(x + o.w * 0.5, top - 10);
+  ctx.lineTo(x + o.w - 4, top + 14);
+  ctx.lineTo(x + o.w - 2, GROUND);
+  ctx.lineTo(x + 2, GROUND);
+  ctx.lineTo(x + 4, top + 14);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,236,196,.72)';
+  ctx.fillRect(x + 6, top + 16, o.w - 12, 2);
+  /* 碑文：琥珀刻痕 */
+  ctx.strokeStyle = 'rgba(255,206,138,.6)';
+  ctx.lineWidth = 1.7;
+  for (let i = 0; i < 4; i++) {
+    const ly = top + 30 + i * 11;
+    ctx.beginPath();
+    ctx.moveTo(x + 15, ly);
+    ctx.lineTo(x + o.w - 15, ly);
+    ctx.stroke();
+  }
+  /* 顶部宝珠 */
+  ctx.fillStyle = 'rgba(255,214,150,.9)';
+  ctx.beginPath();
+  ctx.arc(x + o.w * 0.5, top - 14, 5.4, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,250,238,.7)';
+  ctx.beginPath();
+  ctx.arc(x + o.w * 0.5 - 1.6, top - 15.6, 2, 0, 6.283);
+  ctx.fill();
+  obstacleRim(x, top + 8, o.w, o.h - 8, 4, 'rgba(240,232,255,.6)');
+  actionChevron(x + o.w / 2, top - 34, 'up', true);
+}
+function drawTempleRail(x, o) {
+  const y = GROUND - o.h;
+  obstacleShadow(x, o.w);
+  /* 两端石鼓 */
+  for (let k = 0; k < 2; k++) {
+    const px = k === 0 ? x - 8 : x + o.w - 6;
+    ctx.fillStyle = '#463f60';
+    rrPath(px, y - 16, 14, o.h + 16, 5);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(248,244,255,.5)';
+    ctx.fillRect(px + 2, y - 15, 2, o.h + 12);
+    ctx.fillStyle = 'rgba(255,206,138,.9)';
+    ctx.fillRect(px, y - 19, 14, 4);
+  }
+  /* 栏板：亮石 + 金线 */
+  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
+  g.addColorStop(0, '#6d6690');
+  g.addColorStop(0.3, '#b3aac9');
+  g.addColorStop(0.65, '#d4ccdf');
+  g.addColorStop(1, '#7b7399');
+  ctx.fillStyle = g;
+  rrPath(x, y, o.w, o.h - 4, 5);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,206,138,.5)';
+  ctx.lineWidth = 1.4;
+  for (let i = 0; i < 5; i++) {
+    const dx = x + 12 + i * (o.w - 24) / 4;
+    ctx.beginPath();
+    ctx.moveTo(dx, y + 6);
+    ctx.lineTo(dx + 5, y + o.h - 8);
+    ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(255,248,232,.9)';
+  ctx.fillRect(x + 2, y, o.w - 4, 3);
+  obstacleRim(x, y, o.w, o.h - 4, 5, 'rgba(244,238,255,.75)');
+  actionChevron(x + o.w / 2, y - 30, 'up', true);
+}
+function drawTempleGate(x, o) {
+  const bottom = GROUND - 78;
+  const top = GROUND - 300;
+  obstacleShadow(x, o.w);
+  drawStoneB(x - 3, top, GROUND, 20);
+  drawStoneB(x + o.w - 17, top, GROUND, 20);
+  /* 额枋 */
+  drawStoneB(x - 16, top, top + 16, o.w + 32);
+  ctx.fillStyle = 'rgba(255,206,138,.34)';
+  ctx.fillRect(x - 16, top + 13, o.w + 32, 3);
+  /* 吊灯 */
+  for (let i = 0; i < 3; i++) {
+    const hx = x + 26 + i * (o.w - 52) / 2;
+    ctx.strokeStyle = 'rgba(255,206,138,.45)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(hx, top + 16);
+    ctx.lineTo(hx, bottom - 46);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,204,144,.92)';
+    roundRect(ctx, hx - 6, bottom - 46, 12, 16, 5);
+    ctx.fill();
+  }
+  /* 低位横梁：必须滑铲 */
+  drawHazardBarBright(x - 10, bottom - 34, o.w + 20, 34);
+  ctx.fillStyle = 'rgba(255,206,138,.9)';
+  ctx.fillRect(x - 10, bottom - 37, o.w + 20, 3);
+  actionChevron(x + o.w / 2, bottom + 6, 'down', false);
+  obstacleRim(x - 3, top, 20, GROUND - top, 3, 'rgba(244,238,255,.5)');
+  obstacleRim(x + o.w - 17, top, 20, GROUND - top, 3, 'rgba(244,238,255,.5)');
+}
+function drawTemplePillar(x, o) {
+  const bottom = GROUND - 80;
+  obstacleShadow(x, o.w);
+  /* 悬垂的断柱：从上方压到 80px 净空，只能滑铲 */
+  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
+  g.addColorStop(0, '#2f2944');
+  g.addColorStop(0.32, '#6a6285');
+  g.addColorStop(0.6, '#8f86a8');
+  g.addColorStop(0.85, '#4d4666');
+  g.addColorStop(1, '#221d33');
+  ctx.fillStyle = g;
+  ctx.fillRect(x + 8, 0, o.w - 16, bottom);
+  /* 盘龙浮雕 */
+  ctx.strokeStyle = 'rgba(255,206,138,.42)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 6; i++) {
+    const by = 40 + i * (bottom - 70) / 5;
+    ctx.beginPath();
+    ctx.moveTo(x + 12, by);
+    ctx.quadraticCurveTo(x + o.w * 0.5, by + 12, x + o.w - 12, by + 2);
+    ctx.stroke();
+  }
+  /* 柱底断裂面：扇形豁口 + 亮石芯 */
+  ctx.fillStyle = '#b7aecb';
+  ctx.beginPath();
+  ctx.moveTo(x + 8, bottom);
+  ctx.lineTo(x + 18, bottom - 14);
+  ctx.lineTo(x + o.w * 0.42, bottom - 6);
+  ctx.lineTo(x + o.w * 0.6, bottom - 18);
+  ctx.lineTo(x + o.w - 18, bottom - 8);
+  ctx.lineTo(x + o.w - 8, bottom);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,206,138,.9)';
+  ctx.fillRect(x + 6, bottom - 3, o.w - 12, 3);
+  ctx.fillStyle = 'rgba(255,206,138,.2)';
+  ctx.fillRect(x + 4, bottom - 26, o.w - 8, 14);
+  actionChevron(x + o.w / 2, bottom + 10, 'down', false);
+  obstacleRim(x + 8, 0, o.w - 16, bottom, 2, 'rgba(244,238,255,.45)');
+}
+
+function drawTempleProp(d, x) {
+  if (d.type === 'brazier') {
+    ctx.fillStyle = '#241f36';
+    ctx.fillRect(x + 16, GROUND - 50, 6, 50);
+    ctx.fillStyle = '#332c48';
+    roundRect(ctx, x, GROUND - 64, 38, 16, 5);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,206,138,.3)';
+    ctx.fillRect(x, GROUND - 64, 38, 2);
+    const fl = 0.8 + Math.sin(state.time * 8 + x * 0.02) * 0.1;
+    ctx.fillStyle = 'rgba(255,160,90,.7)';
+    ctx.beginPath();
+    ctx.ellipse(x + 19, GROUND - 68, 8 * fl, 9 * fl, 0, 0, 6.283);
+    ctx.fill();
+  } else {
+    ctx.fillStyle = '#1a1730';
+    ctx.fillRect(x, GROUND - 54, 26, 54);
+    ctx.fillStyle = '#332c48';
+    ctx.fillRect(x - 5, GROUND - 60, 36, 8);
+    ctx.fillStyle = 'rgba(255,206,138,.16)';
+    ctx.fillRect(x - 5, GROUND - 60, 36, 2);
+  }
+}
+
+/* ===== 黑夜海滩：海面、月光倒影与远堤 ===== */
+function drawBeachBack() {
+  const seaTop = GROUND - 214;
+  const sea = ctx.createLinearGradient(0, seaTop, 0, GROUND + 26);
+  sea.addColorStop(0, '#123646');
+  sea.addColorStop(0.10, '#102e40');
+  sea.addColorStop(0.45, '#0b2232');
+  sea.addColorStop(1, '#061420');
+  ctx.fillStyle = sea;
+  ctx.fillRect(0, seaTop, W, GROUND + 26 - seaTop);
+  /* 海天交界的一线冷光 */
+  ctx.fillStyle = 'rgba(150,222,214,.20)';
+  ctx.fillRect(0, seaTop - 1, W, 1.6);
+  ctx.fillStyle = 'rgba(120,200,200,.10)';
+  ctx.fillRect(0, seaTop, W, 12);
+  /* 月光倒影柱 */
+  const moonX = 348;
+  for (let i = 0; i < 26; i++) {
+    const ry = seaTop + 10 + i * 7.6;
+    const wob = Math.sin(state.time * 0.85 + i * 0.72) * (5 + i * 1.5);
+    const wdt = 22 + i * 4.6;
+    const a = Math.max(0, (0.34 - i * 0.009)) * (0.65 + 0.35 * Math.sin(state.time * 1.3 + i * 0.8));
+    ctx.fillStyle = 'rgba(216,250,240,' + a.toFixed(3) + ')';
+    ctx.fillRect(moonX - wdt / 2 + wob, ry, wdt, 2.2);
+  }
+  /* 浪脊：横向短划，错位滚动 */
+  for (let i = 0; i < 12; i++) {
+    const ly = seaTop + 22 + i * 15;
+    const sp = 0.12 + i * 0.014;
+    const off = (state.worldX * sp + state.time * 22 * (i % 2 ? 1 : -1)) % 300;
+    for (let x = -300; x < W + 300; x += 300) {
+      const px2 = x - off;
+      ctx.fillStyle = 'rgba(140,206,214,' + (0.18 - i * 0.008).toFixed(3) + ')';
+      ctx.fillRect(px2, ly, 120 - i * 5, 1.6);
+      ctx.fillStyle = 'rgba(210,248,240,' + (0.14 - i * 0.006).toFixed(3) + ')';
+      ctx.fillRect(px2 + 26, ly + 3, 34, 2);
+    }
+  }
+  /* 远处防波堤 + 灯塔 */
+  const fo = state.worldX * 0.12;
+  const fu = 460;
+  const fbase = Math.floor(fo / fu);
+  for (let i = -1; i <= Math.ceil(W / fu) + 2; i++) {
+    const idx = fbase + i;
+    const x = idx * fu - fo;
+    const dy = seaTop + 56 + hash(idx * 5.7) * 6;
+    ctx.fillStyle = 'rgba(8,20,28,.92)';
+    ctx.fillRect(x + 46, dy, 238, 9);
+    ctx.fillRect(x + 92, dy + 9, 8, 16);
+    ctx.fillRect(x + 214, dy + 9, 8, 16);
+    ctx.fillStyle = 'rgba(120,200,200,.14)';
+    ctx.fillRect(x + 46, dy + 9, 238, 4);
+    if (hash(idx * 9.3) > 0.55) {
+      const lx2 = x + 292;
+      ctx.fillStyle = 'rgba(10,22,30,.95)';
+      ctx.fillRect(lx2, dy - 40, 11, 50);
+      ctx.fillStyle = 'rgba(255,214,150,.92)';
+      ctx.fillRect(lx2 + 2, dy - 44, 8, 8);
+      const lg = ctx.createRadialGradient(lx2 + 6, dy - 40, 1, lx2 + 6, dy - 40, 40);
+      lg.addColorStop(0, 'rgba(255,214,150,.26)');
+      lg.addColorStop(1, 'rgba(255,214,150,0)');
+      ctx.fillStyle = lg;
+      ctx.beginPath();
+      ctx.arc(lx2 + 6, dy - 40, 40, 0, 6.283);
+      ctx.fill();
+    }
+  }
+  /* 近层礁石：压在水线上 */
+  const no = state.worldX * 0.3;
+  const nu = 320;
+  const nbase = Math.floor(no / nu);
+  for (let i = -1; i <= Math.ceil(W / nu) + 2; i++) {
+    const idx = nbase + i;
+    const x = idx * nu - no;
+    const hh = 26 + hash(idx * 3.7) * 34;
+    ctx.fillStyle = 'rgba(5,14,20,.86)';
+    ctx.beginPath();
+    ctx.moveTo(x - 6, GROUND + 8);
+    ctx.lineTo(x + 10, GROUND - hh);
+    ctx.lineTo(x + 26, GROUND - hh * 0.55);
+    ctx.lineTo(x + 44, GROUND - hh * 0.9);
+    ctx.lineTo(x + 66, GROUND - hh * 0.3);
+    ctx.lineTo(x + 92, GROUND + 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(190,246,238,.20)';
+    ctx.fillRect(x + 4, GROUND - 1, 86, 2);
+  }
+  /* 海雾薄带 */
+  const haze = ctx.createLinearGradient(0, GROUND - 40, 0, GROUND + 26);
+  haze.addColorStop(0, 'rgba(120,180,190,0)');
+  haze.addColorStop(1, 'rgba(120,180,190,.10)');
+  ctx.fillStyle = haze;
+  ctx.fillRect(0, GROUND - 40, W, 66);
+}
+/* ===== 黑夜海滩：湿沙滩与断口 ===== */
+function drawBeachGround() {
+  const lip = 54;
+  /* 断口以下就是海水 */
+  const deep = ctx.createLinearGradient(0, GROUND + lip, 0, H);
+  deep.addColorStop(0, '#0a2231');
+  deep.addColorStop(0.35, '#061927');
+  deep.addColorStop(1, '#02080e');
+  ctx.fillStyle = deep;
+  ctx.fillRect(0, GROUND + lip, W, H - GROUND - lip);
+  for (let i = 0; i < world.platforms.length; i++) {
+    const p = world.platforms[i];
+    const x0 = p.start - state.worldX;
+    const x1 = p.end - state.worldX;
+    if (x1 < -160 || x0 > W + 160) continue;
+    const sand = ctx.createLinearGradient(0, GROUND, 0, GROUND + lip);
+    sand.addColorStop(0, '#bdae8c');
+    sand.addColorStop(0.16, '#9a8c6c');
+    sand.addColorStop(0.55, '#6e6650');
+    sand.addColorStop(1, '#3a3527');
+    ctx.fillStyle = sand;
+    ctx.fillRect(x0, GROUND, x1 - x0, lip);
+    /* 浪花咬边 */
+    ctx.fillStyle = 'rgba(226,252,246,.86)';
+    ctx.fillRect(x0, GROUND - 2.4, x1 - x0, 3);
+    ctx.fillStyle = 'rgba(200,244,238,.26)';
+    ctx.fillRect(x0, GROUND + 1, x1 - x0, 5);
+    /* 拍岸浪花：沿岸线滚动的沫团 */
+    for (let fx = Math.ceil((p.start + 10) / 42) * 42; fx < p.end - 14; fx += 42) {
+      const fxp = fx - state.worldX;
+      if (fxp < -40 || fxp > W + 40) continue;
+      const ph = state.time * 1.6 + fx * 0.12;
+      const rr = 7 + Math.sin(ph) * 3;
+      const aa = 0.22 + 0.16 * Math.sin(ph + 1.2);
+      ctx.fillStyle = 'rgba(236,254,248,' + Math.max(0.06, aa).toFixed(2) + ')';
+      ctx.beginPath();
+      ctx.arc(fxp, GROUND - 1, rr, 3.1416, 6.283);
+      ctx.fill();
+    }
+    /* 湿沙的分层暗边 */
+    ctx.fillStyle = 'rgba(38,48,42,.40)';
+    ctx.fillRect(x0, GROUND + 12, x1 - x0, 4);
+    ctx.fillStyle = 'rgba(200,244,238,.10)';
+    ctx.fillRect(x0, GROUND + 24, x1 - x0, 2);
+    /* 沙面颗粒与贝壳 */
+    for (let sx = Math.ceil((p.start + 12) / 26) * 26; sx < p.end - 8; sx += 26) {
+      const sxp = sx - state.worldX;
+      if (sxp < -12 || sxp > W + 12) continue;
+      const hs = hash(sx * 0.43);
+      ctx.fillStyle = hs > 0.78 ? 'rgba(236,252,244,.42)' : 'rgba(44,42,32,.38)';
+      ctx.fillRect(sxp, GROUND + 6 + hs * 24, 2 + hs * 4, 1.5);
+    }
+    ctx.fillStyle = 'rgba(3,10,14,.42)';
+    ctx.fillRect(x0, GROUND + lip, x1 - x0, 12);
+  }
+  /* 断口：拍岸的暗水 */
+  for (let i = 0; i < world.platforms.length - 1; i++) {
+    const a = world.platforms[i];
+    const bt = world.platforms[i + 1];
+    const gap = bt.start - a.end;
+    if (gap <= 6) continue;
+    const gx0 = a.end - state.worldX;
+    const gx1 = bt.start - state.worldX;
+    if (gx1 < -90 || gx0 > W + 90) continue;
+    const pit = ctx.createLinearGradient(0, GROUND, 0, H);
+    pit.addColorStop(0, 'rgba(10,34,49,1)');
+    pit.addColorStop(1, 'rgba(2,8,14,1)');
+    ctx.fillStyle = pit;
+    ctx.fillRect(gx0, GROUND, gx1 - gx0, H - GROUND);
+    for (let k = 0; k < 4; k++) {
+      const t2 = (state.time * 1.1 + k / 4) % 1;
+      ctx.fillStyle = 'rgba(206,250,242,' + (0.30 - t2 * 0.27).toFixed(3) + ')';
+      ctx.fillRect(gx0 + 3 + t2 * (gx1 - gx0 - 8) * 0.4, GROUND + 4 + k * 13, (gx1 - gx0) * 0.5, 2);
+    }
+    ctx.fillStyle = 'rgba(226,252,246,.6)';
+    ctx.fillRect(gx0 - 2, GROUND - 2, 2, 9);
+    ctx.fillRect(gx1, GROUND - 2, 2, 9);
+  }
+}
+/* ===== 黑夜海滩：灯柱与岸边渔火 ===== */
+function drawBeachLamps() {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, W, GROUND + 42);
+  ctx.clip();
+  const spacing = 420;
+  const first = Math.floor(state.worldX / spacing) - 1;
+  for (let i = first; i <= first + Math.ceil(W / spacing) + 2; i++) {
+    const lx = i * spacing - state.worldX + 130;
+    if (lx < -140 || lx > W + 140) continue;
+    /* 地面光斑 */
+    const pool = ctx.createRadialGradient(lx, GROUND + 8, 4, lx, GROUND + 8, 96);
+    pool.addColorStop(0, 'rgba(255,214,150,.22)');
+    pool.addColorStop(1, 'rgba(255,214,150,0)');
+    ctx.fillStyle = pool;
+    ctx.beginPath();
+    ctx.ellipse(lx, GROUND + 6, 96, 34, 0, 0, 6.283);
+    ctx.fill();
+    /* 柱 */
+    ctx.fillStyle = '#243238';
+    ctx.fillRect(lx - 4, GROUND - 172, 8, 172);
+    ctx.fillStyle = 'rgba(206,246,238,.18)';
+    ctx.fillRect(lx + 2, GROUND - 166, 2, 160);
+    ctx.fillStyle = '#2c3c43';
+    ctx.fillRect(lx - 9, GROUND - 12, 18, 12);
+    /* 灯头 */
+    ctx.fillStyle = '#32454c';
+    roundRect(ctx, lx - 13, GROUND - 194, 26, 20, 5);
+    ctx.fill();
+    const fl = 0.9 + Math.sin(state.time * 4.6 + i * 2.1) * 0.06;
+    const lg = ctx.createRadialGradient(lx, GROUND - 184, 2, lx, GROUND - 184, 92 * fl);
+    lg.addColorStop(0, 'rgba(255,220,160,.34)');
+    lg.addColorStop(0.45, 'rgba(255,200,130,.13)');
+    lg.addColorStop(1, 'rgba(255,200,130,0)');
+    ctx.fillStyle = lg;
+    ctx.beginPath();
+    ctx.arc(lx, GROUND - 184, 92 * fl, 0, 6.283);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,244,214,.96)';
+    roundRect(ctx, lx - 7, GROUND - 190, 14, 13, 3.5);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+/* ===== 黑夜海滩：障碍换装 ===== */
+function drawBeachCastle(x, o) {
+  const top = GROUND - o.h;
+  obstacleShadow(x, o.w);
+  /* 双塔沙堡 */
+  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
+  g.addColorStop(0, '#8c7d59');
+  g.addColorStop(0.30, '#c9b78a');
+  g.addColorStop(0.62, '#ddcb9c');
+  g.addColorStop(1, '#8a7b58');
+  ctx.fillStyle = g;
+  /* 主体 */
+  ctx.fillRect(x + 8, top + 26, o.w - 16, o.h - 26);
+  /* 垛口 */
+  for (let i = 0; i < 4; i++) {
+    ctx.fillRect(x + 10 + i * ((o.w - 20) / 4), top + 14, (o.w - 20) / 4 - 4, 14);
+  }
+  /* 左塔 */
+  ctx.fillRect(x + 2, top - 2, 26, o.h + 2);
+  ctx.fillRect(x + 6, top - 12, 8, 12);
+  ctx.fillRect(x + 16, top - 12, 8, 12);
+  /* 右塔 */
+  ctx.fillRect(x + o.w - 28, top + 8, 26, o.h - 8);
+  ctx.fillRect(x + o.w - 24, top - 2, 8, 10);
+  ctx.fillRect(x + o.w - 14, top - 2, 8, 10);
+  /* 窗与门 */
+  ctx.fillStyle = 'rgba(52,40,26,.62)';
+  ctx.fillRect(x + o.w * 0.46, top + 48, 10, 14);
+  ctx.fillRect(x + o.w * 0.46, top + 74, 10, o.h - 86);
+  ctx.fillRect(x + 10, top + 34, 6, 10);
+  /* 潮线 */
+  ctx.fillStyle = 'rgba(226,252,246,.55)';
+  ctx.fillRect(x + 2, GROUND - 12, o.w - 4, 3);
+  ctx.fillStyle = 'rgba(60,52,36,.30)';
+  ctx.fillRect(x + 2, GROUND - 9, o.w - 4, 6);
+  /* 旗 */
+  ctx.strokeStyle = 'rgba(255,206,138,.9)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x + 14, top - 12);
+  ctx.lineTo(x + 14, top - 40);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,150,110,.92)';
+  ctx.beginPath();
+  ctx.moveTo(x + 14, top - 40);
+  ctx.lineTo(x + 32, top - 33);
+  ctx.lineTo(x + 14, top - 26);
+  ctx.closePath();
+  ctx.fill();
+  obstacleRim(x, top + 8, o.w, o.h - 8, 4, 'rgba(255,250,228,.5)');
+  actionChevron(x + o.w / 2, top - 54, 'up', true);
+}
+function drawBeachRock(x, o) {
+  const y = GROUND - o.h;
+  obstacleShadow(x, o.w);
+  /* 一整块被浪打湿的礁石：暗底 + 亮面 + 潮线 */
+  const g = ctx.createLinearGradient(0, y - 6, 0, GROUND);
+  g.addColorStop(0, '#3c4e59');
+  g.addColorStop(0.35, '#93a7b3');
+  g.addColorStop(0.75, '#6d818e');
+  g.addColorStop(1, '#2b3c46');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(x - 6, GROUND);
+  ctx.lineTo(x + o.w * 0.06, y + 18);
+  ctx.lineTo(x + o.w * 0.2, y + 12);
+  ctx.lineTo(x + o.w * 0.3, y + 2);
+  ctx.lineTo(x + o.w * 0.4, y + 13);
+  ctx.lineTo(x + o.w * 0.52, y + 6);
+  ctx.lineTo(x + o.w * 0.62, y - 2);
+  ctx.lineTo(x + o.w * 0.72, y + 10);
+  ctx.lineTo(x + o.w * 0.86, y + 4);
+  ctx.lineTo(x + o.w + 6, y + 20);
+  ctx.lineTo(x + o.w + 8, GROUND);
+  ctx.closePath();
+  ctx.fill();
+  /* 亮面高光 */
+  ctx.fillStyle = 'rgba(228,244,246,.34)';
+  ctx.beginPath();
+  ctx.moveTo(x + o.w * 0.3, y + 3);
+  ctx.lineTo(x + o.w * 0.4, y + 14);
+  ctx.lineTo(x + o.w * 0.34, y + 22);
+  ctx.lineTo(x + o.w * 0.26, y + 14);
+  ctx.closePath();
+  ctx.fill();
+  /* 层理与裂纹 */
+  ctx.strokeStyle = 'rgba(28,42,50,.45)';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(x + 2, y + 26);
+  ctx.lineTo(x + o.w * 0.42, y + 20);
+  ctx.lineTo(x + o.w - 4, y + 28);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x + o.w * 0.52, y + 8);
+  ctx.lineTo(x + o.w * 0.6, GROUND - 8);
+  ctx.stroke();
+  /* 浪花 */
+  ctx.fillStyle = 'rgba(236,254,250,.9)';
+  ctx.fillRect(x + 6, y + 20, o.w * 0.4, 3);
+  ctx.fillStyle = 'rgba(236,254,250,.34)';
+  ctx.fillRect(x - 2, GROUND - 8, o.w + 6, 4);
+  /* 缝隙里的冷光点 */
+  const blink = 0.4 + 0.6 * Math.sin(state.time * 3.2 + (o.seed || 0) * 7);
+  ctx.fillStyle = 'rgba(150,240,238,' + (0.3 + blink * 0.4).toFixed(2) + ')';
+  ctx.beginPath();
+  ctx.arc(x + o.w * 0.66, y + 8, 3.2, 0, 6.283);
+  ctx.fill();
+  actionChevron(x + o.w / 2, y - 32, 'up', true);
+}
+function drawBeachNetGate(x, o) {
+  const bottom = GROUND - 78;
+  const top = GROUND - 286;
+  obstacleShadow(x, o.w);
+  drawWoodB(x - 3, top, GROUND, 14);
+  drawWoodB(x + o.w - 11, top, GROUND, 14);
+  drawWoodB(x - 8, top, top + 12, o.w + 16);
+  /* 渔网 */
+  ctx.strokeStyle = 'rgba(150,222,214,.38)';
+  ctx.lineWidth = 1.3;
+  for (let gx = x + 6; gx < x + o.w - 2; gx += 17) {
+    ctx.beginPath();
+    ctx.moveTo(gx, top + 14);
+    ctx.lineTo(gx + 9, bottom - 36);
+    ctx.stroke();
+  }
+  for (let gy = top + 22; gy < bottom - 40; gy += 17) {
+    ctx.beginPath();
+    ctx.moveTo(x + 2, gy);
+    ctx.lineTo(x + o.w - 2, gy);
+    ctx.stroke();
+  }
+  /* 浮标 */
+  for (let i = 0; i < 3; i++) {
+    const bx = x + 22 + i * (o.w - 44) / 2;
+    ctx.fillStyle = 'rgba(255,150,110,.9)';
+    ctx.beginPath();
+    ctx.arc(bx, bottom - 42, 4.4, 0, 6.283);
+    ctx.fill();
+  }
+  /* 低位横杆：必须滑铲 */
+  drawHazardBarBright(x - 10, bottom - 36, o.w + 20, 36);
+  ctx.fillStyle = 'rgba(226,252,246,.92)';
+  ctx.fillRect(x - 10, bottom - 39, o.w + 20, 3);
+  actionChevron(x + o.w / 2, bottom + 6, 'down', false);
+  obstacleRim(x - 3, top, 14, GROUND - top, 3, 'rgba(236,254,250,.4)');
+  obstacleRim(x + o.w - 11, top, 14, GROUND - top, 3, 'rgba(236,254,250,.4)');
+}
+function drawBeachAwning(x, o) {
+  const bottom = GROUND - 80;
+  const topY = GROUND - 268;
+  obstacleShadow(x, o.w);
+  /* 吊绳 */
+  ctx.strokeStyle = 'rgba(196,168,120,.55)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 4; i++) {
+    const rx = x + 14 + i * (o.w - 28) / 3;
+    ctx.beginPath();
+    ctx.moveTo(rx, topY - 26);
+    ctx.lineTo(rx - 4, topY);
+    ctx.stroke();
+  }
+  /* 横梁 */
+  ctx.fillStyle = '#3d3320';
+  ctx.fillRect(x - 6, topY - 30, o.w + 12, 8);
+  /* 帆布棚 */
+  const g = ctx.createLinearGradient(x, 0, x + o.w, 0);
+  g.addColorStop(0, '#17333d');
+  g.addColorStop(0.38, '#2d5a66');
+  g.addColorStop(0.72, '#1d414c');
+  g.addColorStop(1, '#102228');
+  ctx.fillStyle = g;
+  ctx.fillRect(x, topY, o.w, bottom - 26 - topY);
+  ctx.fillStyle = 'rgba(206,246,238,.12)';
+  for (let i = 0; i < 5; i++) {
+    ctx.fillRect(x, topY + 12 + i * 38, o.w, 8);
+  }
+  ctx.strokeStyle = 'rgba(160,226,220,.42)';
+  ctx.lineWidth = 1.3;
+  for (let gx = x + 8; gx < x + o.w - 4; gx += 19) {
+    ctx.beginPath();
+    ctx.moveTo(gx, topY);
+    ctx.lineTo(gx + 8, bottom - 30);
+    ctx.stroke();
+  }
+  /* 布边褶皱 */
+  ctx.fillStyle = 'rgba(8,18,22,.5)';
+  for (let i = 0; i < 5; i++) {
+    ctx.fillRect(x + i * o.w / 5, topY, 6, bottom - 26 - topY);
+  }
+  ctx.fillStyle = 'rgba(226,252,246,.94)';
+  ctx.fillRect(x + 2, bottom - 30, o.w - 4, 4);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x - 2, bottom - 20, o.w + 4, 20);
+  ctx.clip();
+  ctx.strokeStyle = 'rgba(255,194,102,.58)';
+  ctx.lineWidth = 5;
+  for (let i = -20; i < o.w + 30; i += 18) {
+    ctx.beginPath();
+    ctx.moveTo(x + i, bottom);
+    ctx.lineTo(x + i + 18, bottom - 20);
+    ctx.stroke();
+  }
+  ctx.restore();
+  actionChevron(x + o.w / 2, bottom + 10, 'down', false);
+}
+function drawBeachProp(d, x) {
+  if (d.type === 'parasol') {
+    ctx.strokeStyle = 'rgba(126,146,146,.78)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + 20, GROUND);
+    ctx.lineTo(x + 20, GROUND - 76);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(198,176,138,.5)';
+    ctx.beginPath();
+    ctx.moveTo(x - 8, GROUND - 76);
+    ctx.quadraticCurveTo(x + 20, GROUND - 100, x + 48, GROUND - 76);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,150,110,.36)';
+    ctx.beginPath();
+    ctx.moveTo(x + 20, GROUND - 98);
+    ctx.lineTo(x + 48, GROUND - 76);
+    ctx.lineTo(x + 20, GROUND - 76);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(226,252,246,.14)';
+    ctx.fillRect(x - 6, GROUND - 75, 54, 2);
+  } else {
+    ctx.fillStyle = 'rgba(116,102,78,.72)';
+    roundRect(ctx, x, GROUND - 20, 58, 15, 6);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(206,246,238,.26)';
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(x + 8, GROUND - 13);
+    ctx.lineTo(x + 50, GROUND - 17);
+    ctx.stroke();
+  }
+}
+
+/* ===== 神庙 / 海滩：导弹预警与来袭 ===== */
+function spawnMissile() {
+  const low = Math.random() < 0.5;
+  const h = low ? 34 : 38;
+  world.obstacles.push({
+    type: 'missile',
+    x: state.worldX + W + 210,
+    w: 108,
+    h: h,
+    oy: low ? GROUND - h : GROUND - 114,
+    lane: low ? 'low' : 'high',
+    warnT: 1.55,
+    spd: 380,
+    seed: Math.random(),
+    dead: false
+  });
+  sfx('warn');
+}
+function updateMissiles(dt) {
+  if (state.mode !== 'run') return;
+  if (state.map >= 3) {
+    state.missileClock -= dt;
+    if (state.missileClock <= 0) {
+      state.missileClock = state.map === 4 ? 6.4 : 7.8;
+      spawnMissile();
+    }
+  }
+  for (let i = 0; i < world.obstacles.length; i++) {
+    const o = world.obstacles[i];
+    if (o.type !== 'missile' || o.dead) continue;
+    if (o.warnT > 0) {
+      o.warnT -= dt;
+      /* 预警期间弹体在屏幕外排队，进入视野前不会偷跑 */
+      o.x = state.worldX + W + 120 + o.warnT * 36;
+      continue;
+    }
+    o.x -= o.spd * dt;
+  }
+}
+function drawMissile(x, o) {
+  const cy = o.oy + o.h / 2;
+  /* 尾焰 */
+  const trail = ctx.createLinearGradient(x + o.w, 0, x + o.w + 160, 0);
+  trail.addColorStop(0, 'rgba(255,186,118,.55)');
+  trail.addColorStop(0.45, 'rgba(255,140,80,.20)');
+  trail.addColorStop(1, 'rgba(255,140,80,0)');
+  ctx.fillStyle = trail;
+  ctx.beginPath();
+  ctx.moveTo(x + o.w - 8, cy - 8);
+  ctx.lineTo(x + o.w + 160, cy + Math.sin(state.time * 12 + o.seed * 9) * 3);
+  ctx.lineTo(x + o.w - 8, cy + 8);
+  ctx.closePath();
+  ctx.fill();
+  /* 弹体 */
+  const g = ctx.createLinearGradient(0, cy - 15, 0, cy + 15);
+  g.addColorStop(0, '#a9bccb');
+  g.addColorStop(0.45, '#e4eff6');
+  g.addColorStop(1, '#697b8a');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(x - 8, cy);
+  ctx.quadraticCurveTo(x + 16, cy - 13, x + o.w - 20, cy - 11);
+  ctx.lineTo(x + o.w - 8, cy - 5);
+  ctx.lineTo(x + o.w - 8, cy + 5);
+  ctx.lineTo(x + o.w - 20, cy + 11);
+  ctx.quadraticCurveTo(x + 16, cy + 13, x - 8, cy);
+  ctx.closePath();
+  ctx.fill();
+  /* 尾翼 */
+  ctx.fillStyle = '#4c5f6e';
+  ctx.beginPath();
+  ctx.moveTo(x + o.w - 26, cy - 10);
+  ctx.lineTo(x + o.w + 4, cy - 21);
+  ctx.lineTo(x + o.w - 10, cy - 5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(x + o.w - 26, cy + 10);
+  ctx.lineTo(x + o.w + 4, cy + 21);
+  ctx.lineTo(x + o.w - 10, cy + 5);
+  ctx.closePath();
+  ctx.fill();
+  /* 弹头红灯 */
+  const blink = 0.4 + 0.6 * Math.abs(Math.sin(state.time * 9 + o.seed * 6));
+  ctx.fillStyle = 'rgba(255,116,98,' + blink.toFixed(2) + ')';
+  ctx.beginPath();
+  ctx.arc(x + 8, cy, 5.2, 0, 6.283);
+  ctx.fill();
+  /* 拖尾白汽 */
+  ctx.fillStyle = 'rgba(210,240,240,.22)';
+  for (let i = 0; i < 4; i++) {
+    const tx = x + o.w + 26 + i * 26;
+    ctx.fillRect(tx, cy - 2 + Math.sin(state.time * 6 + i) * 2, 14, 3);
+  }
+}
+function drawMissileWarnings() {
+  if (state.mode !== 'run') return;
+  for (let i = 0; i < world.obstacles.length; i++) {
+    const o = world.obstacles[i];
+    if (o.type !== 'missile' || o.dead || o.warnT <= 0) continue;
+    const t = clamp(1 - o.warnT / 1.55, 0, 1);
+    const pulse = 0.45 + 0.55 * Math.abs(Math.sin(state.time * 8));
+    const bx = W - 48;
+    const cy = o.oy + o.h / 2;
+    /* 来袭高度线 */
+    ctx.save();
+    ctx.setLineDash([14, 12]);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255,124,102,' + (0.2 + pulse * 0.34).toFixed(2) + ')';
+    ctx.beginPath();
+    ctx.moveTo(bx - 34, cy);
+    ctx.lineTo(W + 14, cy);
+    ctx.stroke();
+    ctx.restore();
+    /* 感叹号牌 */
+    ctx.fillStyle = 'rgba(12,17,23,.9)';
+    roundRect(ctx, bx - 21, cy - 26, 42, 52, 10);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,124,102,' + (0.5 + pulse * 0.45).toFixed(2) + ')';
+    ctx.lineWidth = 2;
+    roundRect(ctx, bx - 21, cy - 26, 42, 52, 10);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,146,124,' + (0.72 + pulse * 0.28).toFixed(2) + ')';
+    roundRect(ctx, bx - 4.5, cy - 15, 9, 20, 4);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(bx, cy + 13, 4.8, 0, 6.283);
+    ctx.fill();
+    /* 提示：低弹跳、高弹滑 */
+    actionChevron(bx, cy + 44, o.lane === 'low' ? 'up' : 'down', o.lane === 'low');
+    /* 进度条 */
+    ctx.fillStyle = 'rgba(255,124,102,.16)';
+    ctx.fillRect(bx - 21, cy + 30, 42, 3);
+    ctx.fillStyle = 'rgba(255,124,102,.85)';
+    ctx.fillRect(bx - 21, cy + 30, 42 * t, 3);
+  }
+}
+
 /* ===== 传送门 ===== */
 function drawPortal() {
   if (state.portalIdx >= PORTALS.length || state.mode !== 'run') return;
@@ -4647,7 +6139,8 @@ function drawPortal() {
   ctx.font = '600 14px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(240,255,248,.94)';
-  ctx.fillText((state.portalIdx === 0 ? '传送门 · 夜街' : '传送门 · 高架') + ' +10000', cx, GROUND + 35);
+  const portalName = ['夜街', '黑夜森林', '黑夜神庙', '黑夜海滩'][Math.min(3, state.portalIdx)];
+  ctx.fillText('传送门 · ' + portalName + ' +' + PORTAL_PTS[Math.min(PORTAL_PTS.length - 1, state.portalIdx)], cx, GROUND + 35);
   ctx.textAlign = 'left';
 }
 /* ===== 切换闪白与横幅 ===== */
@@ -4665,16 +6158,21 @@ function drawMapBanner() {
   ctx.textAlign = 'center';
   ctx.font = '600 40px "Songti SC","Noto Serif SC",serif';
   ctx.fillStyle = 'rgba(243,236,221,.96)';
-  ctx.fillText(state.map === 2 ? '夜 高 架 · 桥 面' : '夜 街 · 人 行 道', W / 2, 176);
+  ctx.fillText(state.map === 4 ? MAP_BANNER[3]
+    : state.map === 3 ? MAP_BANNER[2]
+      : state.map === 2 ? MAP_BANNER[1]
+        : state.map === 1 ? MAP_BANNER[0] : '天 台 · 楼 顶 边 缘', W / 2, 176);
   ctx.font = '600 13px "PingFang SC","Microsoft YaHei",sans-serif';
-  ctx.fillStyle = state.map === 2 ? 'rgba(255,206,138,.9)' : 'rgba(95,227,200,.9)';
-  ctx.fillText('穿越传送门 +10000 · 继续向前', W / 2, 206);
+  ctx.fillStyle = state.map === 4 ? 'rgba(206,246,238,.9)'
+    : state.map === 3 ? 'rgba(255,206,138,.9)'
+      : state.map === 2 ? 'rgba(150,246,196,.9)' : 'rgba(95,227,200,.9)';
+  ctx.fillText('穿越传送门 +' + PORTAL_PTS[Math.max(0, state.map - 1)] + ' · 继续向前', W / 2, 206);
   ctx.textAlign = 'left';
   ctx.restore();
 }
 
 function drawSky() {
-  currentSky = skyNow();
+  currentSky = state.map >= 2 ? MAP_SKY[state.map] : skyNow();
   const grad = ctx.createLinearGradient(0, 0, 0, GROUND + 60);
   grad.addColorStop(0, rgb(currentSky.top));
   grad.addColorStop(0.42, rgb(mixArr(currentSky.top, currentSky.mid, 0.8)));
@@ -4695,31 +6193,64 @@ function drawSky() {
   }
   ctx.restore();
 
-  /* 落日 */
-  const sunX = 908 + Math.sin(state.time * 0.06) * 22;
-  const sunY = 394;
-  const sunR = 112;
-  const glow = ctx.createRadialGradient(sunX, sunY, sunR * 0.25, sunX, sunY, sunR * 2.4);
-  glow.addColorStop(0, rgb(currentSky.sun, 0.5));
-  glow.addColorStop(0.4, rgb(currentSky.sun, 0.12));
-  glow.addColorStop(1, rgb(currentSky.sun, 0));
-  ctx.fillStyle = glow;
-  ctx.beginPath();
-  ctx.arc(sunX, sunY, sunR * 2.4, 0, 6.283);
-  ctx.fill();
+  if (state.map >= 2) {
+    /* 夜色地图：换成一轮偏高的淡月，月亮后面压一层薄云 */
+    const moonX = 348 + Math.sin(state.time * 0.05) * 12;
+    const moonY = 214;
+    const moonR = 76;
+    const mg = ctx.createRadialGradient(moonX, moonY, moonR * 0.3, moonX, moonY, moonR * 3.2);
+    mg.addColorStop(0, rgb(currentSky.sun, 0.26));
+    mg.addColorStop(0.45, rgb(currentSky.sun, 0.07));
+    mg.addColorStop(1, rgb(currentSky.sun, 0));
+    ctx.fillStyle = mg;
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, moonR * 3.2, 0, 6.283);
+    ctx.fill();
+    ctx.fillStyle = rgb(currentSky.sun, 0.82);
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, moonR, 0, 6.283);
+    ctx.fill();
+    /* 月面淡斑：只留几处极淡的阴影，别画成泡泡 */
+    ctx.fillStyle = rgb(currentSky.mid, 0.16);
+    for (let i = 0; i < 3; i++) {
+      const ma = i * 1.87 + 0.6;
+      ctx.beginPath();
+      ctx.ellipse(moonX + Math.cos(ma) * moonR * 0.4, moonY + Math.sin(ma) * moonR * 0.34, 9 + i * 3, 7 + i * 2.4, ma, 0, 6.283);
+      ctx.fill();
+    }
+    /* 横向薄云 */
+    ctx.fillStyle = rgb(currentSky.mid, 0.34);
+    for (let i = 0; i < 3; i++) {
+      const cy4 = moonY + 26 + i * 26;
+      ctx.fillRect(moonX - moonR * 2.1, cy4, moonR * 4.2, 4 + i * 2);
+    }
+  } else {
+    /* 落日 */
+    const sunX = 908 + Math.sin(state.time * 0.06) * 22;
+    const sunY = 394;
+    const sunR = 112;
+    const glow = ctx.createRadialGradient(sunX, sunY, sunR * 0.25, sunX, sunY, sunR * 2.4);
+    glow.addColorStop(0, rgb(currentSky.sun, 0.5));
+    glow.addColorStop(0.4, rgb(currentSky.sun, 0.12));
+    glow.addColorStop(1, rgb(currentSky.sun, 0));
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, sunR * 2.4, 0, 6.283);
+    ctx.fill();
 
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(sunX, sunY, sunR, 0, 6.283);
-  ctx.clip();
-  ctx.fillStyle = rgb(currentSky.sun, 0.86);
-  ctx.fillRect(sunX - sunR, sunY - sunR, sunR * 2, sunR * 2);
-  ctx.fillStyle = rgb(currentSky.mid, 0.5);
-  for (let i = 0; i < 8; i++) {
-    const by = sunY - 6 + i * 24;
-    ctx.fillRect(sunX - sunR - 2, by, sunR * 2 + 4, 3 + i * 1.7);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, sunR, 0, 6.283);
+    ctx.clip();
+    ctx.fillStyle = rgb(currentSky.sun, 0.86);
+    ctx.fillRect(sunX - sunR, sunY - sunR, sunR * 2, sunR * 2);
+    ctx.fillStyle = rgb(currentSky.mid, 0.5);
+    for (let i = 0; i < 8; i++) {
+      const by = sunY - 6 + i * 24;
+      ctx.fillRect(sunX - sunR - 2, by, sunR * 2 + 4, 3 + i * 1.7);
+    }
+    ctx.restore();
   }
-  ctx.restore();
 
   /* 地平线雾气 */
   const haze = ctx.createLinearGradient(0, GROUND - 210, 0, GROUND);
@@ -4862,6 +6393,12 @@ function drawDecor() {
       ctx.beginPath();
       ctx.arc(x + 6, GROUND - 99, 2.4, 0, 6.283);
       ctx.fill();
+    } else if (d.type === 'parasol' || d.type === 'driftwood') {
+      drawBeachProp(d, x);
+    } else if (d.type === 'treefern' || d.type === 'stump') {
+      drawForestProp(d, x);
+    } else if (d.type === 'templepillar' || d.type === 'brazier') {
+      drawTempleProp(d, x);
     } else if (d.type === 'gantry' || d.type === 'bridgesign') {
       drawBridgeProp(d, x);
     } else if (d.type === 'hydrant' || d.type === 'planter') {
@@ -5001,11 +6538,22 @@ function drawObstacles() {
     if (o.dead) continue;
     const x = o.x - state.worldX;
     if (x > W + 80 || x + o.w < -80) continue;
-    if (state.map === 2) {
-      if (o.type === 'crate') drawBridgeBarrier(x, o);
-      else if (o.type === 'duct') drawBridgeConeRow(x, o);
-      else if (o.type === 'gate') drawBridgeGate(x, o);
-      else drawBridgeBeam(x, o);
+    if (o.type === 'missile') { drawMissile(x, o); continue; }
+    if (state.map === 4) {
+      if (o.type === 'crate') drawBeachCastle(x, o);
+      else if (o.type === 'duct') drawBeachRock(x, o);
+      else if (o.type === 'gate') drawBeachNetGate(x, o);
+      else drawBeachAwning(x, o);
+    } else if (state.map === 3) {
+      if (o.type === 'crate') drawTempleStele(x, o);
+      else if (o.type === 'duct') drawTempleRail(x, o);
+      else if (o.type === 'gate') drawTempleGate(x, o);
+      else drawTemplePillar(x, o);
+    } else if (state.map === 2) {
+      if (o.type === 'crate') drawForestLog(x, o);
+      else if (o.type === 'duct') drawForestRoot(x, o);
+      else if (o.type === 'gate') drawForestGate(x, o);
+      else drawForestThicket(x, o);
     } else if (state.map === 1) {
       if (o.type === 'crate') drawDumpster(x, o);
       else if (o.type === 'duct') drawLowBarrier(x, o);
@@ -8423,10 +9971,20 @@ function render() {
     ctx.translate((Math.random() - 0.5) * state.shake, (Math.random() - 0.5) * state.shake * 0.7);
   }
   drawSky();
-  if (state.map === 2) {
-    drawBridgeBack();
-    drawBridgeGround();
-    drawBridgeLamps();
+  if (state.map === 4) {
+    drawBeachBack();
+    drawBeachGround();
+    drawBeachLamps();
+    drawDecor();
+  } else if (state.map === 3) {
+    drawTempleBack();
+    drawTempleGround();
+    drawTempleLamps();
+    drawDecor();
+  } else if (state.map === 2) {
+    drawForestBack();
+    drawForestGround();
+    drawForestLamps();
     drawDecor();
   } else if (state.map === 1) {
     drawStreetBack();
@@ -8444,6 +10002,7 @@ function render() {
   drawMeteors();
   drawItems();
   drawObstacles();
+  drawMissileWarnings();
   drawDashTint();
   drawPlayer();
   drawParticles();
