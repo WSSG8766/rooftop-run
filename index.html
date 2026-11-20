@@ -1389,7 +1389,7 @@ const CHARS = {
     ult: '幽灵马',
     tipIdle: '满槽按 E 召唤幽灵马',
     tipFull: 'E 召唤幽灵马已就绪',
-    skillHTML: '<b>三段跳</b>起步，能量槽上限 300，满槽按 E 耗尽全部能量，召唤一匹<b>幽灵马</b>，屏幕四边同时燃起紫焰。<br><b>幽灵马</b>：替恶魔挡下 2 次伤害（坠落不挡、直接死亡）；在马背期间得分 +20%，原能量槽停止积攒，改为独立的<b>幽灵马力槽（上限 100）</b>，满 100 按 E 耗尽全部幽灵马力，获得 2 秒<b>幽灵冲锋</b>——无敌、撞碎接触到的障碍、1.5 倍速度，但踏空仍会摔死。<br><b>马力耗尽</b>：幽灵马吃满 2 次伤害消散，幽灵马力槽切回原恶魔能量槽。<br><b>恶魔复生</b>：恶魔受击死亡时不会立刻倒下，而是获得一次 15 秒复生窗口（能量清零）；窗口内把 300 能量重新攒满并召马即可复活成功，15 秒到或窗口内再次受伤则直接死亡。',
+    skillHTML: '<b>三段跳</b>起步，能量槽上限 300，满槽按 E 耗尽全部能量，召唤一匹<b>幽灵马</b>，屏幕四边同时燃起紫焰。<br><b>幽灵马</b>：替恶魔挡下 2 次伤害（坠落不挡、直接死亡）；在马背期间得分 +20%，原能量槽停止积攒，改为独立的<b>幽灵马力槽（上限 100）</b>，满 100 按 E 耗尽全部幽灵马力，获得 2 秒<b>幽灵冲锋</b>——无敌、撞碎接触到的障碍、1.5 倍速度，冲锋时可以拾取金币但不积攒能量，踏空仍会摔死。<br><b>马力耗尽</b>：幽灵马吃满 2 次伤害消散，幽灵马力槽切回原恶魔能量槽。<br><b>恶魔复生</b>：恶魔受击死亡时不会立刻倒下，而是获得一次 15 秒复生窗口（能量清零）；窗口内把 300 能量重新攒满并召马即可复活成功，15 秒到或窗口内再次受伤则直接死亡。',
     jacket: '#2a1c3a',
     jacketLight: '#4a3266',
     jacketDeep: '#140d1e',
@@ -1711,6 +1711,7 @@ const state = {
   angelShield: false,
   angelShieldShatterT: 0,
   angelReviveUsed: false,
+  angelEdge: 0,
   /* 恶魔：幽灵马、幽灵马力槽、冲锋与 15 秒复生窗口 */
   ghostHorse: false,
   ghostHits: 0,
@@ -2576,6 +2577,7 @@ function resetRun() {
   state.angelShield = false;
   state.angelShieldShatterT = 0;
   state.angelReviveUsed = false;
+  state.angelEdge = 0;
   state.ghostHorse = false;
   state.ghostHits = 0;
   state.ghostEnergy = 0;
@@ -3557,6 +3559,8 @@ function collect() {
   const cy = player.feetY - (player.sliding ? 26 : 48);
   let magnet = (state.dashT > 0 || state.boneFlyT > 0 || state.itemFlyT > 0 || state.angelFlyT > 0 || state.angelChargeT > 0 || state.demonChargeT > 0) ? RULESET.dashMagnet : 0;
   if (state.magnetT > 0) magnet = Math.max(magnet, 340);
+  /* 恶魔幽灵冲锋：磁吸范围略宽，吃金币但不回幽灵马力 */
+  if (state.demonChargeT > 0) magnet = Math.max(magnet, 300);
   /* 黑金御剑挥砍期间不主动吸取金币、道具与流星，贴身碰到仍照常拾取 */
   if (state.swordT > 0) magnet = 0;
   for (let i = 0; i < world.shards.length; i++) {
@@ -3705,6 +3709,7 @@ function updateRun(dt) {
   if (state.char === 'angel' && state.mode === 'run') updateAngelWings(dt);
   updateDemon(dt);
   if (state.mode !== 'run') return;
+  state.angelEdge = lerp(state.angelEdge || 0, (state.char === 'angel' && state.wings >= 9) ? 1 : 0, Math.min(1, dt * 5));
   const flyWas = state.boneFlyT;
   state.boneFlyT = Math.max(0, (state.boneFlyT || 0) - dt);
   if (flyWas > 0 && state.boneFlyT <= 0) {
@@ -9560,28 +9565,240 @@ function drawAngelSprite(ph, air, gliding) {
 function drawAngelSlideSprite() {
   drawAngelFrame(5, 98, 4, -2, -0.05);
 }
-function drawAngelSlashFx(sx, sy) {
-  const p = state.angelSlashT / 0.55;
-  const a = 1 - p;
-  const reach = 90 + (1 - p) * 240;
+function angelFeatherShape(len, wid, alpha) {
+  const g = ctx.createLinearGradient(0, 0, len, 0);
+  g.addColorStop(0, 'rgba(255,252,238,' + (0.92 * alpha).toFixed(3) + ')');
+  g.addColorStop(0.30, 'rgba(255,226,152,' + (0.82 * alpha).toFixed(3) + ')');
+  g.addColorStop(0.70, 'rgba(255,198,104,' + (0.34 * alpha).toFixed(3) + ')');
+  g.addColorStop(1, 'rgba(255,214,140,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(0, -wid);
+  ctx.quadraticCurveTo(len * 0.42, -wid * 0.94, len, 0);
+  ctx.quadraticCurveTo(len * 0.42, wid * 0.64, 0, wid);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,250,232,' + (0.45 * alpha).toFixed(3) + ')';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(len * 0.92, 0);
+  ctx.stroke();
+}
+function drawAngelWing(x, y, dir, scale, alpha, phase) {
   ctx.save();
-  ctx.translate(sx + 6, sy - 68);
-  ctx.globalAlpha = Math.min(1, a * 1.7);
-  const grad = ctx.createLinearGradient(0, -60, reach, 60);
-  grad.addColorStop(0, 'rgba(255,248,226,0)');
-  grad.addColorStop(0.45, 'rgba(255,238,196,.95)');
-  grad.addColorStop(1, 'rgba(255,214,140,0)');
-  ctx.strokeStyle = grad;
-  ctx.lineWidth = 12 - a * 6;
+  ctx.translate(x, y);
+  ctx.rotate(dir + Math.sin(phase) * 0.07);
+  const L = scale;
+  const g = ctx.createLinearGradient(0, -L * 0.55, L * 0.9, L * 0.35);
+  g.addColorStop(0, 'rgba(255,253,242,' + (0.96 * alpha).toFixed(3) + ')');
+  g.addColorStop(0.45, 'rgba(255,240,196,' + (0.90 * alpha).toFixed(3) + ')');
+  g.addColorStop(0.80, 'rgba(255,210,128,' + (0.62 * alpha).toFixed(3) + ')');
+  g.addColorStop(1, 'rgba(255,214,146,' + (0.26 * alpha).toFixed(3) + ')');
+  ctx.fillStyle = g;
+  const tips = [[0.98, -0.16], [0.86, 0.24], [0.70, 0.31], [0.52, 0.34], [0.34, 0.33], [0.17, 0.25]];
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.bezierCurveTo(L * 0.18, -L * 0.42, L * 0.62, -L * 0.56, L * 0.98, -L * 0.16);
+  for (let i = 0; i < tips.length; i++) {
+    const t = tips[i];
+    const nx = t[0] - 0.10, ny = t[1] - 0.115;
+    ctx.quadraticCurveTo(L * (t[0] - 0.035), L * (t[1] + 0.055), L * t[0], L * t[1]);
+    if (i < tips.length - 1) ctx.quadraticCurveTo(L * nx, L * ny, L * tips[i + 1][0], L * tips[i + 1][1]);
+  }
+  ctx.quadraticCurveTo(L * 0.06, L * 0.14, 0, 0);
+  ctx.closePath();
+  ctx.fill();
+  /* 前缘 */
+  ctx.strokeStyle = 'rgba(255,255,248,' + (0.66 * alpha).toFixed(3) + ')';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.bezierCurveTo(L * 0.18, -L * 0.42, L * 0.62, -L * 0.56, L * 0.98, -L * 0.16);
+  ctx.stroke();
+  /* 羽脊 */
+  ctx.strokeStyle = 'rgba(255,244,206,' + (0.42 * alpha).toFixed(3) + ')';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < tips.length; i++) {
+    ctx.beginPath();
+    ctx.moveTo(L * 0.12, -L * 0.12);
+    ctx.quadraticCurveTo(L * (tips[i][0] - 0.24), L * (tips[i][1] - 0.02), L * tips[i][0], L * tips[i][1]);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawAngelEdgeWings() {
+  const a0 = state.angelEdge || 0;
+  if (a0 <= 0.02) return;
+  const t = state.time;
+  const sway = Math.sin(t * 1.35) * 0.09;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const sa = (0.16 * a0).toFixed(3);
+  let g = ctx.createLinearGradient(0, 0, 0, 78);
+  g.addColorStop(0, 'rgba(255,214,140,' + sa + ')');
+  g.addColorStop(1, 'rgba(255,214,140,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, 78);
+  g = ctx.createLinearGradient(0, H, 0, H - 78);
+  g.addColorStop(0, 'rgba(255,214,140,' + sa + ')');
+  g.addColorStop(1, 'rgba(255,214,140,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, H - 78, W, 78);
+  g = ctx.createLinearGradient(0, 0, 78, 0);
+  g.addColorStop(0, 'rgba(255,214,140,' + sa + ')');
+  g.addColorStop(1, 'rgba(255,214,140,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 78, H);
+  g = ctx.createLinearGradient(W, 0, W - 78, 0);
+  g.addColorStop(0, 'rgba(255,214,140,' + sa + ')');
+  g.addColorStop(1, 'rgba(255,214,140,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(W - 78, 0, 78, H);
+  const midW = W * 0.5, midH = H * 0.5;
+  const sc = 78 * (0.95 + 0.05 * Math.sin(t * 1.7));
+  drawAngelWing(midW - 30, 6, Math.PI / 2 + 0.36 + sway, sc, a0 * 0.9, t * 1.7);
+  drawAngelWing(midW + 30, 6, Math.PI / 2 - 0.36 + sway, sc, a0 * 0.9, t * 1.7 + 0.8);
+  drawAngelWing(midW - 30, H - 6, -Math.PI / 2 - 0.36 - sway, sc, a0 * 0.9, t * 1.7 + 1.6);
+  drawAngelWing(midW + 30, H - 6, -Math.PI / 2 + 0.36 - sway, sc, a0 * 0.9, t * 1.7 + 2.4);
+  const sc2 = 72 * (0.95 + 0.05 * Math.sin(t * 1.9 + 1));
+  drawAngelWing(6, midH - 32, -0.36 + sway, sc2, a0 * 0.9, t * 1.9 + 0.4);
+  drawAngelWing(6, midH + 32, 0.36 + sway, sc2, a0 * 0.9, t * 1.9 + 1.2);
+  drawAngelWing(W - 6, midH - 32, Math.PI + 0.36 - sway, sc2, a0 * 0.9, t * 1.9 + 2.0);
+  drawAngelWing(W - 6, midH + 32, Math.PI - 0.36 - sway, sc2, a0 * 0.9, t * 1.9 + 2.8);
+  for (let i = 0; i < 9; i++) {
+    const r = Math.sin(i * 37.3) * 0.5 + 0.5;
+    const q = ((t * (0.05 + r * 0.06) + r) % 1);
+    const side = i % 4;
+    let x, y, ang;
+    if (side === 0) { x = W * 0.16 + r * W * 0.68; y = 8 + q * 96; ang = 0.5 + Math.sin(t * 1.2 + i) * 0.4; }
+    else if (side === 1) { x = W * 0.16 + r * W * 0.68; y = H - 8 - q * 96; ang = -0.5 + Math.sin(t * 1.2 + i) * 0.4; }
+    else if (side === 2) { x = 8 + q * 90; y = H * 0.14 + r * H * 0.72; ang = 1.2 + Math.sin(t * 1.4 + i) * 0.4; }
+    else { x = W - 8 - q * 90; y = H * 0.14 + r * H * 0.72; ang = -1.2 + Math.sin(t * 1.4 + i) * 0.4; }
+    const aa = (0.55 - q * 0.4) * a0;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    angelFeatherShape(15 + r * 8, 2.4, Math.max(0, aa));
+    ctx.restore();
+  }
+  ctx.restore();
+}
+function drawAngelSlashFx(sx, sy) {
+  const p = 1 - state.angelSlashT / 0.55;
+  const a = 1 - p;
+  const reach = 100 + p * 320;
+  const cy = sy - 70;
+  const ang0 = -0.98 + p * 0.26;
+  const ang1 = 0.52 + p * 0.22;
+  ctx.save();
+  ctx.translate(sx + 8, cy);
+  ctx.globalCompositeOperation = 'lighter';
+  /* 起点光晕 */
+  const glow = ctx.createRadialGradient(0, 0, 8, 0, 0, reach * 0.85);
+  glow.addColorStop(0, 'rgba(255,248,222,' + (0.30 * a).toFixed(3) + ')');
+  glow.addColorStop(0.45, 'rgba(255,222,150,' + (0.14 * a).toFixed(3) + ')');
+  glow.addColorStop(1, 'rgba(255,214,140,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(0, 0, reach * 0.85, 0, 6.283);
+  ctx.fill();
+  /* 残影 */
+  ctx.strokeStyle = 'rgba(255,226,164,' + (0.16 * a).toFixed(3) + ')';
+  ctx.lineWidth = 26;
   ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.arc(0, 0, reach, -0.9 + a * 0.5, 0.5 + a * 0.2);
+  ctx.arc(0, 0, reach - 34, ang0 + 0.04, ang1 - 0.04);
   ctx.stroke();
-  ctx.strokeStyle = 'rgba(255,252,240,.9)';
-  ctx.lineWidth = 3;
+  /* 外层柔光 */
+  ctx.strokeStyle = 'rgba(255,214,140,' + (0.20 * a).toFixed(3) + ')';
+  ctx.lineWidth = 40 * (0.45 + a * 0.55);
   ctx.beginPath();
-  ctx.arc(0, 0, reach - 6, -0.8 + a * 0.5, 0.4 + a * 0.2);
+  ctx.arc(0, 0, reach, ang0, ang1);
   ctx.stroke();
+  /* 暖金外晕 */
+  ctx.strokeStyle = 'rgba(255,198,106,' + (0.24 * a).toFixed(3) + ')';
+  ctx.lineWidth = 22 * (0.4 + a * 0.6);
+  ctx.beginPath();
+  ctx.arc(0, 0, reach + 6, ang0 - 0.03, ang1 + 0.03);
+  ctx.stroke();
+  /* 主光带 */
+  const gMain = ctx.createLinearGradient(0, -reach, reach, reach * 0.5);
+  gMain.addColorStop(0, 'rgba(255,252,236,0)');
+  gMain.addColorStop(0.30, 'rgba(255,244,206,' + (0.55 * a).toFixed(3) + ')');
+  gMain.addColorStop(0.56, 'rgba(255,255,250,' + (0.95 * a).toFixed(3) + ')');
+  gMain.addColorStop(0.80, 'rgba(255,228,162,' + (0.50 * a).toFixed(3) + ')');
+  gMain.addColorStop(1, 'rgba(255,214,140,0)');
+  ctx.strokeStyle = gMain;
+  ctx.lineWidth = 15 * (0.35 + a * 0.65);
+  ctx.beginPath();
+  ctx.arc(0, 0, reach, ang0, ang1);
+  ctx.stroke();
+  /* 内芯亮线 */
+  ctx.strokeStyle = 'rgba(255,254,246,' + (0.92 * a).toFixed(3) + ')';
+  ctx.lineWidth = 3.4 * (0.4 + a * 0.6);
+  ctx.beginPath();
+  ctx.arc(0, 0, reach - 4, ang0 + 0.015, ang1 - 0.015);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,236,184,' + (0.45 * a).toFixed(3) + ')';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.arc(0, 0, reach - 22, ang0 + 0.05, ang1 - 0.05);
+  ctx.stroke();
+  /* 起手剑光 */
+  ctx.strokeStyle = 'rgba(255,248,220,' + (0.45 * a).toFixed(3) + ')';
+  ctx.lineWidth = 4 * a + 1;
+  ctx.beginPath();
+  ctx.moveTo(-26, 20);
+  ctx.quadraticCurveTo(46, -30, reach * 0.44, -reach * 0.16);
+  ctx.stroke();
+  /* 弧上飞散的金羽（沿切线拖尾） */
+  const n = 10;
+  for (let i = 0; i < n; i++) {
+    const q = i / (n - 1);
+    const ang = ang0 + (ang1 - ang0) * q;
+    const rr = reach * 0.98 + p * 46 + Math.sin(i * 2.3) * 6;
+    const sc = 13 + 7 * Math.sin(i * 1.9 + 1);
+    ctx.save();
+    ctx.translate(Math.cos(ang) * rr, Math.sin(ang) * rr);
+    ctx.rotate(ang + Math.PI * 0.5 + 0.5 * p);
+    angelFeatherShape(sc, sc * 0.28, a * 0.55);
+    ctx.restore();
+  }
+  /* 弧上星芒 */
+  for (let i = 0; i < 5; i++) {
+    const q = (i + 0.5) / 5;
+    const ang = ang0 + (ang1 - ang0) * q;
+    const rr = reach * (0.86 + 0.05 * Math.sin(i * 2.1)) + p * 18;
+    const tw = 0.55 + 0.45 * Math.sin(state.time * 12 + i * 1.7);
+    ctx.save();
+    ctx.translate(Math.cos(ang) * rr, Math.sin(ang) * rr);
+    ctx.rotate(ang + 1.2);
+    const st = (13 + 10 * tw) * (0.7 + 0.3 * a);
+    ctx.fillStyle = 'rgba(255,252,232,' + (a * 0.9).toFixed(3) + ')';
+    ctx.beginPath();
+    for (let k = 0; k < 4; k++) {
+      const aa = k * Math.PI / 2;
+      const r1 = st, r2 = st * 0.18;
+      ctx.lineTo(Math.cos(aa) * r1, Math.sin(aa) * r1);
+      ctx.lineTo(Math.cos(aa + Math.PI / 4) * r2, Math.sin(aa + Math.PI / 4) * r2);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  /* 弧上星点 */
+  for (let i = 0; i < 20; i++) {
+    const rnd = Math.sin(i * 12.9898 + 4.1414) * 43758.5453;
+    const q = rnd - Math.floor(rnd);
+    const ang = ang0 + (ang1 - ang0) * q;
+    const rr = reach * (0.52 + 0.42 * q) + Math.sin(state.time * 8 + i) * 7;
+    const tw = 0.5 + 0.5 * Math.sin(state.time * 11 + i * 2.4);
+    ctx.fillStyle = 'rgba(255,250,226,' + (a * tw * 0.9).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.arc(Math.cos(ang) * rr, Math.sin(ang) * rr, 1.4 + 1.7 * tw, 0, 6.283);
+    ctx.fill();
+  }
   ctx.restore();
 }
 function drawPlayer() {
@@ -10605,6 +10822,7 @@ function render() {
   drawMapBanner();
   drawFlash();
   drawGhostFireEdges();
+  drawAngelEdgeWings();
 }
 
 /* ===== 恶魔夜刹：幽灵马、幽灵冲锋、15 秒复生与精灵 ===== */
