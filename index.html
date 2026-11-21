@@ -1292,7 +1292,7 @@ const CHARS = {
     ult: '葫芦击',
     tipIdle: '元气攒满 100 按 E 掷葫芦',
     tipFull: 'E 葫芦击已就绪',
-    skillHTML: '<b>四段跳</b>：第三段不耗元气，第四段消耗 10 点元气。<br><b>葫芦击</b>：元气槽上限 100，攒满后按 E，一次性清空整槽元气，葫芦脱手飞出、清空场上障碍，随后飞回身前。<br><b>葫芦护主</b>：死亡时葫芦碎裂替你挡下，原地复活并获得 0.5 秒无敌；此后葫芦已碎，元气无法再蓄、技能失效。',
+    skillHTML: '<b>四段跳</b>：第三段不耗元气，第四段消耗 10 点元气。<br><b>葫芦击</b>：元气槽上限 100，攒满后按 E，一次性清空整槽元气，葫芦脱手飞出、清空场上障碍，随后飞回身前。<br><b>葫芦护主</b>：死亡时葫芦碎裂替你挡下，原地复活并获得 0.5 秒无敌；此后葫芦进入 30 秒冷却：冷却期间元气停止积攒、技能不可用，30 秒后葫芦自动修复，元气重新可蓄，也可再次碎裂护主，循环往复。',
     jacket: '#dfe7e0',
     jacketLight: '#f4f8f3',
     jacketDeep: '#8fa89c',
@@ -1668,6 +1668,7 @@ const state = {
   staffT: 0,
   gourdT: 0,
   gourdAlive: true,
+  gourdRepairT: 0,
   meterLocked: false,
   shield: false,
   shieldT: 0,
@@ -2180,7 +2181,7 @@ function requestDash() {
   }
   if (spec.wuxia) {
     if (!state.gourdAlive && !state.test) {
-      floatText(PLAYER_X, player.feetY - 126, '葫芦已碎 · 技能失效', 'rgba(224,177,90,.85)');
+      floatText(PLAYER_X, player.feetY - 126, '葫芦碎裂 · 修复中 ' + Math.ceil(state.gourdRepairT || 0) + 's', 'rgba(224,177,90,.9)');
       return;
     }
     if (state.meter < meterCap()) {
@@ -2545,6 +2546,7 @@ function resetRun() {
   state.staffT = 0;
   state.gourdT = 0;
   state.gourdAlive = true;
+  state.gourdRepairT = 0;
   state.meterLocked = false;
   state.shield = false;
   state.shieldT = 0;
@@ -2803,7 +2805,7 @@ function syncHud() {
     }
   }
   const full = demonHorse ? (state.ghostEnergy || 0) >= 100 : state.meter >= cap;
-  const tipNow = state.meterLocked ? '葫芦已碎 · 元气枯竭，技能失效'
+  const tipNow = state.meterLocked ? '葫芦碎裂 · 修复 ' + Math.ceil(state.gourdRepairT || 0) + 's'
     : spec.demon
       ? (state.demonReviveT > 0
         ? '复生窗口 ' + state.demonReviveT.toFixed(1) + 's · 满能量召马复活'
@@ -2855,7 +2857,7 @@ function syncHud() {
     : (shieldOn ? '护盾 ' + state.shieldT.toFixed(1) + 's'
       : (armed ? '回生法阵待命'
         : (gourdFly ? '葫芦击 · 掷出'
-          : (!!spec.wuxia && !state.gourdAlive ? '葫芦已碎'
+          : (!!spec.wuxia && !state.gourdAlive ? '葫芦修复 ' + Math.ceil(state.gourdRepairT || 0) + 's'
             : (fanOn ? '羽扇 ' + Math.ceil(state.fanT) + 's' : spec.dashName)))));
   if (chipOn !== hudCache.dash) {
     hudCache.dash = chipOn;
@@ -3277,6 +3279,7 @@ function doWuxiaRevive() {
   /* 葫芦碎一次：挡下这次死亡，之后元气无法再蓄、技能失效 */
   state.gourdAlive = false;
   state.gourdT = 0;
+  state.gourdRepairT = 30;
   state.meter = 0;
   state.meterLocked = true;
   state.invulnT = 0.5;
@@ -3289,8 +3292,20 @@ function doWuxiaRevive() {
   }
   burst(PLAYER_X, player.feetY - 64, 22, 'rgba(224,177,90,.9)', 320, 34);
   floatText(PLAYER_X, player.feetY - 140, '葫芦碎裂', 'rgba(242,200,119,1)');
-  floatText(PLAYER_X, player.feetY - 108, '复活 · 元气枯竭', 'rgba(240,208,140,.9)');
+  floatText(PLAYER_X, player.feetY - 108, '复活 · 葫芦 30 秒后修复', 'rgba(240,208,140,.9)');
   grailFlight();
+}
+function repairGourd() {
+  if (!CHARS[state.char].wuxia) return;
+  state.gourdAlive = true;
+  state.gourdRepairT = 0;
+  state.meterLocked = false;
+  state.meter = 0;
+  state.shake = Math.max(state.shake, 8);
+  sfx('djump');
+  burst(PLAYER_X + 48, player.feetY - 62, 22, 'rgba(242,200,119,.95)', 320, 36);
+  burst(PLAYER_X + 48, player.feetY - 62, 12, 'rgba(255,240,200,.9)', 240, 28);
+  floatText(PLAYER_X, player.feetY - 140, '葫芦修复完成 · 可再次护主', 'rgba(242,200,119,1)');
 }
 function playerBox() {
   const h = player.sliding ? 48 : 92;
@@ -3704,6 +3719,10 @@ function updateRun(dt) {
   state.swordT = Math.max(0, state.swordT - dt);
   state.staffT = Math.max(0, state.staffT - dt);
   state.gourdT = Math.max(0, state.gourdT - dt);
+  if (state.char === 'wuxia' && !state.gourdAlive && state.mode === 'run') {
+    state.gourdRepairT = Math.max(0, (state.gourdRepairT || 0) - dt);
+    if (state.gourdRepairT <= 0.03) { state.gourdRepairT = 0; repairGourd(); }
+  }
   state.flashT = Math.max(0, (state.flashT || 0) - dt * 1.6);
   state.mapBannerT = Math.max(0, (state.mapBannerT || 0) - dt);
   state.windT = Math.max(0, (state.windT || 0) - dt);
@@ -7884,7 +7903,45 @@ function qsGourd(x, y, s, rot, look) {
 }
 /* 身前小葫芦：平时浮动，掷出时飞向前方再飞回 */
 function drawGourdFloat(sx, sy) {
-  if (!state.gourdAlive) return;
+  if (!state.gourdAlive) {
+    /* 冷却期：身前残影 + 30 秒修复进度环 */
+    const t = state.time;
+    const gx = sx + 48, gy = sy - 60;
+    const frac = Math.max(0, Math.min(1, 1 - (state.gourdRepairT || 0) / 30));
+    const pulse = 1 + Math.sin(t * 3) * 0.08;
+    const g = ctx.createRadialGradient(gx, gy, 3, gx, gy, 30 * pulse);
+    g.addColorStop(0, 'rgba(242,200,119,.10)');
+    g.addColorStop(1, 'rgba(242,200,119,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(gx, gy, 30 * pulse, 0, 6.283);
+    ctx.fill();
+    ctx.save();
+    ctx.globalAlpha = 0.34 + Math.sin(t * 2.4) * 0.08;
+    qsGourd(gx, gy, 19, Math.sin(t * 1.4) * 0.1, QS_LOOK.wuxia);
+    ctx.restore();
+    ctx.save();
+    ctx.strokeStyle = 'rgba(242,200,119,.30)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(gx, gy, 22, 0, 6.283);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,226,150,.85)';
+    ctx.lineWidth = 3.2;
+    ctx.beginPath();
+    ctx.arc(gx, gy, 22, -1.5708, -1.5708 + 6.283 * frac);
+    ctx.stroke();
+    for (let i = 0; i < 6; i++) {
+      const a = t * 1.2 + i * 1.047;
+      const rr = 26 + Math.sin(t * 2 + i) * 3;
+      ctx.fillStyle = 'rgba(255,232,166,.55)';
+      ctx.beginPath();
+      ctx.arc(gx + Math.cos(a) * rr, gy + Math.sin(a) * rr * 0.8, 1.6, 0, 6.283);
+      ctx.fill();
+    }
+    ctx.restore();
+    return;
+  }
   const look = QS_LOOK.wuxia;
   const dur = 1.5;
   if (state.gourdT > 0) {
