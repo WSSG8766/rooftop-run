@@ -1365,7 +1365,7 @@ const CHARS = {
     ult: '圣剑斩',
     tipIdle: '满槽后按 E 挥剑斩障',
     tipFull: 'E 圣剑斩已就绪',
-    skillHTML: '<b>三段跳</b>起步，能量槽上限 200，满槽按 E 耗尽全部能量。<br><b>圣剑斩</b>：挥剑发出金色剑气，摧毁前方 50 米内所有障碍。<br><b>羽翼</b>：每 20 秒长出一枚，最多 9 枚；每多一枚羽翼，能量上限 −10（1 枚 190、3 枚 170、6 枚 140、9 枚 110）。<br><b>3 枚</b>：解锁四段跳，并获得一次满能量复活。<br><b>6 枚</b>：技能结束后进入 2 秒圣翼冲锋——无敌、撞碎接触到的障碍、1.5 倍速度，但踏空仍会摔死。<br><b>9 枚</b>：按 E 改为张开翅膀飞行 2 秒（可吸金币、不回能量），并获得被羽翼围绕的金色永久护盾；护盾挡击时会破碎，破碎瞬间清除当前场上所有障碍。',
+    skillHTML: '<b>三段跳</b>起步，能量槽上限 200，满槽按 E 耗尽全部能量。<br><b>圣剑斩</b>：挥剑发出金色剑气，摧毁前方 50 米内所有障碍。<br><b>羽翼</b>：每 20 秒长出一枚，最多 9 枚；每多一枚羽翼，能量上限 −10（1 枚 190、3 枚 170、6 枚 140、9 枚 110）。<br><b>3 枚</b>：解锁四段跳，并获得一次满能量复活。<br><b>6 枚</b>：技能结束后进入 2 秒圣翼冲锋——无敌、撞碎接触到的障碍、1.5 倍速度，但踏空仍会摔死。<br><b>9 枚</b>：按 E 改为张开翅膀飞行 2 秒（可吸金币、不回能量）；飞行结束时获得被九枚金羽围绕的金色护盾，持续 3 秒、可挡下 1 次伤害，护盾破碎瞬间清除当前场上所有障碍；护盾到时未受击则自行消散。',
     jacket: '#f6ecd6',
     jacketLight: '#fff8e8',
     jacketDeep: '#d8b877',
@@ -1709,6 +1709,7 @@ const state = {
   angelChargeT: 0,
   angelSlashT: 0,
   angelShield: false,
+  angelShieldT: 0,
   angelShieldShatterT: 0,
   angelReviveUsed: false,
   angelEdge: 0,
@@ -2129,6 +2130,7 @@ function requestDash() {
       burst(PLAYER_X, player.feetY - 96, 28, 'rgba(255,226,160,.95)', 340, 60);
       burst(PLAYER_X + 10, player.feetY - 150, 18, 'rgba(255,250,226,.9)', 250, 40);
       floatText(PLAYER_X, player.feetY - 148, '九翼 · 展翼飞行 2s', 'rgba(255,226,160,1)');
+      floatText(PLAYER_X, player.feetY - 118, '飞行结束获得 3s 护盾 · 挡 1 击', 'rgba(255,240,200,.92)');
       return;
     }
     angelSlash();
@@ -2575,6 +2577,7 @@ function resetRun() {
   state.angelChargeT = 0;
   state.angelSlashT = 0;
   state.angelShield = false;
+  state.angelShieldT = 0;
   state.angelShieldShatterT = 0;
   state.angelReviveUsed = false;
   state.angelEdge = 0;
@@ -2807,7 +2810,7 @@ function syncHud() {
           : (full ? spec.tipFull : spec.tipIdle))
     : spec.angel
       ? (full
-        ? (state.wings >= 9 ? 'E 展翼飞行 2s · 永久护盾' : 'E 圣剑斩 50 米' + (state.wings >= 6 ? ' · 冲锋 2s' : ''))
+        ? (state.wings >= 9 ? 'E 展翼飞行 2s · 飞行后 3s 护盾' : 'E 圣剑斩 50 米' + (state.wings >= 6 ? ' · 冲锋 2s' : ''))
         : '羽翼 ' + state.wings + '/9 · 下枚 ' + (state.wings >= 9 ? '—' : Math.ceil(Math.max(0, state.wingClock)) + 's'))
       : (full ? spec.tipFull : spec.tipIdle);
   if (full !== hudCache.full || tipNow !== hudCache.tip || spec.angel) {
@@ -3365,6 +3368,8 @@ function collide() {
         /* 羽翼护盾：挡下这一击并破碎，破碎瞬间清除当前场上所有障碍；护盾随即重新聚拢 */
         o.dead = true;
         state.shardPts += 20;
+        state.angelShield = false;
+        state.angelShieldT = 0;
         state.angelShieldShatterT = 0.55;
         state.shake = Math.max(state.shake, 15);
         sfx('break');
@@ -3702,7 +3707,20 @@ function updateRun(dt) {
   state.windT = Math.max(0, (state.windT || 0) - dt);
   state.boltT = Math.max(0, (state.boltT || 0) - dt);
   state.crystalCd = Math.max(0, (state.crystalCd || 0) - dt);
+  const angelFlyWas = state.angelFlyT;
   state.angelFlyT = Math.max(0, (state.angelFlyT || 0) - dt);
+  if (angelFlyWas > 0 && state.angelFlyT <= 0 && state.mode === 'run') grantAngelFlightShield();
+  if (state.angelShield) {
+    state.angelShieldT = Math.max(0, (state.angelShieldT || 0) - dt);
+    if (state.angelShieldT <= 0) {
+      state.angelShield = false;
+      floatText(PLAYER_X, player.feetY - 138, '护盾到时消散', 'rgba(255,236,190,.9)');
+      for (let i = 0; i < 10; i++) {
+        const a2 = rand(0, 6.283);
+        burst(PLAYER_X + Math.cos(a2) * 58, player.feetY - 62 + Math.sin(a2) * 54, 3, 'rgba(255,226,160,.8)', 180, 20);
+      }
+    }
+  }
   state.angelChargeT = Math.max(0, (state.angelChargeT || 0) - dt);
   state.angelSlashT = Math.max(0, (state.angelSlashT || 0) - dt);
   state.angelShieldShatterT = Math.max(0, (state.angelShieldShatterT || 0) - dt);
@@ -9413,15 +9431,24 @@ function addAngelWing() {
   if (state.wings === 6) note += ' · 技能后 2s 冲锋';
   floatText(PLAYER_X, player.feetY - 148, note, 'rgba(255,226,160,1)');
   if (state.wings === 9) {
-    state.angelShield = true;
     state.shake = Math.max(state.shake, 10);
     burst(PLAYER_X, player.feetY - 70, 30, 'rgba(255,236,190,.95)', 340, 60);
-    floatText(PLAYER_X, player.feetY - 176, '九翼 · 永久金色羽翼护盾', 'rgba(255,238,196,1)');
+    floatText(PLAYER_X, player.feetY - 176, '九翼 · E 展翼飞行，飞行结束得 3s 护盾', 'rgba(255,238,196,1)');
   } else if (state.wings === 6) {
     floatText(PLAYER_X, player.feetY - 176, '六翼 · 技能结束冲锋 2s', 'rgba(255,232,180,.95)');
   } else if (state.wings === 3) {
     floatText(PLAYER_X, player.feetY - 176, '三翼 · 四段跳 + 一次满能量复活', 'rgba(255,232,180,.95)');
   }
+}
+function grantAngelFlightShield() {
+  if (state.char !== 'angel' || state.wings < 9) return;
+  state.angelShield = true;
+  state.angelShieldT = 3;
+  state.shake = Math.max(state.shake, 8);
+  sfx('djump');
+  burst(PLAYER_X, player.feetY - 62, 26, 'rgba(255,226,160,.95)', 320, 54);
+  burst(PLAYER_X, player.feetY - 62, 14, 'rgba(255,252,238,.92)', 240, 40);
+  floatText(PLAYER_X, player.feetY - 148, '护盾 3s · 可挡 1 击', 'rgba(255,238,196,1)');
 }
 function angelSlash() {
   state.angelSlashT = 0.55;
@@ -9520,6 +9547,13 @@ function drawAngelShieldAura(sx, sy) {
   ctx.lineWidth = 6;
   ctx.beginPath();
   ctx.arc(sx, sy - 62, 80 * pulse, 0, 6.283);
+  ctx.stroke();
+  /* 剩余时间环（3 秒递减） */
+  const frac = Math.max(0, Math.min(1, (state.angelShieldT || 0) / 3));
+  ctx.strokeStyle = 'rgba(255,214,132,' + (0.30 + 0.50 * frac).toFixed(3) + ')';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(sx, sy - 62, 86 * pulse, -1.5708, -1.5708 + 6.283 * frac);
   ctx.stroke();
   ctx.restore();
   /* 环绕的金色羽翼 */
