@@ -1022,6 +1022,17 @@ kbd{
               </span>
               <span class="char-meta"><b>水晶</b><em>三段跳后落雷劈障碍 · 冷却 5 秒</em></span>
             </button>
+            <button type="button" class="char-card" data-treasure="ice" role="radio" aria-checked="false">
+              <span class="char-face">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <path d="M20 5l7 9-7 21-7-21z" fill="#bfe9ff"/>
+                  <path d="M20 5l7 9-7 21z" fill="#7fd0f0"/>
+                  <path d="M13 14l7 21 7-21" stroke="#ffffff" stroke-width="1.1" opacity=".55" fill="none"/>
+                  <path d="M13 14h14M20 5v30" stroke="#eef9ff" stroke-width="1" opacity=".6"/>
+                </svg>
+              </span>
+              <span class="char-meta"><b>冰晶</b><em>被动技能冷却 −2 秒</em></span>
+            </button>
             <button type="button" class="char-card" data-treasure="amulet" role="radio" aria-checked="false">
               <span class="char-face">
                 <svg viewBox="0 0 40 40" aria-hidden="true">
@@ -1035,6 +1046,20 @@ kbd{
                 </svg>
               </span>
               <span class="char-meta"><b>护符</b><em>受击自动施法 · 每局 3 次</em></span>
+            </button>
+            <button type="button" class="char-card" data-treasure="bead" role="radio" aria-checked="false">
+              <span class="char-face">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <path d="M10 12q10 18 20 0" stroke="#c9a66a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                  <circle cx="12" cy="16" r="3.2" fill="#9b7be0"/>
+                  <circle cx="16.5" cy="21.5" r="3.2" fill="#7fd8c4"/>
+                  <circle cx="20" cy="23.5" r="3.4" fill="#f0d79a"/>
+                  <circle cx="23.5" cy="21.5" r="3.2" fill="#7fd8c4"/>
+                  <circle cx="28" cy="16" r="3.2" fill="#9b7be0"/>
+                  <circle cx="20" cy="30" r="2.4" fill="#ff8574"/>
+                </svg>
+              </span>
+              <span class="char-meta"><b>念珠</b><em>盾碎后 0.8 秒 2 倍速御风 · 吸金不回能 · 结束清场</em></span>
             </button>
             <button type="button" class="char-card" data-treasure="crown" role="radio" aria-checked="false">
               <span class="char-face">
@@ -1444,9 +1469,11 @@ const TREASURES = {
   crown: { id: 'crown', name: '王冠', desc: '最终得分提升 10%' },
   grail: { id: 'grail', name: '圣杯', desc: '每次复活后获得 1 秒 1.5 倍速飞行，飞行结束时清除场上障碍' },
   diamond: { id: 'diamond', name: '钻石', desc: '释放技能后有 20% 概率不消耗能量' },
-  crystal: { id: 'crystal', name: '水晶', desc: '三段跳后召唤闪电，消灭前方一个障碍物' }
+  crystal: { id: 'crystal', name: '水晶', desc: '三段跳后召唤闪电，消灭前方一个障碍物' },
+  ice: { id: 'ice', name: '冰晶', desc: '佩戴角色的被动技能冷却时间减少 2 秒' },
+  bead: { id: 'bead', name: '念珠', desc: '护盾被击碎时御风飞行 0.8 秒（2 倍速），可吸取金币、不积攒能量，飞行结束清除场上障碍' }
 };
-const TREASURE_IDS = ['', 'fan', 'necklace', 'ring', 'diamond', 'crystal', 'amulet', 'crown', 'grail'];
+const TREASURE_IDS = ['', 'fan', 'necklace', 'ring', 'diamond', 'crystal', 'ice', 'amulet', 'bead', 'crown', 'grail'];
 let savedChar = 'male';
 let savedTreasure = '';
 try {
@@ -1725,6 +1752,7 @@ const state = {
   fanT: 8,
   necklaceUsed: false,
   amuletUsed: 0,
+  beadFlyT: 0,
   windT: 0,
   boltT: 0,
   boltX: 0,
@@ -2074,6 +2102,9 @@ function meterCap(id) {
   return state.treasure === 'ring' ? Math.round(base * 0.90) : base;
 }
 /* 科学家齐衡：能量上限 150 = 100 普通 + 50 特殊；普通满槽后溢出到特殊槽 */
+function passiveCd(base) {
+  return state.treasure === 'ice' ? Math.max(1, base - 2) : base;
+}
 function snowScoreMult() {
   return state.char === 'snow' && (state.snowBlessT || 0) > 0 ? 2 : 1;
 }
@@ -2132,7 +2163,7 @@ function crystalStrike() {
   state.boltX = best ? bestSx + (best.w || 60) * 0.5 : PLAYER_X + 260;
   state.boltY = best ? (best.type === 'beam' || best.type === 'gate' ? GROUND - 40 : GROUND - best.h) : GROUND;
   state.shake = Math.max(state.shake, 8);
-  state.crystalCd = state.test ? 0.4 : 5;
+  state.crystalCd = state.test ? 0.4 : passiveCd(5);
   sfx('break');
   if (best) {
     best.dead = true;
@@ -2143,7 +2174,7 @@ function crystalStrike() {
   burst(state.boltX, state.boltY - 14, 18, 'rgba(198,255,248,.95)', 300, 40);
 }
 function astralOn() { return state.astralT > 0; }
-const ASTRAL_POOL = ['male', 'female', 'sci', 'bone', 'wuxia', 'explorer'];
+const ASTRAL_POOL = ['male', 'female', 'sci', 'mage', 'bone', 'wuxia', 'explorer', 'angel', 'demon', 'snow'];
 function startAstral() {
   const pool = ASTRAL_POOL.filter((id) => CHARS[id]);
   const pick = pool[Math.floor(Math.random() * pool.length)];
@@ -2546,6 +2577,8 @@ const RELIC_SVG = {
   ring: '<svg viewBox="0 0 40 40"><circle cx="20" cy="24" r="10" fill="none" stroke="#e8d6a4" stroke-width="3"/><path d="M20 6l6 6-6 6-6-6z" fill="#c9a6ff"/><path d="M20 6l6 6-6 6z" fill="#9b7be0"/><path d="M20 13.6l3 4-3 3-3-3z" fill="#efe2ff" opacity=".85"/></svg>',
   diamond: '<svg viewBox="0 0 40 40"><path d="M20 6l10 8-10 20-10-20z" fill="#bfe9ff"/><path d="M20 6l10 8-10 20z" fill="#7fd0f0"/><path d="M10 14h20" stroke="#efe2ff" stroke-width="1.2" opacity=".6"/><path d="M20 6l-6 8 6 20 6-20z" fill="#eef9ff" opacity=".55"/><circle cx="16.6" cy="11.6" r="1.6" fill="#ffffff"/></svg>',
   crystal: '<svg viewBox="0 0 40 40"><path d="M16 34l-5-13 3-7 4 5z" fill="#8ff0e2"/><path d="M16 34l-5-13 3-7z" fill="#54c8bd"/><path d="M24 34l-2-17 4-8 5 9z" fill="#c6fff6"/><path d="M24 34l-2-17 4-8z" fill="#66d9cd"/><path d="M8 16l-2 6 1 4 3-4z" fill="#a9f3e9"/></svg>',
+  ice: '<svg viewBox="0 0 40 40"><path d="M20 5l7 9-7 21-7-21z" fill="#bfe9ff"/><path d="M20 5l7 9-7 21z" fill="#7fd0f0"/><path d="M13 14h14M20 5v30" stroke="#eef9ff" stroke-width="1" opacity=".6"/></svg>',
+  bead: '<svg viewBox="0 0 40 40"><path d="M10 12q10 18 20 0" stroke="#c9a66a" stroke-width="1.6" fill="none"/><circle cx="12" cy="16" r="3.2" fill="#9b7be0"/><circle cx="16.5" cy="21.5" r="3.2" fill="#7fd8c4"/><circle cx="20" cy="23.5" r="3.4" fill="#f0d79a"/><circle cx="23.5" cy="21.5" r="3.2" fill="#7fd8c4"/><circle cx="28" cy="16" r="3.2" fill="#9b7be0"/></svg>',
   amulet: '<svg viewBox="0 0 40 40"><path d="M12 9h16l-2 25H14z" fill="#f0d79a"/><path d="M12 9h16l-1 5H13z" fill="#e0bd72"/><path d="M16 17h8M16 21h8M16 25h5" stroke="#a9762f" stroke-width="1.3" stroke-linecap="round"/><circle cx="30" cy="14" r="4.3" fill="#ff8574"/><path d="M20 6l3 3-3 3-3-3z" fill="#5fe3c8"/></svg>',
   grail: '<svg viewBox="0 0 40 40"><path d="M12.4 7.6h15.2l-1.9 11.2a5.7 5.7 0 0 1-11.4 0z" fill="#f7dc94"/><path d="M12.4 7.6h15.2l-.4 3.4H12.8z" fill="#e8b45c"/><path d="M20 24.6v8.2" stroke="#e8b45c" stroke-width="2.6"/><path d="M13.4 33.6h13.2" stroke="#e8b45c" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="5.2" r="2.1" fill="#5fe3c8"/><path d="M8.6 11.8c-1.2 6.2 2.2 9.6 5.6 10.8M31.4 11.8c1.2 6.2-2.2 9.6-5.6 10.8" stroke="#f0d79a" stroke-width="2" fill="none"/></svg>',
   crown: '<svg viewBox="0 0 40 40"><path d="M8 28h24l2-13-6 5-6-11-4 8-4-8-6 11-6-5z" fill="#ffd45c"/><path d="M8 28h24l1-6H7z" fill="#e8b45c"/><circle cx="20" cy="9" r="2.3" fill="#ff8574"/><circle cx="12" cy="12" r="1.6" fill="#5fe3c8"/><circle cx="28" cy="12" r="1.6" fill="#5fe3c8"/></svg>'
@@ -2577,6 +2610,11 @@ function syncRelic() {
     } else {
       txt = '待命';
     }
+  } else if (t === 'ice') {
+    txt = 'CD −2s';
+  } else if (t === 'bead') {
+    txt = state.beadFlyT > 0 ? state.beadFlyT.toFixed(1) + 's' : '待命';
+    off = state.beadFlyT > 0;
   } else if (t === 'amulet') {
     txt = (3 - state.amuletUsed) + '次';
     off = state.amuletUsed >= 3;
@@ -2675,7 +2713,7 @@ function resetRun() {
   state.shield = false;
   state.shieldT = 0;
   state.invulnT = 0;
-  state.fanT = state.test ? 2 : 8;
+  state.fanT = state.test ? 2 : passiveCd(8);
   state.necklaceUsed = false;
   state.shards = 0;
   state.shardPts = 0;
@@ -2685,20 +2723,22 @@ function resetRun() {
   state.growT = 0;
   state.itemFlyT = 0;
   state.grailFlyT = 0;
+  state.beadFlyT = 0;
   state.explorerT = 0;
   state.astralT = 0;
   if (state.astralId) { state.astralId = ''; state.char = 'astrologer'; }
   state.magnetT = 0;
-  state.magnetClock = 15;
-  state.meteorClock = 15;
+  state.magnetClock = passiveCd(15);
+  state.meteorClock = passiveCd(15);
   state.missileClock = 9;
   state.obstacleCalm = 0;
   state.meteorT = 0;
+  state.amuletUsed = 0;
   state.meteorEmit = 0;
   state.meteors.length = 0;
   state.itemShield = false;
   state.wings = 0;
-  state.wingClock = 20;
+  state.wingClock = passiveCd(20);
   state.angelFlyT = 0;
   state.angelChargeT = 0;
   state.angelSlashT = 0;
@@ -2732,7 +2772,7 @@ function resetRun() {
   state.portalIdx = 0;
   state.portalRevive = 0;
   state.portalX = PORTALS[0] * RULESET.pxPerMeter;
-  state.snowClock = 15;
+  state.snowClock = passiveCd(15);
   state.snowWaveT = 0;
   state.snowFreezeT = 0;
   state.snowFxT = 0;
@@ -2983,10 +3023,11 @@ function syncHud() {
   const demonChargeOn = !!spec.demon && (state.demonChargeT || 0) > 0;
   const demonReviveOn = !!spec.demon && (state.demonReviveT || 0) > 0;
   const snowFlyOn = !!spec.snow && (state.snowFlyT || 0) > 0;
+  const beadFlyOn = state.beadFlyT > 0;
   const snowTempOn = !!spec.snow && (state.snowTempMeter || 0) > 0;
   const snowBlessOn = !!spec.snow && (state.snowBlessT || 0) > 0;
   const snowFreezeOn = !!spec.snow && (state.snowFreezeT || 0) > 0;
-  const chipOn = astralOnNow || dashing || shieldOn || armed || gourdFly || fanOn || boneFly || boneIdle || portalReviveOn || growOn || itemFlyOn || itemShieldOn || magnetOn || exploreOn || demonHorseNow || demonChargeOn || demonReviveOn || snowFlyOn || snowTempOn || snowBlessOn || snowFreezeOn || (!!spec.wuxia && !state.gourdAlive);
+  const chipOn = astralOnNow || dashing || shieldOn || armed || gourdFly || fanOn || boneFly || boneIdle || portalReviveOn || growOn || itemFlyOn || itemShieldOn || magnetOn || exploreOn || demonHorseNow || demonChargeOn || demonReviveOn || snowFlyOn || beadFlyOn || snowTempOn || snowBlessOn || snowFreezeOn || (!!spec.wuxia && !state.gourdAlive);
   const chipText = astralOnNow ? '易形 ' + CHARS[state.astralId].name + ' ' + state.astralT.toFixed(1) + 's'
     : exploreOn ? '寻宝时刻 ' + state.explorerT.toFixed(1) + 's'
     : magnetOn ? '磁吸 ' + state.magnetT.toFixed(1) + 's'
@@ -2995,6 +3036,7 @@ function syncHud() {
     : itemFlyOn ? '飞行 ' + state.itemFlyT.toFixed(1) + 's'
     : itemShieldOn ? '道具护盾 · 待命'
     : boneIdle ? '九骨 ' + state.bones + '/9'
+    : beadFlyOn ? '念珠御风 ' + state.beadFlyT.toFixed(1) + 's'
     : snowFlyOn ? '冰霄飞行 ' + state.snowFlyT.toFixed(1) + 's'
     : snowTempOn ? '临时能量 ' + Math.round(state.snowTempMeter) + ' · ' + state.snowTempT.toFixed(1) + 's'
     : snowBlessOn ? '祝福 得分×2 ' + state.snowBlessT.toFixed(1) + 's'
@@ -3070,6 +3112,18 @@ function updatePlayer(dt) {
     player.vy = 0;
     input.jumpBuffer = 0;
     player.feetY = lerp(player.feetY, GROUND - 172, Math.min(1, dt * 8));
+    return;
+  }
+  /* 念珠：0.8 秒御风飞行，悬停、2 倍速，结束清场 */
+  if (state.beadFlyT > 0) {
+    player.sliding = false;
+    player.slideT = 0;
+    player.coyote = 0;
+    player.onGround = false;
+    player.jumps = 3;
+    player.vy = 0;
+    input.jumpBuffer = 0;
+    player.feetY = lerp(player.feetY, GROUND - 152, Math.min(1, dt * 7));
     return;
   }
   /* 雪女祝福：1 秒冰霄飞行，悬停、2 倍速，结束清场 */
@@ -3281,6 +3335,15 @@ function grailFlight() {
   burst(PLAYER_X, player.feetY - 50, 18, 'rgba(255,232,160,.92)', 250, 30);
   burst(PLAYER_X, player.feetY - 96, 10, 'rgba(255,246,214,.9)', 210, 40);
   floatText(PLAYER_X, player.feetY - 122, '圣杯 · 复生羽翼 1.5×', 'rgba(255,232,160,1)');
+}
+function beadFlight() {
+  if (state.treasure !== 'bead') return;
+  state.beadFlyT = 0.8;
+  state.invulnT = Math.max(state.invulnT, 0.8);
+  sfx('dash');
+  burst(PLAYER_X, player.feetY - 50, 20, 'rgba(196,168,255,.92)', 280, 26);
+  burst(PLAYER_X, player.feetY - 96, 12, 'rgba(232,214,255,.9)', 220, 22);
+  floatText(PLAYER_X, player.feetY - 132, '念珠 · 御风飞行 0.8s', 'rgba(214,190,255,1)');
 }
 function doNecklaceRevive() {
   state.necklaceUsed = true;
@@ -3506,6 +3569,7 @@ function collide() {
   if (state.itemFlyT > 0) return;
   if (state.angelFlyT > 0) return;
   if (state.snowFlyT > 0) return;
+  if (state.beadFlyT > 0) return;
   if (spec.fly && state.dashT > 0) return;
   if (state.invulnT > 0) return;
   const box = playerBox();
@@ -3577,6 +3641,7 @@ function collide() {
         state.angelShield = false;
         state.angelShieldT = 0;
         state.angelShieldShatterT = 0.55;
+        beadFlight();
         state.shake = Math.max(state.shake, 15);
         sfx('break');
         burst(PLAYER_X, player.feetY - 62, 34, 'rgba(255,226,160,.95)', 360, 60);
@@ -3609,6 +3674,7 @@ function collide() {
         burst(sx + o.w / 2, oy + oh * 0.5, 26, 'rgba(217,255,246,.95)', 340, 20);
         burst(PLAYER_X, player.feetY - 50, 18, 'rgba(240,255,252,.9)', 260, 30);
         floatText(PLAYER_X, player.feetY - 132, '道具护盾 · 抵挡', 'rgba(217,255,246,1)');
+        beadFlight();
       } else if (state.shield && state.char === 'snow') {
         /* 冰雪护盾：抵挡一次碰撞，冰蓝白爆散 */
         state.shield = false;
@@ -3620,6 +3686,7 @@ function collide() {
         burst(sx + o.w / 2, oy + oh * 0.5, 26, 'rgba(210,244,255,.95)', 340, 20);
         burst(PLAYER_X, player.feetY - 50, 18, 'rgba(240,252,255,.9)', 260, 30);
         floatText(PLAYER_X, player.feetY - 132, '冰雪护盾 · 抵挡', 'rgba(214,244,255,1)');
+        beadFlight();
       } else if (state.shield) {
         /* 护盾抵挡一次碰撞 */
         state.shield = false;
@@ -3631,6 +3698,7 @@ function collide() {
         burst(sx + o.w / 2, oy + oh * 0.5, 26, 'rgba(255,217,79,.95)', 340, 20);
         burst(PLAYER_X, player.feetY - 50, 18, 'rgba(255,240,168,.9)', 260, 30);
         floatText(PLAYER_X, player.feetY - 132, '护盾抵挡', 'rgba(255,217,79,1)');
+        beadFlight();
       } else if (state.char === 'sci' && state.meter < meterCap() && (state.special || 0) > 0) {
         /* 科学家：普通能量未满时，用特殊能量抵消这次伤害，随后能量全清 */
         o.dead = true;
@@ -3779,7 +3847,7 @@ function drawMeteors() {
 function collect() {
   const px = PLAYER_X;
   const cy = player.feetY - (player.sliding ? 26 : 48);
-  let magnet = (state.dashT > 0 || state.boneFlyT > 0 || state.itemFlyT > 0 || state.angelFlyT > 0 || state.angelChargeT > 0 || state.demonChargeT > 0) ? RULESET.dashMagnet : 0;
+  let magnet = (state.dashT > 0 || state.boneFlyT > 0 || state.itemFlyT > 0 || state.angelFlyT > 0 || state.angelChargeT > 0 || state.demonChargeT > 0 || state.snowFlyT > 0 || state.beadFlyT > 0) ? RULESET.dashMagnet : 0;
   if (state.magnetT > 0) magnet = Math.max(magnet, 340);
   /* 恶魔幽灵冲锋：磁吸范围略宽，吃金币但不回幽灵马力 */
   if (state.demonChargeT > 0) magnet = Math.max(magnet, 300);
@@ -3809,7 +3877,7 @@ function collect() {
       state.maxCombo = Math.max(state.maxCombo, state.combo);
       state.comboT = RULESET.comboWindow;
       /* 技能生效期间不吸收能量 */
-      if (state.dashT <= 0 && state.itemFlyT <= 0 && state.angelFlyT <= 0 && state.angelChargeT <= 0 && state.demonChargeT <= 0 && !state.meterLocked) gainMeter(RULESET.shardGain * (isSnow && !isLotus ? 0.8 : 1));
+      if (state.dashT <= 0 && state.itemFlyT <= 0 && state.angelFlyT <= 0 && state.angelChargeT <= 0 && state.demonChargeT <= 0 && state.snowFlyT <= 0 && state.beadFlyT <= 0 && !state.meterLocked) gainMeter(RULESET.shardGain * (isSnow && !isLotus ? 0.8 : 1));
       sfx('coin');
       if (isBone) {
         state.bones++;
@@ -3997,7 +4065,7 @@ function updateRun(dt) {
   if (state.treasure === 'fan' && state.mode === 'run') {
     state.fanT -= dt;
     if (state.fanT <= 0) {
-      state.fanT = state.test ? 2 : 8;
+      state.fanT = state.test ? 2 : passiveCd(8);
       fanGust();
     }
   }
@@ -4005,7 +4073,7 @@ function updateRun(dt) {
   if (state.char === 'explorer' && state.astralT <= 0) {
     state.magnetClock -= dt;
     if (state.magnetClock <= 0) {
-      state.magnetClock = 15;
+      state.magnetClock = passiveCd(15);
       state.magnetT = 3;
       state.shake = Math.max(state.shake, 4);
       sfx('djump');
@@ -4022,7 +4090,7 @@ function updateRun(dt) {
   if (state.char === 'mage' && state.astralT <= 0 && state.mode === 'run') {
     state.meteorClock -= dt;
     if (state.meteorClock <= 0) {
-      state.meteorClock = 15;
+      state.meteorClock = passiveCd(15);
       summonMeteorShower();
     }
   }
@@ -4067,8 +4135,8 @@ function updateRun(dt) {
   if (state.swordT > 0) mul = Math.max(mul, 1.18);
   /* 道具「飞行」：速度提升到 1.5 倍，时长不变 */
   if (state.itemFlyT > 0) mul = Math.max(mul, 1.5);
-  /* 雪女祝福飞行：2 倍速 */
-  if (state.snowFlyT > 0) mul = Math.max(mul, 2);
+  /* 雪女祝福飞行 / 念珠御风：2 倍速 */
+  if (state.snowFlyT > 0 || state.beadFlyT > 0) mul = Math.max(mul, 2);
   /* 天使：展翼飞行与圣翼冲锋均为 1.5 倍速度 */
   if (state.angelFlyT > 0 || state.angelChargeT > 0) mul = Math.max(mul, 1.5);
   /* 恶魔：幽灵冲锋 1.5 倍速度 */
@@ -9938,7 +10006,7 @@ function updateAngelWings(dt) {
   if (state.wings >= 9) { state.wingClock = 0; return; }
   state.wingClock -= dt;
   while (state.wingClock <= 0 && state.wings < 9) {
-    state.wingClock += ANGEL_WING_INTERVAL;
+    state.wingClock = passiveCd(ANGEL_WING_INTERVAL);
     addAngelWing();
   }
 }
@@ -11878,6 +11946,13 @@ function updateSnowPowers(dt) {
       if (world.iceGaps[i].end < cut) world.iceGaps.splice(i, 1);
     }
   }
+  const beadFlyWas = state.beadFlyT || 0;
+  state.beadFlyT = Math.max(0, beadFlyWas - dt);
+  if (beadFlyWas > 0 && state.beadFlyT <= 0) {
+    clearObstacles();
+    if (!groundAt(state.worldX + PLAYER_X)) climbBackToRoof();
+    floatText(PLAYER_X, player.feetY - 142, '念珠御风结束 · 清场', 'rgba(214,190,255,.9)');
+  }
   if (state.char !== 'snow' || state.mode !== 'run') return;
   state.snowFreezeT = Math.max(0, (state.snowFreezeT || 0) - dt);
   state.snowBlessT = Math.max(0, (state.snowBlessT || 0) - dt);
@@ -11899,7 +11974,7 @@ function updateSnowPowers(dt) {
   if (state.snowClock <= 0) {
     const e = Math.floor(Math.random() * 4);
     snowGrantEffect(e);
-    state.snowClock = 15;
+    state.snowClock = passiveCd(15);
   }
 }
 function snowFreezeWave(rangeMeters) {
