@@ -2163,7 +2163,7 @@ function crystalStrike() {
   state.boltX = best ? bestSx + (best.w || 60) * 0.5 : PLAYER_X + 260;
   state.boltY = best ? (best.type === 'beam' || best.type === 'gate' ? GROUND - 40 : GROUND - best.h) : GROUND;
   state.shake = Math.max(state.shake, 8);
-  state.crystalCd = state.test ? 0.4 : passiveCd(5);
+  state.crystalCd = state.test ? 0.4 : 5;
   sfx('break');
   if (best) {
     best.dead = true;
@@ -2713,7 +2713,7 @@ function resetRun() {
   state.shield = false;
   state.shieldT = 0;
   state.invulnT = 0;
-  state.fanT = state.test ? 2 : passiveCd(8);
+  state.fanT = state.test ? 2 : 8;
   state.necklaceUsed = false;
   state.shards = 0;
   state.shardPts = 0;
@@ -4065,7 +4065,7 @@ function updateRun(dt) {
   if (state.treasure === 'fan' && state.mode === 'run') {
     state.fanT -= dt;
     if (state.fanT <= 0) {
-      state.fanT = state.test ? 2 : passiveCd(8);
+      state.fanT = state.test ? 2 : 8;
       fanGust();
     }
   }
