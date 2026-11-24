@@ -1706,7 +1706,7 @@ function escHtml(str) {
 
 /* ===== 世界与状态 ===== */
 const world = {
-  platforms: [], obstacles: [], shards: [], items: [], particles: [], floats: [], trail: [], decor: []
+  platforms: [], obstacles: [], shards: [], items: [], particles: [], floats: [], trail: [], decor: [], strikes: [], hails: []
 };
 const player = {
   feetY: GROUND, vy: 0, onGround: true, jumps: 0, sliding: false,
@@ -1793,6 +1793,14 @@ const state = {
   blizzardT: 0,
   blizzardWarnT: 0,
   blizzardClock: 0,
+  /* 湖心亭：雷雨 / 雷暴雨 / 雨雪 / 雪暴雨 */
+  thunderClock: 7,
+  thunderStormClock: 15,
+  thunderStormT: 0,
+  rainSnow: false,
+  snowStormClock: 15,
+  snowStormT: 0,
+  hailClock: 0,
   monsterNextX: 0,
   demonReviveUsed: false,
   explorerT: 0,
@@ -1815,16 +1823,17 @@ let genCursor = 1700;
 let lastObstacleEnd = 1212;
 
 /* ===== 关卡生成 ===== */
-const PORTALS = [3000, 6000, 9000, 12000, 15000];
+const PORTALS = [3000, 6000, 9000, 12000, 15000, 20000];
 /* 五道传送门的通关奖励：2 万 / 3 万 / 5 万 / 6 千 / 7 千 */
-const PORTAL_PTS = [20000, 30000, 50000, 60000, 70000];
-const MAP_CN = ['天台', '夜街', '黑夜森林', '黑夜神庙', '黑夜海滩', '黑夜雪山'];
-const MAP_BANNER = ['夜 街 · 人 行 道', '黑 夜 森 林 · 林 间 小 径', '黑 夜 神 庙 · 石 阶 长 廊', '黑 夜 海 滩 · 潮 线 长 堤', '黑 夜 雪 山 · 风 雪 山 脊'];
+const PORTAL_PTS = [20000, 30000, 50000, 60000, 70000, 80000];
+const MAP_CN = ['天台', '夜街', '黑夜森林', '黑夜神庙', '黑夜海滩', '黑夜雪山', '湖心亭'];
+const MAP_BANNER = ['夜 街 · 人 行 道', '黑 夜 森 林 · 林 间 小 径', '黑 夜 神 庙 · 石 阶 长 廊', '黑 夜 海 滩 · 潮 线 长 堤', '黑 夜 雪 山 · 风 雪 山 脊', '湖 心 亭 · 雷 雨 夜 景'];
 const MAP_SKY = {
   2: { top: [4, 12, 14], mid: [10, 32, 26], low: [18, 46, 34], sun: [176, 240, 208] },
   3: { top: [7, 7, 20], mid: [22, 18, 42], low: [46, 32, 52], sun: [255, 210, 168] },
   4: { top: [5, 12, 26], mid: [14, 36, 54], low: [32, 66, 74], sun: [206, 244, 238] },
-  5: { top: [8, 14, 30], mid: [26, 40, 60], low: [74, 96, 120], sun: [232, 242, 255] }
+  5: { top: [8, 14, 30], mid: [26, 40, 60], low: [74, 96, 120], sun: [232, 242, 255] },
+  6: { top: [6, 10, 22], mid: [18, 28, 46], low: [42, 58, 78], sun: [190, 220, 255] }
 };
 function difficulty(wx) {
   /* 基础难度随距离拉满；神庙（map 3）与海滩（map 4）再叠一层 */
@@ -1848,14 +1857,14 @@ function addShardArc(cx, count, span, peak, baseY) {
       dead: false,
       key: state.explorerT > 0,
       snow: state.map === 5,
-      purple: state.map > 0 && state.map !== 5 && Math.random() < 0.20
+      purple: state.map > 0 && state.map !== 5 && state.map !== 6 && Math.random() < 0.20
     });
   }
 }
 function addShardLine(cx, count, gap, y) {
   const total = (count - 1) * gap;
   for (let i = 0; i < count; i++) {
-    world.shards.push({ x: cx - total / 2 + i * gap, y, phase: Math.random() * 6.283, dead: false, key: state.explorerT > 0, snow: state.map === 5, purple: state.map > 0 && state.map !== 5 && Math.random() < 0.20 });
+    world.shards.push({ x: cx - total / 2 + i * gap, y, phase: Math.random() * 6.283, dead: false, key: state.explorerT > 0, snow: state.map === 5, purple: state.map > 0 && state.map !== 5 && state.map !== 6 && Math.random() < 0.20 });
   }
 }
 function addObstacle(type, x, diff) {
@@ -1938,10 +1947,11 @@ function generateAhead() {
     /* 夜街 / 森林 / 神庙：隔一段距离随机出现一个道具；森林与神庙概率 +10% */
     if (state.map > 0) {
       const lastItem = world.items.length ? world.items[world.items.length - 1].x : -1e9;
-      const itemChance = state.map >= 3 ? 0.60 : 0.50;
+      const itemBase = state.map >= 3 ? 0.60 : 0.50;
+      const itemChance = itemBase * 0.80;
       if (genCursor - lastItem > 900 && Math.random() < itemChance) {
-        const kinds = ['grow', 'fly', 'shield'];
-        const kind = kinds[Math.floor(Math.random() * 3)];
+        const kinds = state.itemShield ? ['grow', 'fly'] : ['grow', 'fly', 'shield'];
+        const kind = kinds[Math.floor(Math.random() * kinds.length)];
         /* 在平台内挑一个不与障碍重叠的落点 */
         const cands = [genCursor + 200, genCursor + len * 0.62, genCursor + len - 150];
         let ix = -1;
@@ -1970,7 +1980,9 @@ function generateAhead() {
       }
     }
     if (Math.random() < 0.55) {
-      const dType = state.map === 5
+      const dType = state.map === 6
+        ? (Math.random() < 0.5 ? 'pavilionlantern' : 'pavilionstone')
+        : state.map === 5
         ? (Math.random() < 0.5 ? 'snowpine' : 'snowrock')
         : state.map === 4
           ? (Math.random() < 0.5 ? 'parasol' : 'driftwood')
@@ -2027,6 +2039,8 @@ function pruneWorld() {
   world.shards = world.shards.filter(s => s.x > cutoff && !s.dead);
   world.items = world.items.filter(it => it.x > cutoff && !it.dead);
   world.decor = world.decor.filter(d => d.x > cutoff);
+  world.strikes = world.strikes.filter(x => x.x > cutoff);
+  world.hails = world.hails.filter(h => !h.dead && h.x > cutoff);
 }
 function groundAt(wx) {
   for (let i = 0; i < world.platforms.length; i++) {
@@ -2049,6 +2063,8 @@ function buildLevel() {
   world.floats.length = 0;
   world.trail.length = 0;
   world.decor.length = 0;
+  world.strikes.length = 0;
+  world.hails.length = 0;
 
   world.platforms.push({ start: -900, end: 1700 });
   world.obstacles.push({ type: 'crate', x: 1150, w: 62, h: 70, dead: false, seed: 0.4 });
@@ -2108,6 +2124,19 @@ function passiveCd(base) {
 function snowScoreMult() {
   return state.char === 'snow' && (state.snowBlessT || 0) > 0 ? 2 : 1;
 }
+function pavilionMeters() { return state.worldX / RULESET.pxPerMeter; }
+function shardSnowFlag(s) {
+  if (s.snow) return true;
+  if (state.map === 6 && (state.snowStormT || 0) > 0 && ((s.phase || 0) / 6.28318) < 0.30) return true;
+  return false;
+}
+function meterGainMult() {
+  let m = 1;
+  if ((state.blizzardT || 0) > 0 && state.char !== 'snow') m *= 0.5;
+  if (state.map === 6 && state.rainSnow && state.char !== 'snow') m *= 0.85;
+  if ((state.thunderStormT || 0) > 0) m *= 1.30;
+  return m;
+}
 function sciSpecialCap(id) {
   if ((id || state.char) !== 'sci') return 0;
   /* 特殊槽固定 50，不受戒指等宝物影响 */
@@ -2118,8 +2147,8 @@ function meterCapTotal(id) { return meterCap(id) + sciSpecialCap(id); }
 function gainMeter(amount) {
   /* 冲锋期间（天使圣翼冲锋 / 恶魔幽灵冲锋）不积攒任何能量 */
   if ((state.angelChargeT || 0) > 0 || (state.demonChargeT || 0) > 0) return;
-  /* 雪山暴风雪：能量槽积攒速度 −30%；雪女免疫 */
-  if ((state.blizzardT || 0) > 0 && state.char !== 'snow') amount *= 0.7;
+  /* 天气回能倍率：雪山暴风雪 −50%；湖心亭雨雪 −15%；雷暴雨 +30%；雪女免疫负面天气 */
+  amount *= meterGainMult();
   /* 恶魔：幽灵马在场时原能量槽冻结，回能全部进入 100 点幽灵马力槽 */
   const gspec = CHARS[state.char];
   if (gspec.demon && state.ghostHorse) {
@@ -2758,6 +2787,13 @@ function resetRun() {
   state.blizzardT = 0;
   state.blizzardWarnT = 0;
   state.blizzardClock = 0;
+  state.thunderClock = 7;
+  state.thunderStormClock = 15;
+  state.thunderStormT = 0;
+  state.rainSnow = false;
+  state.snowStormClock = 15;
+  state.snowStormT = 0;
+  state.hailClock = 0;
   state.monsterNextX = 0;
   state.demonReviveUsed = false;
   state.demonReviveCount = 0;
@@ -2932,7 +2968,9 @@ function syncHud() {
     hudCache.dist = dist;
     distEl.textContent = dist;
   }
-  const mapText = state.map === 5
+  const mapText = state.map === 6
+    ? (state.rainSnow ? '湖心亭 · 雨雪之夜' : '湖心亭 · 雷雨之夜')
+    : state.map === 5
     ? '黑夜雪山 · 雪线尽头'
     : state.map === 4
       ? '黑夜海滩 · 传送门 ' + Math.max(0, Math.ceil(PORTALS[4] - dist)) + ' 米'
@@ -3762,6 +3800,38 @@ function collide() {
       }
     }
   }
+  /* 湖心亭雷电：预警后落地的光柱判定 */
+  for (let i = 0; i < world.strikes.length; i++) {
+    const st = world.strikes[i];
+    if (st.warnT > 0) continue;
+    const sx = st.x - state.worldX;
+    if (box.x + box.w > sx - 18 && box.x < sx + 18 && box.y + box.h > 0 && box.y < GROUND) {
+      crash('hit');
+      return;
+    }
+  }
+  /* 湖心亭冰雹：每颗扣除 10 点能量；能量为 0 视为受击；雪女免疫 */
+  for (let i = 0; i < world.hails.length; i++) {
+    const h = world.hails[i];
+    if (h.dead) continue;
+    const hx = h.x - state.worldX;
+    if (box.x + box.w > hx && box.x < hx + h.w && box.y + box.h > h.y && box.y < h.y + h.h) {
+      h.dead = true;
+      if (state.char === 'snow') {
+        burst(hx + h.w / 2, h.y + h.h / 2, 8, 'rgba(210,236,255,.8)', 160, 12);
+        continue;
+      }
+      state.meter = Math.max(0, state.meter - 10);
+      if (state.meter <= 0) {
+        crash('hit');
+        return;
+      }
+      state.shake = Math.max(state.shake, 5);
+      sfx('hit');
+      burst(hx + h.w / 2, h.y + h.h / 2, 10, 'rgba(210,236,255,.9)', 180, 14);
+      floatText(PLAYER_X, player.feetY - 126, '冰雹 · 能量 -10', 'rgba(214,236,255,1)');
+    }
+  }
 }
 /* ===== 玄枢·流星雨 ===== */
 function summonMeteorShower() {
@@ -3867,7 +3937,7 @@ function collect() {
       const isBone = !!s.bone;
       const isPurple = !!s.purple;
       const isKey = !!s.key && !isBone;
-      const isSnow = !!s.snow;
+      const isSnow = shardSnowFlag(s);
       const isLotus = !!s.lotus;
       const pts = Math.round(RULESET.shardScore * state.combo * (isBone ? 2 : 1) * (isPurple ? 1.5 : 1) * (isKey ? 1.3 : 1) * (isSnow ? 1.5 : 1) * (isLotus ? 2 : 1) * snowScoreMult());
       state.shardPts += pts;
@@ -3954,8 +4024,12 @@ function applyItem(type, sx, sy) {
     floatText(sx, sy - 34, '道具 · 飞行 1.5 秒 · 吸金不回能', 'rgba(198,255,246,1)');
     burst(sx, sy, 18, 'rgba(95,227,200,.95)', 240, 20);
   } else {
-    state.itemShield = true;
-    floatText(sx, sy - 34, '道具 · 永久护盾', 'rgba(230,255,250,1)');
+    if (!state.itemShield) {
+      state.itemShield = true;
+      floatText(sx, sy - 34, '道具 · 永久护盾', 'rgba(230,255,250,1)');
+    } else {
+      floatText(sx, sy - 34, '护盾已存在 · 不叠加', 'rgba(230,255,250,.8)');
+    }
     burst(sx, sy, 22, 'rgba(217,255,246,.95)', 260, 24);
   }
   sfx('djump');
@@ -4116,6 +4190,7 @@ function updateRun(dt) {
   }
   updateMissiles(dt);
   updateBlizzard(dt);
+  updatePavilion(dt);
   updateSnowmen(dt);
   updateSnowPowers(dt);
   const target = speedAt(state.worldX);
@@ -4137,6 +4212,8 @@ function updateRun(dt) {
   if (state.itemFlyT > 0) mul = Math.max(mul, 1.5);
   /* 雪女祝福飞行 / 念珠御风：2 倍速 */
   if (state.snowFlyT > 0 || state.beadFlyT > 0) mul = Math.max(mul, 2);
+  if (state.thunderStormT > 0) mul = Math.max(mul, 1.30);
+  if (state.snowStormT > 0) mul = Math.max(mul, 1.15);
   /* 天使：展翼飞行与圣翼冲锋均为 1.5 倍速度 */
   if (state.angelFlyT > 0 || state.angelChargeT > 0) mul = Math.max(mul, 1.5);
   /* 恶魔：幽灵冲锋 1.5 倍速度 */
@@ -4318,7 +4395,7 @@ const purpleSprite = (function () {
 function enterNextMap() {
   state.portalIdx += 1;
   const reward = PORTAL_PTS[Math.min(PORTAL_PTS.length - 1, state.portalIdx - 1)];
-  state.map = Math.min(5, state.map + 1);
+  state.map = Math.min(6, state.map + 1);
   state.bonusPts += reward;
   state.portalRevive += 1;
   state.portalX = state.portalIdx < PORTALS.length ? PORTALS[state.portalIdx] * RULESET.pxPerMeter : Infinity;
@@ -4338,6 +4415,18 @@ function enterNextMap() {
     /* 进入雪山：重置暴风雪与雪怪节奏 */
     state.blizzardT = 0; state.blizzardWarnT = 0; state.blizzardClock = 20;
     state.monsterNextX = state.worldX + 500 * RULESET.pxPerMeter;
+  }
+  if (state.map === 6) {
+    /* 进入湖心亭：清空雪山遗留天气，重置雷雨/雨雪节奏 */
+    world.strikes.length = 0;
+    world.hails.length = 0;
+    state.thunderClock = 7;
+    state.thunderStormClock = 15;
+    state.thunderStormT = 0;
+    state.rainSnow = false;
+    state.snowStormClock = 15;
+    state.snowStormT = 0;
+    state.hailClock = 0;
   }
   burst(PLAYER_X + 46, GROUND - 96, 30, burstCol, 420, 70);
   burst(PLAYER_X + 46, GROUND - 40, 18, 'rgba(255,214,150,.9)', 300, 40);
@@ -6629,6 +6718,100 @@ function updateBlizzard(dt) {
     floatText(PLAYER_X, player.feetY - 158, '暴风雪将至 · 3s 预警', 'rgba(255,236,210,1)');
   }
 }
+function spawnPavilionStrikes(count) {
+  for (let i = 0; i < count; i++) {
+    world.strikes.push({
+      x: state.worldX + rand(220, W + 120),
+      warnT: 0.8,
+      activeT: 0,
+      seed: Math.random() * 6.283
+    });
+  }
+}
+function spawnHailWave() {
+  for (let i = 0; i < 15; i++) {
+    world.hails.push({
+      x: state.worldX + rand(160, W + 180),
+      y: -20 - rand(0, 180),
+      vy: rand(260, 380),
+      w: 18,
+      h: 22,
+      dead: false,
+      seed: Math.random() * 6.283
+    });
+  }
+  sfx('warn');
+  floatText(PLAYER_X, player.feetY - 150, '雪暴雨 · 冰雹来袭', 'rgba(214,236,255,.95)');
+}
+function updatePavilion(dt) {
+  if (state.map !== 6 || state.mode !== 'run') return;
+  const meters = pavilionMeters();
+  state.rainSnow = meters >= 25000;
+
+  if (!state.rainSnow) {
+    const stormWas = state.thunderStormT || 0;
+    state.thunderStormT = Math.max(0, stormWas - dt);
+    if (stormWas > 0 && state.thunderStormT <= 0) {
+      state.bonusPts += 30000;
+      floatText(PLAYER_X, player.feetY - 166, '雷暴雨结束 · +30000', 'rgba(190,224,255,1)');
+    }
+    if (state.thunderStormT <= 0) {
+      state.thunderStormClock -= dt;
+      if (state.thunderStormClock <= 0) {
+        state.thunderStormClock = 15;
+        state.thunderStormT = 10;
+        state.shake = Math.max(state.shake, 8);
+        sfx('warn');
+        floatText(PLAYER_X, player.feetY - 166, '雷暴雨时刻 · 速度 +30% · 回能 +30%', 'rgba(190,224,255,1)');
+      }
+    }
+    state.thunderClock -= dt;
+    if (state.thunderClock <= 0) {
+      state.thunderClock = 7;
+      spawnPavilionStrikes(state.thunderStormT > 0 ? 4 : 2);
+    }
+  } else {
+    const snowWas = state.snowStormT || 0;
+    state.snowStormT = Math.max(0, snowWas - dt);
+    if (snowWas > 0 && state.snowStormT <= 0) {
+      state.bonusPts += 50000;
+      state.hailClock = 0;
+      floatText(PLAYER_X, player.feetY - 166, '雪暴雨结束 · +50000', 'rgba(226,244,255,1)');
+    }
+    if (state.snowStormT > 0) {
+      state.hailClock -= dt;
+      if (state.hailClock <= 0) {
+        state.hailClock = 4;
+        spawnHailWave();
+      }
+    } else {
+      state.snowStormClock -= dt;
+      if (state.snowStormClock <= 0) {
+        state.snowStormClock = 15;
+        state.snowStormT = 10;
+        state.hailClock = 4;
+        state.shake = Math.max(state.shake, 8);
+        sfx('warn');
+        floatText(PLAYER_X, player.feetY - 166, '雪暴雨时刻 · 速度 +15% · 金币化雪花', 'rgba(226,244,255,1)');
+      }
+    }
+  }
+
+  for (let i = world.strikes.length - 1; i >= 0; i--) {
+    const st = world.strikes[i];
+    if (st.warnT > 0) {
+      st.warnT -= dt;
+    } else {
+      st.activeT += dt;
+      if (st.activeT > 0.22) world.strikes.splice(i, 1);
+    }
+  }
+  for (let i = world.hails.length - 1; i >= 0; i--) {
+    const h = world.hails[i];
+    h.y += h.vy * dt;
+    if (h.y > GROUND - 8 || h.x < state.worldX - 120 || h.dead) world.hails.splice(i, 1);
+  }
+}
 function updateMissiles(dt) {
   if (state.mode !== 'run') return;
   state.obstacleCalm = Math.max(0, state.obstacleCalm - dt);
@@ -6835,7 +7018,7 @@ function drawPortal() {
   ctx.font = '600 14px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(240,255,248,.94)';
-  const portalName = ['夜街', '黑夜森林', '黑夜神庙', '黑夜海滩', '黑夜雪山'][Math.min(4, state.portalIdx)];
+  const portalName = ['夜街', '黑夜森林', '黑夜神庙', '黑夜海滩', '黑夜雪山', '湖心亭'][Math.min(5, state.portalIdx)];
   ctx.fillText('传送门 · ' + portalName + ' +' + PORTAL_PTS[Math.min(PORTAL_PTS.length - 1, state.portalIdx)], cx, GROUND + 35);
   ctx.textAlign = 'left';
 }
@@ -6854,13 +7037,15 @@ function drawMapBanner() {
   ctx.textAlign = 'center';
   ctx.font = '600 40px "Songti SC","Noto Serif SC",serif';
   ctx.fillStyle = 'rgba(243,236,221,.96)';
-  ctx.fillText(state.map === 5 ? MAP_BANNER[4]
+  ctx.fillText(state.map === 6 ? (state.rainSnow ? '湖 心 亭 · 雨 雪 夜 色' : MAP_BANNER[5])
+    : state.map === 5 ? MAP_BANNER[4]
     : state.map === 4 ? MAP_BANNER[3]
       : state.map === 3 ? MAP_BANNER[2]
       : state.map === 2 ? MAP_BANNER[1]
         : state.map === 1 ? MAP_BANNER[0] : '天 台 · 楼 顶 边 缘', W / 2, 176);
   ctx.font = '600 13px "PingFang SC","Microsoft YaHei",sans-serif';
-  ctx.fillStyle = state.map === 5 ? 'rgba(236,246,255,.92)'
+  ctx.fillStyle = state.map === 6 ? 'rgba(226,242,255,.92)'
+    : state.map === 5 ? 'rgba(236,246,255,.92)'
     : state.map === 4 ? 'rgba(206,246,238,.9)'
       : state.map === 3 ? 'rgba(255,206,138,.9)'
       : state.map === 2 ? 'rgba(150,246,196,.9)' : 'rgba(95,227,200,.9)';
@@ -7091,6 +7276,8 @@ function drawDecor() {
       ctx.beginPath();
       ctx.arc(x + 6, GROUND - 99, 2.4, 0, 6.283);
       ctx.fill();
+    } else if (d.type === 'pavilionlantern' || d.type === 'pavilionstone') {
+      drawPavilionProp(d, x);
     } else if (d.type === 'snowpine' || d.type === 'snowrock') {
       drawSnowProp(d, x);
     } else if (d.type === 'parasol' || d.type === 'driftwood') {
@@ -7227,7 +7414,7 @@ function drawShards() {
     if (s.bone) { drawBoneToken(sx, s.y + bob, s.phase); continue; }
     if (s.key) { drawKeyToken(sx, s.y + bob, s.phase); continue; }
     if (s.lotus) { drawLotusToken(sx, s.y + bob, s.phase); continue; }
-    if (s.snow) { drawSnowflakeToken(sx, s.y + bob, s.phase); continue; }
+    if (shardSnowFlag(s)) { drawSnowflakeToken(sx, s.y + bob, s.phase); continue; }
     ctx.save();
     ctx.translate(sx, s.y + bob);
     ctx.rotate(Math.sin(state.time * 1.7 + s.phase) * 0.4);
@@ -7410,7 +7597,12 @@ function drawObstacles() {
     if (x > W + 80 || x + o.w < -80) continue;
     if (o.type === 'snowman') { drawSnowman(x, o); continue; }
     if (o.type === 'missile') { drawMissile(x, o); continue; }
-    if (state.map === 5) {
+    if (state.map === 6) {
+      if (o.type === 'crate') drawTempleStele(x, o);
+      else if (o.type === 'duct') drawTempleRail(x, o);
+      else if (o.type === 'gate') drawTempleGate(x, o);
+      else drawTemplePillar(x, o);
+    } else if (state.map === 5) {
       if (o.type === 'crate') drawSnowMound(x, o);
       else if (o.type === 'duct') drawSnowRidge(x, o);
       else if (o.type === 'gate') drawSnowArch(x, o);
@@ -11779,6 +11971,217 @@ function drawSnowProp(d, x) {
     ctx.fill();
   }
 }
+function drawPavilionBack() {
+  const t = state.time;
+  /* 湖面与远山剪影 */
+  ctx.fillStyle = 'rgba(14,26,40,.52)';
+  ctx.fillRect(0, 170, W, GROUND - 170);
+  const moonG = ctx.createRadialGradient(W * 0.78, 118, 8, W * 0.78, 118, 90);
+  moonG.addColorStop(0, 'rgba(226,240,255,.72)');
+  moonG.addColorStop(1, 'rgba(226,240,255,0)');
+  ctx.fillStyle = moonG;
+  ctx.beginPath();
+  ctx.arc(W * 0.78, 118, 90, 0, 6.283);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(214,232,250,.72)';
+  ctx.beginPath();
+  ctx.arc(W * 0.78, 118, 28, 0, 6.283);
+  ctx.fill();
+
+  const off = state.worldX * 0.12;
+  for (let i = -1; i < 5; i++) {
+    const x = ((i * 360 - off) % (W + 360) + W + 360) % (W + 360) - 180;
+    const base = 356;
+    ctx.fillStyle = 'rgba(18,30,46,.88)';
+    ctx.fillRect(x + 24, base - 78, 10, 78);
+    ctx.fillRect(x + 72, base - 78, 10, 78);
+    ctx.beginPath();
+    ctx.moveTo(x, base - 72);
+    ctx.lineTo(x + 56, base - 112);
+    ctx.lineTo(x + 112, base - 72);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(70,112,142,.35)';
+    ctx.fillRect(x + 38, base - 42, 36, 42);
+  }
+  /* 湖面反光 */
+  ctx.strokeStyle = state.rainSnow ? 'rgba(190,220,240,.12)' : 'rgba(120,180,220,.10)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 7; i++) {
+    const y = GROUND - 64 + i * 18;
+    const x = ((i * 173 + t * 14) % (W + 120)) - 60;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + 70 + (i % 3) * 26, y);
+    ctx.stroke();
+  }
+}
+function drawPavilionGround() {
+  ctx.fillStyle = '#16212d';
+  ctx.fillRect(0, GROUND, W, H - GROUND);
+  const icy = state.rainSnow;
+  ctx.fillStyle = icy ? 'rgba(196,224,244,.24)' : 'rgba(120,170,200,.12)';
+  ctx.fillRect(0, GROUND, W, 9);
+  ctx.strokeStyle = icy ? 'rgba(224,240,255,.20)' : 'rgba(90,130,158,.18)';
+  ctx.lineWidth = 2;
+  const off = state.worldX * 0.6;
+  for (let i = -1; i < 12; i++) {
+    const x = ((i * 150 - off) % (W + 150) + W + 150) % (W + 150) - 75;
+    ctx.beginPath();
+    ctx.moveTo(x, GROUND + 16);
+    ctx.lineTo(x + 46, GROUND + 38);
+    ctx.stroke();
+  }
+}
+function drawPavilionLamps() {
+  const t = state.time;
+  const off = state.worldX * 0.35;
+  for (let i = -1; i < 7; i++) {
+    const x = ((i * 230 - off) % (W + 230) + W + 230) % (W + 230) - 115;
+    ctx.strokeStyle = 'rgba(46,62,78,.9)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x, 160);
+    ctx.lineTo(x, GROUND - 130);
+    ctx.stroke();
+    const glow = ctx.createRadialGradient(x, GROUND - 106, 4, x, GROUND - 106, 42);
+    glow.addColorStop(0, 'rgba(255,178,96,.52)');
+    glow.addColorStop(1, 'rgba(255,178,96,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, GROUND - 106, 42, 0, 6.283);
+    ctx.fill();
+    ctx.fillStyle = '#7c2f35';
+    roundRect(ctx, x - 15, GROUND - 122, 30, 32, 8);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,210,140,.86)';
+    ctx.fillRect(x - 10, GROUND - 116, 20, 20);
+  }
+}
+function drawPavilionProp(d, x) {
+  if (d.type === 'pavilionlantern') {
+    ctx.fillStyle = '#22313f';
+    ctx.fillRect(x + 24, GROUND - 58, 7, 58);
+    ctx.fillStyle = '#8a3538';
+    roundRect(ctx, x + 8, GROUND - 92, 39, 36, 9);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,216,150,.88)';
+    roundRect(ctx, x + 14, GROUND - 86, 27, 24, 6);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,178,96,.22)';
+    ctx.beginPath();
+    ctx.arc(x + 27, GROUND - 74, 38, 0, 6.283);
+    ctx.fill();
+  } else {
+    ctx.fillStyle = '#27384a';
+    ctx.beginPath();
+    ctx.ellipse(x + 28, GROUND - 18, 36, 20, 0, 0, 6.283);
+    ctx.fill();
+    ctx.fillStyle = '#334b60';
+    ctx.beginPath();
+    ctx.ellipse(x + 18, GROUND - 28, 18, 12, -0.2, 0, 6.283);
+    ctx.fill();
+    if (state.rainSnow) {
+      ctx.fillStyle = 'rgba(230,242,255,.62)';
+      ctx.beginPath();
+      ctx.ellipse(x + 24, GROUND - 34, 30, 9, 0, 0, 6.283);
+      ctx.fill();
+    }
+  }
+}
+function drawPavilionWeather() {
+  if (state.map !== 6) return;
+  const t = state.time;
+  const stormThunder = state.thunderStormT > 0;
+  const stormSnow = state.snowStormT > 0;
+  if (!state.rainSnow) {
+    const count = stormThunder ? 100 : 58;
+    ctx.strokeStyle = stormThunder ? 'rgba(176,216,248,.52)' : 'rgba(150,190,220,.34)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < count; i++) {
+      const px = ((i * 97 + t * (stormThunder ? 420 : 260)) % (W + 80)) - 40;
+      const py = ((i * 131 + t * (stormThunder ? 520 : 340)) % (H + 40)) - 20;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px - 12, py + 26);
+      ctx.stroke();
+    }
+  } else {
+    const count = stormSnow ? 82 : 42;
+    ctx.fillStyle = stormSnow ? 'rgba(236,246,255,.78)' : 'rgba(220,236,250,.55)';
+    for (let i = 0; i < count; i++) {
+      const px = ((i * 113 + Math.sin(t * 1.7 + i) * 34) % (W + 60) + W + 60) % (W + 60) - 30;
+      const py = ((i * 89 + t * (stormSnow ? 150 : 82)) % (H + 50)) - 25;
+      ctx.beginPath();
+      ctx.arc(px, py, 3 + (i % 3), 0, 6.283);
+      ctx.fill();
+    }
+  }
+
+  /* 雷电预警与落雷 */
+  for (const st of world.strikes) {
+    const sx = st.x - state.worldX;
+    if (sx < -80 || sx > W + 80) continue;
+    if (st.warnT > 0) {
+      const pulse = 1 + Math.sin(t * 18) * 0.12;
+      ctx.strokeStyle = 'rgba(255,120,120,.72)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(sx, GROUND - 12, 36 * pulse, 10 * pulse, 0, 0, 6.283);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,220,160,.5)';
+      ctx.beginPath();
+      ctx.ellipse(sx, GROUND - 12, 22 * pulse, 6 * pulse, 0, 0, 6.283);
+      ctx.stroke();
+    } else {
+      ctx.save();
+      ctx.shadowColor = 'rgba(190,226,255,.9)';
+      ctx.shadowBlur = 18;
+      ctx.strokeStyle = 'rgba(236,248,255,.96)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(sx, 0);
+      for (let k = 1; k <= 5; k++) {
+        const yy = (GROUND / 5) * k;
+        const off = Math.sin(st.seed + k * 1.7) * 18;
+        ctx.lineTo(sx + off, yy);
+      }
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(120,180,255,.7)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(sx - 8, 0);
+      ctx.lineTo(sx + 6, GROUND);
+      ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = 'rgba(220,240,255,.5)';
+      ctx.beginPath();
+      ctx.ellipse(sx, GROUND - 8, 30, 8, 0, 0, 6.283);
+      ctx.fill();
+    }
+  }
+
+  /* 冰雹 */
+  for (const h of world.hails) {
+    const hx = h.x - state.worldX;
+    if (hx < -60 || hx > W + 60) continue;
+    ctx.save();
+    ctx.translate(hx + h.w / 2, h.y + h.h / 2);
+    ctx.rotate(h.seed + t * 3);
+    ctx.fillStyle = 'rgba(214,236,255,.9)';
+    ctx.strokeStyle = 'rgba(150,196,230,.8)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, -h.h / 2);
+    ctx.lineTo(h.w / 2, 0);
+    ctx.lineTo(0, h.h / 2);
+    ctx.lineTo(-h.w / 2, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+}
 function drawSnowMound(x, o) {
   const g = ctx.createLinearGradient(0, GROUND - o.h, 0, GROUND);
   g.addColorStop(0, '#eef6ff');
@@ -12540,7 +12943,12 @@ function render() {
     ctx.translate((Math.random() - 0.5) * state.shake, (Math.random() - 0.5) * state.shake * 0.7);
   }
   drawSky();
-  if (state.map === 5) {
+  if (state.map === 6) {
+    drawPavilionBack();
+    drawPavilionGround();
+    drawPavilionLamps();
+    drawDecor();
+  } else if (state.map === 5) {
     drawSnowBack();
     drawSnowGround();
     drawSnowLamps();
@@ -12578,6 +12986,7 @@ function render() {
   drawItems();
   drawObstacles();
   drawMissileWarnings();
+  drawPavilionWeather();
   drawDashTint();
   drawPlayer();
   drawParticles();
