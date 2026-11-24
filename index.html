@@ -12382,10 +12382,10 @@ function updateSnowPowers(dt) {
 }
 function snowFreezeWave(rangeMeters) {
   const range = (rangeMeters || 300) * RULESET.pxPerMeter;
-  const playerWx = state.worldX + PLAYER_X;
+  const baseWx = state.worldX;
   const portalBound = isFinite(state.portalX) ? state.portalX - 300 : Infinity;
-  const left = playerWx - 120;
-  const right = Math.min(playerWx + range, portalBound);
+  const left = baseWx - 120;
+  const right = Math.min(baseWx + range, portalBound);
   /* 先把冻结范围内的道路、障碍与金币提前生成，保证冻结口径与左上角里程一致 */
   let preGuard = 0;
   while (genCursor < right + 200 && preGuard++ < 40) generateAhead(right + 200);
