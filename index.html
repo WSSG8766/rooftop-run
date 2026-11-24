@@ -887,7 +887,7 @@ kbd{
             <span class="char-face">
               <img src="" alt="雪女" id="snowCardImg">
             </span>
-            <span class="char-meta"><b>雪女</b><em>三段跳 + 滑翔 · 15 秒随机祝福 · E 冰封 150 米</em></span>
+            <span class="char-meta"><b>雪女</b><em>三段跳 + 滑翔 · 15 秒随机祝福 · E 冰封 300 米</em></span>
           </button>
         </div>
         <div class="start-actions">
@@ -1444,9 +1444,9 @@ const CHARS = {
     dashName: '冰封时刻',
     energyName: '冰雪能量',
     ult: '冰封时刻',
-    tipIdle: '冰雪能量攒满 300 按 E 冰封 150 米',
+    tipIdle: '冰雪能量攒满 300 按 E 冰封 300 米',
     tipFull: 'E 冰封时刻已就绪',
-    skillHTML: '<b>三段跳</b>起步，能量槽上限 <b>300</b>，满槽（可含临时能量）按 E 发动。<br><b>滑翔</b>：二段跳后长按跳跃键展开冰绡滑翔；能量未满时持续消耗冰雪能量，能量耗尽即收翼。<br><b>冰雪奇缘</b>（被动）：每 15 秒随机降下一种祝福：① 4 秒冰雪护盾；② 1 秒 2 倍速飞行，结束时清场；③ 50 点临时冰雪能量，4 秒内可与普通能量合并触发 E；④ 4 秒得分 ×2。首次获得每种祝福留下一枚印记，集齐 4 枚后自动补发一种不同祝福，随后印记清零重新集齐；雪山暴风雪不削减雪女的回能。<br><b>冰封时刻</b>：按 E 全屏结冰特效，前方 150 米内障碍凝成冰雕（撞上不掉血，但会被挡住、卡住），楼缝冰封成冰面；150 米内金币化为高分雪莲，2 倍分数、回能与普通金币一致。',
+    skillHTML: '<b>三段跳</b>起步，能量槽上限 <b>300</b>，满槽（可含临时能量）按 E 发动。<br><b>滑翔</b>：二段跳后长按跳跃键展开冰绡滑翔；能量未满时持续消耗冰雪能量，能量耗尽即收翼。<br><b>冰雪奇缘</b>（被动）：每 15 秒随机降下一种祝福：① 4 秒冰雪护盾；② 1 秒 2 倍速飞行，结束时清场；③ 50 点临时冰雪能量，4 秒内可与普通能量合并触发 E；④ 4 秒得分 ×2。首次获得每种祝福留下一枚印记，集齐 4 枚后自动补发一种不同祝福，随后印记清零重新集齐；雪山暴风雪不削减雪女的回能。<br><b>冰封时刻</b>：按 E 全屏结冰特效，前方 300 米内障碍凝成冰雕（撞上不掉血，但会被挡住、卡住），楼缝冰封成冰面；300 米内金币化为高分雪莲，2 倍分数、回能与普通金币一致。',
     jacket: '#e3edf8',
     jacketLight: '#ffffff',
     jacketDeep: '#8fa6c8',
@@ -2317,12 +2317,12 @@ function requestDash() {
     state.meter = Math.max(0, state.meter - snowNeed);
     if (state.snowTempMeter <= 0) state.snowTempT = 0;
     state.snowFxT = 1.15;
-    snowFreezeWave(150);
+    snowFreezeWave(300);
     state.shake = Math.max(state.shake, 10);
     sfx('dash');
     burst(PLAYER_X, player.feetY - 76, 30, 'rgba(198,238,255,.95)', 380, 70);
     burst(PLAYER_X, player.feetY - 110, 18, 'rgba(255,255,255,.95)', 300, 50);
-    floatText(PLAYER_X, player.feetY - 150, '冰封时刻 · 150 米障碍成冰雕 · 金币化雪莲', 'rgba(214,244,255,1)');
+    floatText(PLAYER_X, player.feetY - 150, '冰封时刻 · 300 米障碍成冰雕 · 金币化雪莲', 'rgba(214,244,255,1)');
     return;
   }
   if (spec.passive) {
@@ -12381,7 +12381,7 @@ function updateSnowPowers(dt) {
   }
 }
 function snowFreezeWave(rangeMeters) {
-  const range = (rangeMeters || 150) * RULESET.pxPerMeter;
+  const range = (rangeMeters || 300) * RULESET.pxPerMeter;
   const left = state.worldX - 120;
   const right = state.worldX + range;
   for (let i = 0; i < world.obstacles.length; i++) {
@@ -12403,7 +12403,7 @@ function snowFreezeWave(rangeMeters) {
     }
     if (!dup) world.iceGaps.push({ start: a.end, end: b.start });
   }
-  /* 150 米内金币化为高分雪莲：2 倍分数，回能与普通金币一致 */
+  /* 300 米内金币化为高分雪莲：2 倍分数，回能与普通金币一致 */
   for (let i = 0; i < world.shards.length; i++) {
     const sh = world.shards[i];
     if (sh.dead) continue;
@@ -12418,7 +12418,7 @@ function snowFreezeWave(rangeMeters) {
     const px = 40 + Math.random() * (W - 80);
     burst(px, 90 + Math.random() * 420, 3, 'rgba(206,240,255,.9)', 70, 26);
   }
-  floatText(PLAYER_X, player.feetY - 148, '风雪冰封 · 150 米障碍成冰雕 · 金币化雪莲', 'rgba(214,244,255,.98)');
+  floatText(PLAYER_X, player.feetY - 148, '风雪冰封 · 300 米障碍成冰雕 · 金币化雪莲', 'rgba(214,244,255,.98)');
 }
 function drawIceGaps() {
   const ice = world.iceGaps || [];
