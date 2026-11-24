@@ -1446,7 +1446,7 @@ const CHARS = {
     ult: '冰封时刻',
     tipIdle: '冰雪能量攒满 300 按 E 冰封 150 米',
     tipFull: 'E 冰封时刻已就绪',
-    skillHTML: '<b>三段跳</b>起步，能量槽上限 <b>300</b>，满槽（可含临时能量）按 E 发动。<br><b>滑翔</b>：二段跳后长按跳跃键展开冰绡滑翔；能量未满时持续消耗冰雪能量，能量耗尽即收翼。<br><b>冰雪奇缘</b>（被动）：每 15 秒随机降下一种祝福：① 3 秒冰雪护盾；② 1 秒 2 倍速飞行，结束时清场；③ 50 点临时冰雪能量，3 秒内可与普通能量合并触发 E；④ 4 秒得分 ×2。首次获得每种祝福留下一枚印记，集齐 4 枚后自动补发一种不同祝福，随后印记清零重新集齐；雪山暴风雪不削减雪女的回能。<br><b>冰封时刻</b>：按 E 全屏结冰特效，前方 150 米内障碍凝成冰雕（撞上不掉血，但会被挡住、卡住），楼缝冰封成冰面；150 米内金币化为高分雪莲，2 倍分数、回能与普通金币一致。',
+    skillHTML: '<b>三段跳</b>起步，能量槽上限 <b>300</b>，满槽（可含临时能量）按 E 发动。<br><b>滑翔</b>：二段跳后长按跳跃键展开冰绡滑翔；能量未满时持续消耗冰雪能量，能量耗尽即收翼。<br><b>冰雪奇缘</b>（被动）：每 15 秒随机降下一种祝福：① 4 秒冰雪护盾；② 1 秒 2 倍速飞行，结束时清场；③ 50 点临时冰雪能量，4 秒内可与普通能量合并触发 E；④ 4 秒得分 ×2。首次获得每种祝福留下一枚印记，集齐 4 枚后自动补发一种不同祝福，随后印记清零重新集齐；雪山暴风雪不削减雪女的回能。<br><b>冰封时刻</b>：按 E 全屏结冰特效，前方 150 米内障碍凝成冰雕（撞上不掉血，但会被挡住、卡住），楼缝冰封成冰面；150 米内金币化为高分雪莲，2 倍分数、回能与普通金币一致。',
     jacket: '#e3edf8',
     jacketLight: '#ffffff',
     jacketDeep: '#8fa6c8',
@@ -11897,10 +11897,10 @@ function snowGrantEffect(e, silentStamp) {
   const names = ['冰雪护盾', '冰霄飞行', '临时能量', '冰雪祝福'];
   if (e === 0) {
     state.shield = true;
-    state.shieldT = 3;
+    state.shieldT = 4;
     sfx('dash');
     burst(PLAYER_X, player.feetY - 56, 18, 'rgba(210,244,255,.9)', 260, 26);
-    floatText(PLAYER_X, player.feetY - 138, '冰雪护盾 3s', 'rgba(214,244,255,1)');
+    floatText(PLAYER_X, player.feetY - 138, '冰雪护盾 4s', 'rgba(214,244,255,1)');
   } else if (e === 1) {
     state.snowFlyT = 1;
     state.invulnT = Math.max(state.invulnT, 1);
@@ -11910,10 +11910,10 @@ function snowGrantEffect(e, silentStamp) {
     floatText(PLAYER_X, player.feetY - 138, '冰霄飞行 1s · 2 倍速', 'rgba(190,234,255,1)');
   } else if (e === 2) {
     state.snowTempMeter = 50;
-    state.snowTempT = 3;
+    state.snowTempT = 4;
     sfx('coin');
     burst(PLAYER_X, player.feetY - 58, 18, 'rgba(255,236,170,.92)', 260, 24);
-    floatText(PLAYER_X, player.feetY - 138, '临时冰雪能量 +50 · 3s', 'rgba(255,240,190,1)');
+    floatText(PLAYER_X, player.feetY - 138, '临时冰雪能量 +50 · 4s', 'rgba(255,240,190,1)');
   } else {
     state.snowBlessT = 4;
     sfx('djump');
