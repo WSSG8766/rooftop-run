@@ -1927,8 +1927,8 @@ function addFeatures(start, end, diff) {
     x += Math.max(baseSpacing, speedNeed) + Math.random() * 50;
   }
 }
-function generateAhead() {
-  const limit = state.worldX + W + 900;
+function generateAhead(untilX) {
+  const limit = untilX !== undefined ? untilX : state.worldX + W + 900;
   let guard = 0;
   while (genCursor < limit && guard++ < 12) {
     const diff = difficulty(genCursor);
@@ -12382,8 +12382,13 @@ function updateSnowPowers(dt) {
 }
 function snowFreezeWave(rangeMeters) {
   const range = (rangeMeters || 300) * RULESET.pxPerMeter;
-  const left = state.worldX - 120;
-  const right = state.worldX + range;
+  const playerWx = state.worldX + PLAYER_X;
+  const portalBound = isFinite(state.portalX) ? state.portalX - 300 : Infinity;
+  const left = playerWx - 120;
+  const right = Math.min(playerWx + range, portalBound);
+  /* 先把冻结范围内的道路、障碍与金币提前生成，保证冻结口径与左上角里程一致 */
+  let preGuard = 0;
+  while (genCursor < right + 200 && preGuard++ < 40) generateAhead(right + 200);
   for (let i = 0; i < world.obstacles.length; i++) {
     const o = world.obstacles[i];
     if (o.dead || o.type === 'missile') continue;
