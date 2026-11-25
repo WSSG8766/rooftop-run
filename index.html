@@ -1760,6 +1760,7 @@ const state = {
   crystalCd: 0,
   bones: 0,
   boneFlyT: 0,
+  boneEmberClock: 0,
   reviveCount: 0,
   growT: 0,
   itemFlyT: 0,
@@ -2749,6 +2750,7 @@ function resetRun() {
   state.shardPts = 0;
   state.bones = 0;
   state.boneFlyT = 0;
+  state.boneEmberClock = 0;
   state.reviveCount = 0;
   state.growT = 0;
   state.itemFlyT = 0;
@@ -3485,6 +3487,10 @@ function startBoneFlight() {
   for (let i = 0; i < 20; i++) {
     burst(PLAYER_X + rand(-64, 64), player.feetY - rand(16, 108), 4, 'rgba(248,252,248,.9)', 230, 28);
   }
+  for (let i = 0; i < 14; i++) {
+    burst(PLAYER_X - rand(12, 78), player.feetY - rand(20, 104), 3, 'rgba(142,28,30,.82)', 190, 22);
+  }
+  state.boneEmberClock = 0;
 }
 function boneReviveArmed() {
   if (state.astralT > 0) return false;
@@ -4115,6 +4121,26 @@ function updateRun(dt) {
   state.angelEdge = lerp(state.angelEdge || 0, (state.char === 'angel' && state.wings >= 9) ? 1 : 0, Math.min(1, dt * 5));
   const flyWas = state.boneFlyT;
   state.boneFlyT = Math.max(0, (state.boneFlyT || 0) - dt);
+  if (state.char === 'bone' && state.boneFlyT > 0) {
+    state.boneEmberClock = Math.max(0, (state.boneEmberClock || 0) - dt);
+    if (state.boneEmberClock <= 0) {
+      state.boneEmberClock = 0.07;
+      for (let i = 0; i < 2; i++) {
+        if (world.particles.length > 240) break;
+        world.particles.push({
+          x: PLAYER_X - rand(24, 82),
+          y: player.feetY - rand(18, 92),
+          vx: -rand(92, 178),
+          vy: -rand(12, 58),
+          life: 0,
+          max: 0.34 + Math.random() * 0.32,
+          size: 1.8 + Math.random() * 2.6,
+          color: 'rgba(154,32,34,.72)',
+          grav: 0.12
+        });
+      }
+    }
+  }
   if (flyWas > 0 && state.boneFlyT <= 0) {
     const wxNow = state.worldX + PLAYER_X;
     if (!groundAt(wxNow)) climbBackToRoof();
@@ -11179,6 +11205,15 @@ function drawExplorerDog(sx, sy) {
 function drawBoneWings(sx, sy) {
   const t = state.time;
   const flap = Math.sin(t * 8) * 0.16;
+  const redPulse = 0.84 + Math.sin(t * 7) * 0.16;
+  const redAura = ctx.createRadialGradient(sx, sy - 66, 12, sx, sy - 66, 132);
+  redAura.addColorStop(0, 'rgba(116,22,26,' + (0.32 * redPulse).toFixed(3) + ')');
+  redAura.addColorStop(0.62, 'rgba(96,18,22,' + (0.13 * redPulse).toFixed(3) + ')');
+  redAura.addColorStop(1, 'rgba(96,18,22,0)');
+  ctx.fillStyle = redAura;
+  ctx.beginPath();
+  ctx.arc(sx, sy - 66, 132, 0, 6.283);
+  ctx.fill();
   const aura = ctx.createRadialGradient(sx, sy - 66, 10, sx, sy - 66, 120);
   aura.addColorStop(0, 'rgba(248,255,252,.26)');
   aura.addColorStop(0.6, 'rgba(226,255,246,.10)');
@@ -11186,6 +11221,13 @@ function drawBoneWings(sx, sy) {
   ctx.fillStyle = aura;
   ctx.beginPath();
   ctx.arc(sx, sy - 66, 120, 0, 6.283);
+  ctx.fill();
+  const underGlow = ctx.createRadialGradient(sx - 18, sy - 44, 6, sx - 18, sy - 44, 86);
+  underGlow.addColorStop(0, 'rgba(128,24,28,' + (0.18 * redPulse).toFixed(3) + ')');
+  underGlow.addColorStop(1, 'rgba(128,24,28,0)');
+  ctx.fillStyle = underGlow;
+  ctx.beginPath();
+  ctx.ellipse(sx - 18, sy - 44, 86, 54, -0.12, 0, 6.283);
   ctx.fill();
   ctx.save();
   ctx.translate(sx - 8, sy - 66);
@@ -11214,16 +11256,36 @@ function drawBoneWings(sx, sy) {
     }
   }
   ctx.restore();
-  /* 身后拖尾 */
-  ctx.strokeStyle = 'rgba(240,255,250,.35)';
-  ctx.lineWidth = 2;
+  /* 身后暗红拖尾 */
   ctx.lineCap = 'round';
+  for (let i = 0; i < 4; i++) {
+    const yy = sy - 90 + i * 24;
+    const alpha = 0.38 - i * 0.06;
+    ctx.strokeStyle = 'rgba(150,32,34,' + alpha.toFixed(3) + ')';
+    ctx.lineWidth = 3.6 - i * 0.45;
+    ctx.beginPath();
+    ctx.moveTo(sx - 38, yy);
+    ctx.lineTo(sx - 128 - i * 30, yy + 7);
+    ctx.stroke();
+  }
+  /* 骨白残光压在暗红尾迹之上 */
+  ctx.strokeStyle = 'rgba(240,255,250,.30)';
+  ctx.lineWidth = 1.6;
   for (let i = 0; i < 3; i++) {
     const yy = sy - 84 + i * 26;
     ctx.beginPath();
     ctx.moveTo(sx - 40, yy);
-    ctx.lineTo(sx - 120 - i * 30, yy + 6);
+    ctx.lineTo(sx - 116 - i * 28, yy + 6);
     ctx.stroke();
+  }
+  /* 暗红余烬光点 */
+  for (let i = 0; i < 5; i++) {
+    const ex = sx - 54 - i * 24 - Math.sin(t * 6 + i) * 8;
+    const ey = sy - 76 + i * 18 + Math.sin(t * 5 + i * 1.7) * 7;
+    ctx.fillStyle = 'rgba(178,42,42,' + (0.55 - i * 0.07).toFixed(3) + ')';
+    ctx.beginPath();
+    ctx.arc(ex, ey, 2.8 - i * 0.25, 0, 6.283);
+    ctx.fill();
   }
 }
 
