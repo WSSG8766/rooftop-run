@@ -11206,49 +11206,49 @@ function drawBoneWings(sx, sy) {
   const t = state.time;
   const flap = Math.sin(t * 8) * 0.16;
   const redPulse = 0.84 + Math.sin(t * 7) * 0.16;
-  const redAura = ctx.createRadialGradient(sx, sy - 66, 12, sx, sy - 66, 132);
+  const redAura = ctx.createRadialGradient(sx, sy - 70, 12, sx, sy - 70, 150);
   redAura.addColorStop(0, 'rgba(116,22,26,' + (0.32 * redPulse).toFixed(3) + ')');
   redAura.addColorStop(0.62, 'rgba(96,18,22,' + (0.13 * redPulse).toFixed(3) + ')');
   redAura.addColorStop(1, 'rgba(96,18,22,0)');
   ctx.fillStyle = redAura;
   ctx.beginPath();
-  ctx.arc(sx, sy - 66, 132, 0, 6.283);
+  ctx.arc(sx, sy - 70, 150, 0, 6.283);
   ctx.fill();
-  const aura = ctx.createRadialGradient(sx, sy - 66, 10, sx, sy - 66, 120);
+  const aura = ctx.createRadialGradient(sx, sy - 70, 10, sx, sy - 70, 142);
   aura.addColorStop(0, 'rgba(248,255,252,.26)');
   aura.addColorStop(0.6, 'rgba(226,255,246,.10)');
   aura.addColorStop(1, 'rgba(226,255,246,0)');
   ctx.fillStyle = aura;
   ctx.beginPath();
-  ctx.arc(sx, sy - 66, 120, 0, 6.283);
+  ctx.arc(sx, sy - 70, 142, 0, 6.283);
   ctx.fill();
-  const underGlow = ctx.createRadialGradient(sx - 18, sy - 44, 6, sx - 18, sy - 44, 86);
+  const underGlow = ctx.createRadialGradient(sx - 18, sy - 46, 6, sx - 18, sy - 46, 104);
   underGlow.addColorStop(0, 'rgba(128,24,28,' + (0.18 * redPulse).toFixed(3) + ')');
   underGlow.addColorStop(1, 'rgba(128,24,28,0)');
   ctx.fillStyle = underGlow;
   ctx.beginPath();
-  ctx.ellipse(sx - 18, sy - 44, 86, 54, -0.12, 0, 6.283);
+  ctx.ellipse(sx - 18, sy - 46, 104, 64, -0.12, 0, 6.283);
   ctx.fill();
   ctx.save();
-  ctx.translate(sx - 8, sy - 66);
+  ctx.translate(sx - 10, sy - 70);
   for (let side = -1; side <= 1; side += 1) {
     if (side === 0) continue;
     for (let i = 0; i < 5; i++) {
-      const len = 58 + i * 13;
+      const len = 74 + i * 16;
       const ang = side * (2.52 + i * 0.14 + flap * (1 - i * 0.15));
       const tipX = Math.cos(ang) * len;
       const tipY = Math.sin(ang) * len + 6;
       const midX = Math.cos(ang - side * 0.22) * len * 0.58;
       const midY = Math.sin(ang - side * 0.22) * len * 0.58;
       ctx.strokeStyle = 'rgba(248,252,248,' + (0.62 - i * 0.09).toFixed(2) + ')';
-      ctx.lineWidth = 4.2 - i * 0.5;
+      ctx.lineWidth = 5.1 - i * 0.55;
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.quadraticCurveTo(midX, midY, tipX, tipY);
       ctx.stroke();
       ctx.strokeStyle = 'rgba(217,255,246,' + (0.32 - i * 0.05).toFixed(2) + ')';
-      ctx.lineWidth = 1.4;
+      ctx.lineWidth = 1.7;
       ctx.beginPath();
       ctx.moveTo(midX, midY + 4);
       ctx.quadraticCurveTo(tipX * 0.8, tipY * 0.8 + 10, tipX, tipY);
@@ -11265,7 +11265,7 @@ function drawBoneWings(sx, sy) {
     ctx.lineWidth = 3.6 - i * 0.45;
     ctx.beginPath();
     ctx.moveTo(sx - 38, yy);
-    ctx.lineTo(sx - 128 - i * 30, yy + 7);
+    ctx.lineTo(sx - 148 - i * 32, yy + 7);
     ctx.stroke();
   }
   /* 骨白残光压在暗红尾迹之上 */
@@ -11739,24 +11739,6 @@ function drawDashTint() {
   ctx.fillStyle = 'rgba(95,227,200,.055)';
   ctx.fillRect(0, 0, W, H);
 }
-/* 白骨羽化：全屏暗红压幕，角色中心留亮 */
-function drawBoneDarkRedVeil() {
-  if (state.mode !== 'run' || state.char !== 'bone' || state.boneFlyT <= 0) return;
-  const pulse = 0.9 + Math.sin(state.time * 5.5) * 0.1;
-  const g = ctx.createLinearGradient(0, 0, W, H);
-  g.addColorStop(0, 'rgba(82,12,18,' + (0.22 * pulse).toFixed(3) + ')');
-  g.addColorStop(0.5, 'rgba(58,8,12,' + (0.28 * pulse).toFixed(3) + ')');
-  g.addColorStop(1, 'rgba(44,5,9,' + (0.32 * pulse).toFixed(3) + ')');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
-  const v = ctx.createRadialGradient(PLAYER_X, GROUND - 160, 90, PLAYER_X, GROUND - 160, 720);
-  v.addColorStop(0, 'rgba(0,0,0,0)');
-  v.addColorStop(0.55, 'rgba(70,10,14,.10)');
-  v.addColorStop(1, 'rgba(36,4,8,' + (0.34 * pulse).toFixed(3) + ')');
-  ctx.fillStyle = v;
-  ctx.fillRect(0, 0, W, H);
-}
-
 /* ===== 主渲染 ===== */
 /* 恶魔幽灵冲锋：全身紫气包围 */
 function drawDemonChargeAura(sx, sy) {
@@ -13089,7 +13071,6 @@ function render() {
   drawMissileWarnings();
   drawPavilionWeather();
   drawDashTint();
-  drawBoneDarkRedVeil();
   drawPlayer();
   drawParticles();
   drawFloats();
