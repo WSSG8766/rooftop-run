@@ -4131,7 +4131,11 @@ function updateRun(dt) {
   state.itemFlyT = Math.max(0, itemFlyWas - dt);
   if (itemFlyWas > 0 && state.itemFlyT <= 0) {
     if (!groundAt(state.worldX + PLAYER_X)) climbBackToRoof();
-    floatText(PLAYER_X, player.feetY - 142, '飞行结束 · 落地', 'rgba(217,255,246,.85)');
+    clearObstacles();
+    state.shake = Math.max(state.shake, 7);
+    burst(PLAYER_X + 40, player.feetY - 40, 20, 'rgba(198,255,246,.95)', 300, 30);
+    burst(PLAYER_X + 40, player.feetY - 96, 12, 'rgba(217,255,246,.9)', 240, 36);
+    floatText(PLAYER_X, player.feetY - 142, '飞行结束 · 落地清场', 'rgba(217,255,246,1)');
   }
   /* 羽扇：起风后 1.5 秒内持续清场 */
   if (state.treasure === 'fan' && state.windT > 0 && state.mode === 'run') clearObstacles();
