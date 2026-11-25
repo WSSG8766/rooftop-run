@@ -11739,6 +11739,23 @@ function drawDashTint() {
   ctx.fillStyle = 'rgba(95,227,200,.055)';
   ctx.fillRect(0, 0, W, H);
 }
+/* 白骨羽化：全屏暗红压幕，角色中心留亮 */
+function drawBoneDarkRedVeil() {
+  if (state.mode !== 'run' || state.char !== 'bone' || state.boneFlyT <= 0) return;
+  const pulse = 0.9 + Math.sin(state.time * 5.5) * 0.1;
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, 'rgba(82,12,18,' + (0.22 * pulse).toFixed(3) + ')');
+  g.addColorStop(0.5, 'rgba(58,8,12,' + (0.28 * pulse).toFixed(3) + ')');
+  g.addColorStop(1, 'rgba(44,5,9,' + (0.32 * pulse).toFixed(3) + ')');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  const v = ctx.createRadialGradient(PLAYER_X, GROUND - 160, 90, PLAYER_X, GROUND - 160, 720);
+  v.addColorStop(0, 'rgba(0,0,0,0)');
+  v.addColorStop(0.55, 'rgba(70,10,14,.10)');
+  v.addColorStop(1, 'rgba(36,4,8,' + (0.34 * pulse).toFixed(3) + ')');
+  ctx.fillStyle = v;
+  ctx.fillRect(0, 0, W, H);
+}
 
 /* ===== 主渲染 ===== */
 /* 恶魔幽灵冲锋：全身紫气包围 */
@@ -13072,6 +13089,7 @@ function render() {
   drawMissileWarnings();
   drawPavilionWeather();
   drawDashTint();
+  drawBoneDarkRedVeil();
   drawPlayer();
   drawParticles();
   drawFloats();
