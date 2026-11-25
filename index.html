@@ -887,7 +887,7 @@ kbd{
             <span class="char-face">
               <img src="" alt="雪女" id="snowCardImg">
             </span>
-            <span class="char-meta"><b>雪女</b><em>三段跳 + 滑翔 · 15 秒随机祝福 · E 冰封 150 米</em></span>
+            <span class="char-meta"><b>雪女</b><em>三段跳 + 滑翔 · 15 秒随机祝福 · E 冰封 120 米</em></span>
           </button>
         </div>
         <div class="start-actions">
@@ -1297,7 +1297,7 @@ const CHARS = {
     ult: '白骨化',
     tipIdle: '骨能攒满 200 按 E 骨化障碍',
     tipFull: 'E 白骨化已就绪',
-    skillHTML: '<b>白骨化</b>：骨能满 200 按 E，耗尽全部骨能，把前方障碍全部点化成白骨，白骨可当金币拾取，分数翻倍。<br><b>九骨羽化</b>：拾满 9 枚白骨，羽化飞行 1 秒、双倍速前进，期间无视障碍与楼缝，落地瞬间清除前方全部障碍。<br><b>白骨不死</b>：死亡时依次按 100% / 75% / 50% / 25% 的概率复活，第五次死亡不再复活。',
+    skillHTML: '<b>白骨化</b>：骨能满 200 按 E，耗尽全部骨能，把前方障碍全部点化成白骨，白骨可当金币拾取，每枚固定 1200 分，不受连击、祝福等倍率影响。<br><b>九骨羽化</b>：拾满 9 枚白骨，羽化飞行 2 秒、双倍速前进，期间无视障碍与楼缝，落地瞬间清除前方全部障碍。<br><b>白骨不死</b>：死亡时依次按 100% / 75% / 50% / 25% 的概率复活，第五次死亡不再复活。',
     jacket: '#f4f1e5',
     jacketLight: '#ffffff',
     jacketDeep: '#c3bdac',
@@ -1444,9 +1444,9 @@ const CHARS = {
     dashName: '冰封时刻',
     energyName: '冰雪能量',
     ult: '冰封时刻',
-    tipIdle: '冰雪能量攒满 300 按 E 冰封 150 米',
+    tipIdle: '冰雪能量攒满 300 按 E 冰封 120 米',
     tipFull: 'E 冰封时刻已就绪',
-    skillHTML: '<b>三段跳</b>起步，能量槽上限 <b>300</b>，满槽（可含临时能量）按 E 发动。<br><b>滑翔</b>：二段跳后长按跳跃键展开冰绡滑翔；能量未满时持续消耗冰雪能量，能量耗尽即收翼。<br><b>冰雪奇缘</b>（被动）：每 15 秒随机降下一种祝福：① 4 秒冰雪护盾；② 1 秒 2 倍速飞行，结束时清场；③ 50 点临时冰雪能量，4 秒内可与普通能量合并触发 E；④ 4 秒得分 ×2。首次获得每种祝福留下一枚印记，集齐 4 枚后自动补发一种不同祝福，随后印记清零重新集齐；雪山暴风雪不削减雪女的回能。<br><b>冰封时刻</b>：按 E 全屏结冰特效，前方 150 米内障碍凝成冰雕（撞上不掉血，但会被挡住、卡住），楼缝冰封成冰面；150 米内金币化为高分雪莲，2 倍分数、回能与普通金币一致。',
+    skillHTML: '<b>三段跳</b>起步，能量槽上限 <b>300</b>，满槽（可含临时能量）按 E 发动。<br><b>滑翔</b>：二段跳后长按跳跃键展开冰绡滑翔；能量未满时持续消耗冰雪能量，能量耗尽即收翼。<br><b>冰雪奇缘</b>（被动）：每 15 秒随机降下一种祝福：① 4 秒冰雪护盾；② 1 秒 2 倍速飞行，结束时清场；③ 50 点临时冰雪能量，4 秒内可与普通能量合并触发 E；④ 4 秒得分 ×2。首次获得每种祝福留下一枚印记，集齐 4 枚后自动补发一种强化版不同祝福：强化护盾 8 秒、强化飞行 2.5 秒 2 倍速、强化临时能量 +100 持续 4 秒、强化得分 ×4 持续 4 秒，随后印记清零重新集齐；雪山暴风雪不削减雪女的回能。<br><b>冰封时刻</b>：按 E 全屏结冰特效，前方 120 米内障碍凝成冰雕（撞上不掉血，但会被挡住、卡住），楼缝冰封成冰面；120 米内金币化为高分雪莲，2 倍分数、回能与普通金币一致。',
     jacket: '#e3edf8',
     jacketLight: '#ffffff',
     jacketDeep: '#8fa6c8',
@@ -1779,6 +1779,7 @@ const state = {
   snowTempMeter: 0,
   snowTempT: 0,
   snowBlessT: 0,
+  snowBlessPow: 2,
   snowStamps: [false, false, false, false],
   snowLastStamp: -1,
   /* 恶魔：幽灵马、幽灵马力槽、冲锋与 15 秒复生窗口 */
@@ -2122,7 +2123,7 @@ function passiveCd(base) {
   return state.treasure === 'ice' ? Math.max(1, base - 2) : base;
 }
 function snowScoreMult() {
-  return state.char === 'snow' && (state.snowBlessT || 0) > 0 ? 2 : 1;
+  return state.char === 'snow' && (state.snowBlessT || 0) > 0 ? (state.snowBlessPow || 2) : 1;
 }
 function pavilionMeters() { return state.worldX / RULESET.pxPerMeter; }
 function shardSnowFlag(s) {
@@ -2317,12 +2318,12 @@ function requestDash() {
     state.meter = Math.max(0, state.meter - snowNeed);
     if (state.snowTempMeter <= 0) state.snowTempT = 0;
     state.snowFxT = 1.15;
-    snowFreezeWave(150);
+    snowFreezeWave(120);
     state.shake = Math.max(state.shake, 10);
     sfx('dash');
     burst(PLAYER_X, player.feetY - 76, 30, 'rgba(198,238,255,.95)', 380, 70);
     burst(PLAYER_X, player.feetY - 110, 18, 'rgba(255,255,255,.95)', 300, 50);
-    floatText(PLAYER_X, player.feetY - 150, '冰封时刻 · 150 米障碍成冰雕 · 金币化雪莲', 'rgba(214,244,255,1)');
+    floatText(PLAYER_X, player.feetY - 150, '冰封时刻 · 120 米障碍成冰雕 · 金币化雪莲', 'rgba(214,244,255,1)');
     return;
   }
   if (spec.passive) {
@@ -2816,6 +2817,7 @@ function resetRun() {
   state.snowTempMeter = 0;
   state.snowTempT = 0;
   state.snowBlessT = 0;
+  state.snowBlessPow = 2;
   state.snowStamps = [false, false, false, false];
   state.snowLastStamp = -1;
   state.slowTravel = 0;
@@ -3077,7 +3079,7 @@ function syncHud() {
     : beadFlyOn ? '念珠御风 ' + state.beadFlyT.toFixed(1) + 's'
     : snowFlyOn ? '冰霄飞行 ' + state.snowFlyT.toFixed(1) + 's'
     : snowTempOn ? '临时能量 ' + Math.round(state.snowTempMeter) + ' · ' + state.snowTempT.toFixed(1) + 's'
-    : snowBlessOn ? '祝福 得分×2 ' + state.snowBlessT.toFixed(1) + 's'
+    : snowBlessOn ? '祝福 得分×' + (state.snowBlessPow || 2) + ' ' + state.snowBlessT.toFixed(1) + 's'
     : snowFreezeOn ? '冰封时刻 ' + state.snowFreezeT.toFixed(1) + 's'
     : demonReviveOn ? '复生窗口 ' + state.demonReviveT.toFixed(1) + 's'
     : demonChargeOn ? '幽灵冲锋 ' + state.demonChargeT.toFixed(1) + 's'
@@ -3432,7 +3434,7 @@ function doAmuletSkill() {
 
 /* ===== 白骨：点化障碍 / 九骨羽化 / 白骨不死 ===== */
 const BONE_SKILL_RANGE = 760;
-const BONE_FLY_DUR = 1;
+const BONE_FLY_DUR = 2;
 const BONE_REVIVE_P = [1, 0.75, 0.5, 0.25];
 function boneObstaclesAhead() {
   let n = 0;
@@ -3479,7 +3481,7 @@ function startBoneFlight() {
   state.shake = Math.max(state.shake, 10);
   sfx('dash');
   floatText(PLAYER_X, player.feetY - 152, '白骨九枚 · 羽化', 'rgba(248,252,246,1)');
-  floatText(PLAYER_X, player.feetY - 118, '1 秒 · 双倍速飞行', 'rgba(217,255,246,.92)');
+  floatText(PLAYER_X, player.feetY - 118, '2 秒 · 双倍速飞行', 'rgba(217,255,246,.92)');
   for (let i = 0; i < 20; i++) {
     burst(PLAYER_X + rand(-64, 64), player.feetY - rand(16, 108), 4, 'rgba(248,252,248,.9)', 230, 28);
   }
@@ -3939,10 +3941,15 @@ function collect() {
       const isKey = !!s.key && !isBone;
       const isSnow = shardSnowFlag(s);
       const isLotus = !!s.lotus;
-      const pts = Math.round(RULESET.shardScore * state.combo * (isBone ? 2 : 1) * (isPurple ? 1.5 : 1) * (isKey ? 1.3 : 1) * (isSnow ? 1.5 : 1) * (isLotus ? 2 : 1) * snowScoreMult());
+      let pts;
+      if (isBone) {
+        pts = 1200;
+      } else {
+        pts = Math.round(RULESET.shardScore * state.combo * (isPurple ? 1.5 : 1) * (isKey ? 1.3 : 1) * (isSnow ? 1.5 : 1) * (isLotus ? 2 : 1) * snowScoreMult());
+      }
       state.shardPts += pts;
-      /* 幽灵马在场：本帧收益额外 +20%，计入独立加成字段 */
-      if (state.ghostHorse) state.ghostBonus = (state.ghostBonus || 0) + pts * 0.2;
+      /* 幽灵马在场：本帧收益额外 +20%，计入独立加成字段；白骨固定分不吃额外加成 */
+      if (state.ghostHorse && !isBone) state.ghostBonus = (state.ghostBonus || 0) + pts * 0.2;
       state.combo = Math.min(RULESET.comboMax, state.combo + 1);
       state.maxCombo = Math.max(state.maxCombo, state.combo);
       state.comboT = RULESET.comboWindow;
@@ -12300,32 +12307,38 @@ function drawBlizzard() {
 }
 
 /* ===== 雪女：风雪冰封 / 冰封时刻 / 冰面与冰雕绘制 ===== */
-function snowGrantEffect(e, silentStamp) {
+function snowGrantEffect(e, silentStamp, enhanced) {
   const names = ['冰雪护盾', '冰霄飞行', '临时能量', '冰雪祝福'];
+  const strong = !!enhanced;
   if (e === 0) {
+    const dur = strong ? 8 : 4;
     state.shield = true;
-    state.shieldT = 4;
+    state.shieldT = dur;
     sfx('dash');
     burst(PLAYER_X, player.feetY - 56, 18, 'rgba(210,244,255,.9)', 260, 26);
-    floatText(PLAYER_X, player.feetY - 138, '冰雪护盾 4s', 'rgba(214,244,255,1)');
+    floatText(PLAYER_X, player.feetY - 138, '冰雪护盾 ' + dur + 's', 'rgba(214,244,255,1)');
   } else if (e === 1) {
-    state.snowFlyT = 1;
-    state.invulnT = Math.max(state.invulnT, 1);
+    const dur = strong ? 2.5 : 1;
+    state.snowFlyT = dur;
+    state.invulnT = Math.max(state.invulnT, dur);
     sfx('dash');
     burst(PLAYER_X, player.feetY - 70, 22, 'rgba(150,220,255,.95)', 300, 30);
     burst(PLAYER_X, player.feetY - 112, 12, 'rgba(226,246,255,.9)', 220, 26);
-    floatText(PLAYER_X, player.feetY - 138, '冰霄飞行 1s · 2 倍速', 'rgba(190,234,255,1)');
+    floatText(PLAYER_X, player.feetY - 138, '冰霄飞行 ' + dur + 's · 2 倍速', 'rgba(190,234,255,1)');
   } else if (e === 2) {
-    state.snowTempMeter = 50;
+    const amt = strong ? 100 : 50;
+    state.snowTempMeter = amt;
     state.snowTempT = 4;
     sfx('coin');
     burst(PLAYER_X, player.feetY - 58, 18, 'rgba(255,236,170,.92)', 260, 24);
-    floatText(PLAYER_X, player.feetY - 138, '临时冰雪能量 +50 · 4s', 'rgba(255,240,190,1)');
+    floatText(PLAYER_X, player.feetY - 138, '临时冰雪能量 +' + amt + ' · 4s', 'rgba(255,240,190,1)');
   } else {
+    const pow = strong ? 4 : 2;
     state.snowBlessT = 4;
+    state.snowBlessPow = pow;
     sfx('djump');
     burst(PLAYER_X, player.feetY - 64, 20, 'rgba(255,214,236,.92)', 280, 26);
-    floatText(PLAYER_X, player.feetY - 138, '冰雪祝福 4s · 得分 ×2', 'rgba(255,224,240,1)');
+    floatText(PLAYER_X, player.feetY - 138, '冰雪祝福 4s · 得分 ×' + pow, 'rgba(255,224,240,1)');
   }
   if (!silentStamp && !state.snowStamps[e]) {
     state.snowStamps[e] = true;
@@ -12336,8 +12349,8 @@ function snowGrantEffect(e, silentStamp) {
       const e2 = pool[Math.floor(Math.random() * pool.length)];
       state.snowStamps = [false, false, false, false];
       state.snowLastStamp = -1;
-      floatText(PLAYER_X, player.feetY - 170, '四印集齐 · 自动降下 ' + names[e2], 'rgba(255,244,196,1)');
-      snowGrantEffect(e2, true);
+      floatText(PLAYER_X, player.feetY - 170, '四印集齐 · 强化版 ' + names[e2], 'rgba(255,244,196,1)');
+      snowGrantEffect(e2, true, true);
     } else {
       floatText(PLAYER_X, player.feetY - 166, '印记 ' + n + '/4 · ' + names[e], 'rgba(214,244,255,.9)');
     }
@@ -12385,7 +12398,7 @@ function updateSnowPowers(dt) {
   }
 }
 function snowFreezeWave(rangeMeters) {
-  const range = (rangeMeters || 150) * RULESET.pxPerMeter;
+  const range = (rangeMeters || 120) * RULESET.pxPerMeter;
   const baseWx = state.worldX;
   const portalBound = isFinite(state.portalX) ? state.portalX - 300 : Infinity;
   const left = baseWx - 120;
@@ -12412,7 +12425,7 @@ function snowFreezeWave(rangeMeters) {
     }
     if (!dup) world.iceGaps.push({ start: a.end, end: b.start });
   }
-  /* 150 米内金币化为高分雪莲：2 倍分数，回能与普通金币一致 */
+  /* 120 米内金币化为高分雪莲：2 倍分数，回能与普通金币一致 */
   for (let i = 0; i < world.shards.length; i++) {
     const sh = world.shards[i];
     if (sh.dead) continue;
@@ -12427,7 +12440,7 @@ function snowFreezeWave(rangeMeters) {
     const px = 40 + Math.random() * (W - 80);
     burst(px, 90 + Math.random() * 420, 3, 'rgba(206,240,255,.9)', 70, 26);
   }
-  floatText(PLAYER_X, player.feetY - 148, '风雪冰封 · 150 米障碍成冰雕 · 金币化雪莲', 'rgba(214,244,255,.98)');
+  floatText(PLAYER_X, player.feetY - 148, '风雪冰封 · 120 米障碍成冰雕 · 金币化雪莲', 'rgba(214,244,255,.98)');
 }
 function drawIceGaps() {
   const ice = world.iceGaps || [];
